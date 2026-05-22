@@ -54,6 +54,26 @@ final class PDFAssemblerTests: XCTestCase {
         XCTAssertEqual(reloaded.documentAttributes?[PDFDocumentAttribute.creationDateAttribute] as? Date, date)
     }
 
+    func test_assemble_respectsUIImageOrientation() throws {
+        // Build a 100×200 raw image, then wrap it with .right orientation —
+        // displays as 200×100. PDFAssembler must normalize so the page reflects
+        // the displayed size, not the raw sensor-orientation pixels.
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 200))
+        let raw = renderer.image { _ in
+            UIColor.white.setFill()
+            UIRectFill(CGRect(x: 0, y: 0, width: 100, height: 200))
+        }
+        let rotated = UIImage(cgImage: raw.cgImage!, scale: raw.scale, orientation: .right)
+
+        let pdf = try PDFAssembler().assemble(
+            pages: [ScannedPage(image: rotated, recognizedStrings: [])],
+            createdAt: Date()
+        )
+        let bounds = try XCTUnwrap(pdf.page(at: 0)).bounds(for: .mediaBox)
+        XCTAssertEqual(bounds.width, 200, accuracy: 0.5)
+        XCTAssertEqual(bounds.height, 100, accuracy: 0.5)
+    }
+
     // MARK: - Helpers
 
     private func whitePageImage() -> UIImage {

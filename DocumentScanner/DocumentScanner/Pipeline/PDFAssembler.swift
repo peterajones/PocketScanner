@@ -72,7 +72,12 @@ struct PDFAssembler {
     }
 
     private func renderPage(_ page: ScannedPage, into context: CGContext) throws {
-        guard let cgImage = page.image.cgImage else {
+        // VisionKit returns UIImages with a non-`.up` orientation flag (the camera
+        // sensor is landscape; portrait photos carry a "rotate 90°" hint). Pulling
+        // `.cgImage` returns the raw sensor-orientation pixels, losing that flag —
+        // which lands the page rotated in the PDF. Normalize first so the bytes
+        // we draw match what the user saw in the scanner.
+        guard let cgImage = normalizedCGImage(from: page.image) else {
             throw PDFAssemblerError.pageCreationFailed
         }
 
@@ -105,6 +110,21 @@ struct PDFAssembler {
         }
 
         context.endPage()
+    }
+
+    /// Returns a CGImage whose pixel data matches what the UIImage displays —
+    /// i.e. with the imageOrientation baked in — and whose pixel dimensions
+    /// equal the UIImage's point size. Forcing scale=1 here is what keeps the
+    /// resulting PDF page sized in document points rather than screen pixels;
+    /// `renderPage` derives the page mediaBox from these dimensions.
+    private func normalizedCGImage(from image: UIImage) -> CGImage? {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+        return renderer.image { _ in
+            image.draw(at: .zero)
+        }.cgImage
     }
 
     private func drawInvisibleText(_ lines: [String], in pageRect: CGRect, into context: CGContext) {
