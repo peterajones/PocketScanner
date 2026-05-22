@@ -1,4 +1,4 @@
-import Vision
+@preconcurrency import Vision
 import UIKit
 
 protocol OCRProviding: Sendable {

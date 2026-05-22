@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 final class MetadataQueryLibraryStore: NSObject, LibraryStoring {
     private(set) var summaries: [DocumentSummary] = []
