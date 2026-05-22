@@ -26,9 +26,16 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                         description: Text("Tap + to scan a document.")
                     )
                 } else {
-                    List(filtered) { DocumentRow(summary: $0) }
-                        .searchable(text: $searchText, prompt: "Search documents")
-                        .refreshable { store.refresh() }
+                    List(filtered) { summary in
+                        NavigationLink(value: summary) {
+                            DocumentRow(summary: summary)
+                        }
+                    }
+                    .searchable(text: $searchText, prompt: "Search documents")
+                    .refreshable { store.refresh() }
+                    .navigationDestination(for: DocumentSummary.self) { summary in
+                        DocumentViewerView(summary: summary)
+                    }
                 }
             }
             .navigationTitle("Documents")
