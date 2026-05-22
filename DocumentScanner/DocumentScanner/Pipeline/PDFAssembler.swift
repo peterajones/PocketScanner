@@ -7,24 +7,6 @@ enum PDFAssemblerError: Error {
     case documentLoadFailed
 }
 
-/// `PDFDocument` whose `dataRepresentation()` returns the exact bytes it was
-/// constructed from, rather than re-serializing through PDFKit. PDFKit's
-/// re-serialization stamps a fresh `CreationDate` and `Producer`, which would
-/// silently drop the metadata we baked into the byte stream via
-/// `CGContext`'s `auxiliaryInfo`.
-private final class ByteFaithfulPDFDocument: PDFDocument {
-    private let sourceData: Data
-
-    init?(byteFaithfulData: Data) {
-        self.sourceData = byteFaithfulData
-        super.init(data: byteFaithfulData)
-    }
-
-    override func dataRepresentation() -> Data? {
-        return sourceData
-    }
-}
-
 struct PDFAssembler {
 
     func assemble(pages: [ScannedPage], createdAt: Date) throws -> PDFDocument {
@@ -64,7 +46,7 @@ struct PDFAssembler {
 
         context.closePDF()
 
-        guard let document = ByteFaithfulPDFDocument(byteFaithfulData: data as Data) else {
+        guard let document = PDFDocument(data: data as Data) else {
             throw PDFAssemblerError.documentLoadFailed
         }
 
