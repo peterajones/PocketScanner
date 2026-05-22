@@ -37,7 +37,7 @@ A single SwiftUI `App` target. Root scene = library, gated by an optional `LockG
 
 ### Modules
 
-```
+```text
 App/         @main, root scene, LockGate
 Library/     LibraryView, LibraryStore (NSMetadataQuery wrapper), DocumentSummary
 Capture/     VisionKit wrapper, NameDocumentSheet
@@ -62,7 +62,7 @@ Each module has one purpose and depends on a narrow surface from its neighbors. 
 
 Each scan is a single self-contained PDF file in the app's iCloud Documents container:
 
-```
+```text
 <iCloud ubiquity container>/Documents/
   Lease Agreement.pdf
   Costco Receipt.pdf
