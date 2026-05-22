@@ -88,13 +88,10 @@ struct PDFAssembler {
 
         context.beginPage(mediaBox: &pageRect)
 
-        // CGContext PDF origin is bottom-left, so flip before drawing the image so it
-        // appears right-side up.
-        context.saveGState()
-        context.translateBy(x: 0, y: size.height)
-        context.scaleBy(x: 1, y: -1)
+        // CGContext for PDF uses bottom-left origin. `draw(_:in:)` already handles
+        // that and renders the image right-side up — an explicit y-flip here would
+        // render it upside-down.
         context.draw(cgImage, in: pageRect)
-        context.restoreGState()
 
         // Draw OCR-recognized text invisibly so `pdf.string` returns it and search
         // works. We use the PDF text-rendering mode "invisible" (3), which keeps the
