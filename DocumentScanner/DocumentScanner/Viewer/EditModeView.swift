@@ -36,9 +36,27 @@ struct EditModeView: View {
                         _ = try? session.save()
                         return true
                     }
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            deletePage(at: index)
+                        } label: {
+                            Label("Delete page", systemImage: "trash")
+                        }
+                    }
                 Text("\(index + 1)").font(.caption).foregroundStyle(.secondary)
             }
         }
+    }
+
+    private func deletePage(at index: Int) {
+        guard session.pdf.pageCount > 1 else {
+            // Last page — surface delete-whole-document via notification so
+            // EditModeView doesn't need direct access to storage/onDeleted.
+            NotificationCenter.default.post(name: .requestDeleteDocument, object: nil)
+            return
+        }
+        DocumentMutations.deletePage(in: session.pdf, at: index)
+        _ = try? session.save()
     }
 
     private struct IndexPayload: Codable, Transferable {
@@ -47,4 +65,8 @@ struct EditModeView: View {
             CodableRepresentation(contentType: .data)
         }
     }
+}
+
+extension Notification.Name {
+    static let requestDeleteDocument = Notification.Name("requestDeleteDocument")
 }

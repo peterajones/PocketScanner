@@ -78,6 +78,9 @@ struct DocumentViewerView: View {
         } message: {
             Text("This will permanently remove \"\(session.displayName).pdf\" from iCloud.")
         }
+        .onReceive(NotificationCenter.default.publisher(for: .requestDeleteDocument)) { _ in
+            showDeleteConfirm = true
+        }
     }
 
     private func commitRename(session: DocumentSession) {
