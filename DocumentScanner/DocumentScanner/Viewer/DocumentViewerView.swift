@@ -10,6 +10,11 @@ struct DocumentViewerView: View {
     /// path can pop the navigation stack.
     let onDeleted: () -> Void
 
+    private struct PageEditorContext: Identifiable {
+        let index: Int
+        var id: Int { index }
+    }
+
     @State private var session: DocumentSession?
     @State private var loadError: String?
     @State private var isRenaming = false
@@ -17,6 +22,7 @@ struct DocumentViewerView: View {
     @State private var editMode = false
     @State private var showAddPages = false
     @State private var addPagesTask: Task<Void, Never>?
+    @State private var editingPageIndex: Int?
 
     var body: some View {
         Group {
@@ -42,8 +48,12 @@ struct DocumentViewerView: View {
             PDFKitView(document: session.pdf)
                 .ignoresSafeArea(edges: editMode ? [] : .bottom)
             if editMode {
-                EditModeView(session: session, onAddPages: { showAddPages = true })
-                    .transition(.move(edge: .bottom))
+                EditModeView(
+                    session: session,
+                    onEditPage: { editingPageIndex = $0 },
+                    onAddPages: { showAddPages = true }
+                )
+                .transition(.move(edge: .bottom))
             }
         }
         .animation(.easeInOut(duration: 0.2), value: editMode)
@@ -116,6 +126,16 @@ struct DocumentViewerView: View {
                 onCancel: { showAddPages = false }
             )
             .ignoresSafeArea()
+        }
+        .sheet(item: Binding(
+            get: { editingPageIndex.map { PageEditorContext(index: $0) } },
+            set: { editingPageIndex = $0?.index }
+        )) { ctx in
+            PageEditorView(
+                session: session,
+                pageIndex: ctx.index,
+                onDismiss: { editingPageIndex = nil }
+            )
         }
     }
 

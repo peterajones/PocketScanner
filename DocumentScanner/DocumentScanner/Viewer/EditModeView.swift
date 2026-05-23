@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 
 struct EditModeView: View {
     @Bindable var session: DocumentSession
+    let onEditPage: (Int) -> Void
     let onAddPages: () -> Void
 
     var body: some View {
@@ -55,6 +56,9 @@ struct EditModeView: View {
                         } label: {
                             Label("Delete page", systemImage: "trash")
                         }
+                    }
+                    .onTapGesture {
+                        onEditPage(index)
                     }
                 Text("\(index + 1)").font(.caption).foregroundStyle(.secondary)
             }
