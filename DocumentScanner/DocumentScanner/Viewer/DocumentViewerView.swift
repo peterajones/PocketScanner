@@ -24,6 +24,7 @@ struct DocumentViewerView: View {
     @State private var showAddPages = false
     @State private var addPagesTask: Task<Void, Never>?
     @State private var editingPageIndex: Int?
+    @State private var searchHighlight: SearchHighlight?
 
     var body: some View {
         Group {
@@ -46,8 +47,12 @@ struct DocumentViewerView: View {
     @ViewBuilder
     private func loadedBody(session: DocumentSession) -> some View {
         VStack(spacing: 0) {
-            PDFKitView(document: session.pdf)
-                .ignoresSafeArea(edges: editMode ? [] : .bottom)
+            PDFKitView(
+                document: session.pdf,
+                highlightedSelections: searchHighlight?.matches ?? [],
+                currentSelection: searchHighlight?.current
+            )
+            .ignoresSafeArea(edges: editMode ? [] : .bottom)
             if editMode {
                 EditModeView(
                     session: session,
@@ -58,6 +63,9 @@ struct DocumentViewerView: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: editMode)
+        .task(id: ObjectIdentifier(session.pdf)) {
+            rebuildHighlight(session: session)
+        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -79,6 +87,14 @@ struct DocumentViewerView: View {
             ToolbarItemGroup(placement: .bottomBar) {
                 Button(editMode ? "Done" : "Edit") { editMode.toggle() }
                 Spacer()
+                if let h = searchHighlight, h.matchCount > 0 {
+                    Button { h.previous() } label: { Image(systemName: "chevron.up") }
+                    Text("\((h.currentIndex ?? 0) + 1) of \(h.matchCount)")
+                        .font(.footnote.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                    Button { h.next() } label: { Image(systemName: "chevron.down") }
+                    Spacer()
+                }
                 ShareLink(item: session.url)
                 Menu {
                     Button {
@@ -140,6 +156,15 @@ struct DocumentViewerView: View {
         }
     }
 
+    private func rebuildHighlight(session: DocumentSession) {
+        guard let term = searchTerm, !term.isEmpty else {
+            searchHighlight = nil
+            return
+        }
+        let matches = session.pdf.findString(term, withOptions: .caseInsensitive)
+        searchHighlight = SearchHighlight(matches: matches)
+    }
+
     private func commitRename(session: DocumentSession) {
         isRenaming = false
         let trimmed = session.displayName.trimmingCharacters(in: .whitespaces)
@@ -154,6 +179,9 @@ struct DocumentViewerView: View {
 
 private struct PDFKitView: UIViewRepresentable {
     let document: PDFDocument
+    let highlightedSelections: [PDFSelection]
+    let currentSelection: PDFSelection?
+
     func makeUIView(context: Context) -> PDFView {
         let v = PDFView()
         v.autoScales = true
@@ -161,7 +189,15 @@ private struct PDFKitView: UIViewRepresentable {
         v.usePageViewController(false)
         return v
     }
+
     func updateUIView(_ view: PDFView, context: Context) {
-        view.document = document
+        if view.document !== document {
+            view.document = document
+        }
+        view.highlightedSelections = highlightedSelections.isEmpty ? nil : highlightedSelections
+        if let currentSelection {
+            view.setCurrentSelection(currentSelection, animate: false)
+            view.go(to: currentSelection)
+        }
     }
 }
