@@ -12,6 +12,7 @@ final class DocumentSession {
     private(set) var url: URL
     private(set) var pdf: PDFDocument
     var displayName: String
+    private(set) var conflicts: [NSFileVersion]
 
     private let storage: DocumentStorage
 
@@ -27,6 +28,23 @@ final class DocumentSession {
         self.pdf = pdf
         self.displayName = summary.displayName
         self.storage = storage
+        self.conflicts = NSFileVersion.unresolvedConflictVersionsOfItem(at: summary.url) ?? []
+    }
+
+    func resolveConflict(keeping chosen: NSFileVersion?) throws {
+        // chosen == nil means "keep this device's current version" (i.e., do nothing
+        // with the conflict version, just mark resolved).
+        // chosen != nil means "replace with that version".
+        if let chosen {
+            try chosen.replaceItem(at: url, options: [])
+        }
+        for version in conflicts {
+            version.isResolved = true
+        }
+        conflicts = []
+        if let reloaded = PDFDocument(url: url) {
+            pdf = reloaded
+        }
     }
 
     /// Persist the current `pdf` over the current `url`. Used after edit-mode

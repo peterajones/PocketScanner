@@ -46,7 +46,13 @@ struct DocumentViewerView: View {
 
     @ViewBuilder
     private func loadedBody(session: DocumentSession) -> some View {
-        VStack(spacing: 0) {
+        if !session.conflicts.isEmpty {
+            ConflictResolutionView(session: session, onResolved: {
+                // No-op — once session.conflicts is empty, this view rebuilds
+                // and falls through to the main body below.
+            })
+        } else {
+            VStack(spacing: 0) {
             PDFKitView(
                 document: session.pdf,
                 highlightedSelections: searchHighlight?.matches ?? [],
@@ -153,6 +159,7 @@ struct DocumentViewerView: View {
                 pageIndex: ctx.index,
                 onDismiss: { editingPageIndex = nil }
             )
+        }
         }
     }
 
