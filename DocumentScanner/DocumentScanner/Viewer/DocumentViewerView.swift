@@ -196,10 +196,6 @@ private struct PDFKitView: UIViewRepresentable {
     }
 
     func updateUIView(_ view: PDFView, context: Context) {
-        if view.document !== document {
-            view.document = document
-        }
-
         // PDFView.highlightedSelections doesn't reliably render on iOS — use
         // real PDFAnnotation highlights, which are guaranteed to draw.
         removeOurAnnotations(from: document)
@@ -210,6 +206,12 @@ private struct PDFKitView: UIViewRepresentable {
                 : UIColor.systemYellow.withAlphaComponent(0.45)
             addHighlight(for: match, color: color)
         }
+
+        // PDFView doesn't automatically redraw when annotations on its
+        // document change after the document was first assigned. Re-assigning
+        // forces a refresh; we keep it unconditional rather than gated on
+        // `view.document !== document` so highlight edits flow through.
+        view.document = document
 
         if let currentSelection {
             view.go(to: currentSelection)
