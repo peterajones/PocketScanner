@@ -5,6 +5,7 @@ struct DocumentScannerApp: App {
     @State private var store = MetadataQueryLibraryStore()
     @State private var lockSettings = AppLockSettings()
     @State private var alertCenter = AlertCenter()
+    @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
 
     private let container = ICloudContainer()
     private let pipeline = ScanPipeline()
@@ -12,23 +13,28 @@ struct DocumentScannerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            LockGate(lockSettings: lockSettings) {
-                PrivacyBlurOverlay {
-                    LibraryView(
-                        store: store,
-                        scannerPresenter: scannerPresenter,
-                        storage: DocumentStorage(documentsURL: container.resolveDocumentsURL()),
-                        pipeline: pipeline,
-                        lockSettings: lockSettings
-                    )
+            if !iCloudOnboardingDismissed && !container.isICloudAvailable {
+                ICloudOnboardingView(onTryAnyway: { iCloudOnboardingDismissed = true })
+                    .environment(\.alertCenter, alertCenter)
+            } else {
+                LockGate(lockSettings: lockSettings) {
+                    PrivacyBlurOverlay {
+                        LibraryView(
+                            store: store,
+                            scannerPresenter: scannerPresenter,
+                            storage: DocumentStorage(documentsURL: container.resolveDocumentsURL()),
+                            pipeline: pipeline,
+                            lockSettings: lockSettings
+                        )
+                    }
                 }
-            }
-            .environment(\.alertCenter, alertCenter)
-            .alert(item: Binding(
-                get: { alertCenter.current },
-                set: { _ in alertCenter.dismiss() }
-            )) { alert in
-                appAlert(alert)
+                .environment(\.alertCenter, alertCenter)
+                .alert(item: Binding(
+                    get: { alertCenter.current },
+                    set: { _ in alertCenter.dismiss() }
+                )) { alert in
+                    appAlert(alert)
+                }
             }
         }
     }
