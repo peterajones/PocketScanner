@@ -6,6 +6,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     let scannerPresenter: DocumentScannerPresenting
     let storage: DocumentStorage
     let pipeline: ScanPipeline
+    let lockSettings: AppLockSettings
 
     @State private var searchText = ""
     @State private var showingCapture = false
@@ -50,6 +51,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             }
             .navigationTitle("Documents")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        SettingsView(lockSettings: lockSettings)
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showingCapture = true } label: { Image(systemName: "plus") }
                 }
