@@ -13,6 +13,20 @@ struct PageImageRenderer {
         format.scale = 1
         format.opaque = true
         let renderer = UIGraphicsImageRenderer(size: bounds.size, format: format)
+
+        // Temporarily hide all annotations during rasterization. The editor
+        // wants the original page content, not whatever transient overlays
+        // the viewer may have added (e.g., search highlights). Without this,
+        // highlight overlays get rasterized into the new page image and end
+        // up baked into the saved PDF.
+        let savedDisplay = page.annotations.map { ($0, $0.shouldDisplay) }
+        for annotation in page.annotations { annotation.shouldDisplay = false }
+        defer {
+            for (annotation, original) in savedDisplay {
+                annotation.shouldDisplay = original
+            }
+        }
+
         return renderer.image { ctx in
             UIColor.white.setFill()
             ctx.fill(CGRect(origin: .zero, size: bounds.size))
