@@ -185,7 +185,7 @@ private struct PDFKitView: UIViewRepresentable {
     /// Tag we attach to highlight annotations so we can remove the ones we
     /// added on the next update without disturbing any annotations that
     /// happened to be in the PDF already.
-    private static let annotationUserName = "DocumentScanner.searchHighlight"
+    private static let annotationUserName = DocumentSession.searchHighlightAnnotationName
 
     func makeUIView(context: Context) -> PDFView {
         let v = PDFView()

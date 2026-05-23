@@ -15,6 +15,10 @@ final class DocumentSession {
 
     private let storage: DocumentStorage
 
+    /// Annotation `userName` that marks PDFAnnotations added by the search-highlight
+    /// view layer. `save()` strips these before writing so they don't persist.
+    static let searchHighlightAnnotationName = "DocumentScanner.searchHighlight"
+
     enum InitError: Error { case unreadablePDF }
 
     init(summary: DocumentSummary, storage: DocumentStorage) throws {
@@ -29,8 +33,19 @@ final class DocumentSession {
     /// mutations or rename. Returns the (possibly new) URL.
     @discardableResult
     func save() throws -> URL {
+        stripSearchHighlightAnnotations()
         let newURL = try storage.write(pdf, replacing: url, withName: displayName)
         self.url = newURL
         return newURL
+    }
+
+    private func stripSearchHighlightAnnotations() {
+        for i in 0..<pdf.pageCount {
+            guard let page = pdf.page(at: i) else { continue }
+            for annotation in page.annotations
+                where annotation.userName == Self.searchHighlightAnnotationName {
+                page.removeAnnotation(annotation)
+            }
+        }
     }
 }
