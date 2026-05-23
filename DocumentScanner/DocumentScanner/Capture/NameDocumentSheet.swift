@@ -12,7 +12,7 @@ struct NameDocumentSheet: View {
 
     @State private var name: String = NameDocumentSheet.defaultName()
     @State private var isWorking = false
-    @State private var errorMessage: String?
+    @Environment(\.alertCenter) private var alertCenter
 
     var body: some View {
         NavigationStack {
@@ -21,9 +21,6 @@ struct NameDocumentSheet: View {
                     TextField("Name", text: $name)
                         .textInputAutocapitalization(.words)
                         .disabled(isWorking)
-                }
-                if let errorMessage {
-                    Section { Text(errorMessage).foregroundStyle(.red) }
                 }
             }
             .navigationTitle("Save Scan")
@@ -58,7 +55,16 @@ struct NameDocumentSheet: View {
         } catch is CancellationError {
             onCancel()
         } catch {
-            errorMessage = error.localizedDescription
+            alertCenter.present(AppAlert(
+                title: "Couldn't save",
+                message: error.localizedDescription,
+                primary: AppAlert.Action(title: "Retry", role: .default, handler: {
+                    Task { await save() }
+                }),
+                secondary: AppAlert.Action(title: "Cancel", role: .cancel, handler: {
+                    onCancel()
+                })
+            ))
         }
     }
 
