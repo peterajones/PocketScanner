@@ -16,3 +16,6 @@ Package.resolved
 
 # Brainstorming scratchpad
 .superpowers/
+
+#Markdownlint rules so I don't go crazy with the formatting of my markdown files.
+.markdownlint.cjs
