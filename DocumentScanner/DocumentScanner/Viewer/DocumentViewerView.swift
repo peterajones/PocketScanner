@@ -12,6 +12,7 @@ struct DocumentViewerView: View {
     @State private var loadError: String?
     @State private var isRenaming = false
     @State private var showDeleteConfirm = false
+    @State private var editMode = false
 
     var body: some View {
         Group {
@@ -33,42 +34,50 @@ struct DocumentViewerView: View {
 
     @ViewBuilder
     private func loadedBody(session: DocumentSession) -> some View {
-        PDFKitView(document: session.pdf)
-            .ignoresSafeArea(edges: .bottom)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    if isRenaming {
-                        TextField("Name", text: Binding(
-                            get: { session.displayName },
-                            set: { session.displayName = $0 }
-                        ))
-                        .textFieldStyle(.roundedBorder)
-                        .submitLabel(.done)
-                        .onSubmit { commitRename(session: session) }
-                        .frame(minWidth: 200)
-                    } else {
-                        Button(session.displayName) { isRenaming = true }
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-                    }
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    ShareLink(item: session.url)
-                    Button { showDeleteConfirm = true } label: {
-                        Image(systemName: "trash")
-                    }
+        VStack(spacing: 0) {
+            PDFKitView(document: session.pdf)
+                .ignoresSafeArea(edges: editMode ? [] : .bottom)
+            if editMode {
+                EditModeView(session: session)
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: editMode)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                if isRenaming {
+                    TextField("Name", text: Binding(
+                        get: { session.displayName },
+                        set: { session.displayName = $0 }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .submitLabel(.done)
+                    .onSubmit { commitRename(session: session) }
+                    .frame(minWidth: 200)
+                } else {
+                    Button(session.displayName) { isRenaming = true }
+                        .font(.headline)
+                        .foregroundStyle(.primary)
                 }
             }
-            .confirmationDialog("Delete this document?", isPresented: $showDeleteConfirm) {
-                Button("Delete", role: .destructive) {
-                    try? storage.delete(at: session.url)
-                    onDeleted()
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button(editMode ? "Done" : "Edit") { editMode.toggle() }
+                ShareLink(item: session.url)
+                Button { showDeleteConfirm = true } label: {
+                    Image(systemName: "trash")
                 }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will permanently remove \"\(session.displayName).pdf\" from iCloud.")
             }
+        }
+        .confirmationDialog("Delete this document?", isPresented: $showDeleteConfirm) {
+            Button("Delete", role: .destructive) {
+                try? storage.delete(at: session.url)
+                onDeleted()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently remove \"\(session.displayName).pdf\" from iCloud.")
+        }
     }
 
     private func commitRename(session: DocumentSession) {
