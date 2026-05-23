@@ -38,6 +38,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                         DocumentViewerView(
                             summary: summary,
                             storage: storage,
+                            scannerPresenter: scannerPresenter,
+                            pipeline: pipeline,
                             onDeleted: {
                                 store.refresh()
                                 path.removeLast()

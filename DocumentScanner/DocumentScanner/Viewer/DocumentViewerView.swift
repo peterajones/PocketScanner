@@ -4,6 +4,8 @@ import PDFKit
 struct DocumentViewerView: View {
     let summary: DocumentSummary
     let storage: DocumentStorage
+    let scannerPresenter: DocumentScannerPresenting
+    let pipeline: ScanPipeline
     /// Closure dismissing the viewer; provided by LibraryView so the deletion
     /// path can pop the navigation stack.
     let onDeleted: () -> Void
@@ -13,6 +15,8 @@ struct DocumentViewerView: View {
     @State private var isRenaming = false
     @State private var showDeleteConfirm = false
     @State private var editMode = false
+    @State private var showAddPages = false
+    @State private var addPagesTask: Task<Void, Never>?
 
     var body: some View {
         Group {
@@ -38,7 +42,7 @@ struct DocumentViewerView: View {
             PDFKitView(document: session.pdf)
                 .ignoresSafeArea(edges: editMode ? [] : .bottom)
             if editMode {
-                EditModeView(session: session)
+                EditModeView(session: session, onAddPages: { showAddPages = true })
                     .transition(.move(edge: .bottom))
             }
         }
@@ -80,6 +84,26 @@ struct DocumentViewerView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .requestDeleteDocument)) { _ in
             showDeleteConfirm = true
+        }
+        .fullScreenCover(isPresented: $showAddPages) {
+            CaptureSheet(
+                presenter: scannerPresenter,
+                onFinish: { images in
+                    showAddPages = false
+                    addPagesTask = Task { @MainActor in
+                        guard let session = self.session else { return }
+                        do {
+                            let result = try await pipeline.process(images: images)
+                            DocumentMutations.append(result.pdf, to: session.pdf)
+                            _ = try session.save()
+                        } catch {
+                            // Surfaced later by Plan 4 error handling.
+                        }
+                    }
+                },
+                onCancel: { showAddPages = false }
+            )
+            .ignoresSafeArea()
         }
     }
 

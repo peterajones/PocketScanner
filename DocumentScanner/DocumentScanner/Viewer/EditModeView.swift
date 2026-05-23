@@ -4,12 +4,25 @@ import UniformTypeIdentifiers
 
 struct EditModeView: View {
     @Bindable var session: DocumentSession
+    let onAddPages: () -> Void
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(currentPages.indices, id: \.self) { index in
                     thumbnail(at: index)
+                }
+                Button {
+                    onAddPages()
+                } label: {
+                    VStack(spacing: 4) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
+                            .foregroundStyle(.tint)
+                            .overlay(Image(systemName: "plus").font(.title2).foregroundStyle(.tint))
+                            .frame(width: 80, height: 104)
+                        Text("Add").font(.caption).foregroundStyle(.tint)
+                    }
                 }
             }
             .padding(.horizontal, 16)
