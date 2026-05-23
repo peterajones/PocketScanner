@@ -6,6 +6,7 @@ struct DocumentViewerView: View {
     let storage: DocumentStorage
     let scannerPresenter: DocumentScannerPresenting
     let pipeline: ScanPipeline
+    let searchTerm: String?
     /// Closure dismissing the viewer; provided by LibraryView so the deletion
     /// path can pop the navigation stack.
     let onDeleted: () -> Void

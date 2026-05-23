@@ -41,6 +41,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                             storage: storage,
                             scannerPresenter: scannerPresenter,
                             pipeline: pipeline,
+                            searchTerm: searchText.isEmpty ? nil : searchText,
                             onDeleted: {
                                 store.refresh()
                                 path.removeLast()
