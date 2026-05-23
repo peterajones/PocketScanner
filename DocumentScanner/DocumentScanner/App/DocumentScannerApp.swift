@@ -4,6 +4,7 @@ import SwiftUI
 struct DocumentScannerApp: App {
     @State private var store = MetadataQueryLibraryStore()
     @State private var lockSettings = AppLockSettings()
+    @State private var alertCenter = AlertCenter()
 
     private let container = ICloudContainer()
     private let pipeline = ScanPipeline()
@@ -22,6 +23,38 @@ struct DocumentScannerApp: App {
                     )
                 }
             }
+            .environment(\.alertCenter, alertCenter)
+            .alert(item: Binding(
+                get: { alertCenter.current },
+                set: { _ in alertCenter.dismiss() }
+            )) { alert in
+                appAlert(alert)
+            }
+        }
+    }
+
+    @MainActor
+    private func appAlert(_ alert: AppAlert) -> Alert {
+        let primaryButton = button(from: alert.primary)
+        if let secondary = alert.secondary {
+            return Alert(title: Text(alert.title),
+                         message: Text(alert.message),
+                         primaryButton: primaryButton,
+                         secondaryButton: button(from: secondary))
+        }
+        return Alert(title: Text(alert.title),
+                     message: Text(alert.message),
+                     dismissButton: primaryButton)
+    }
+
+    private func button(from action: AppAlert.Action) -> Alert.Button {
+        switch action.role {
+        case .cancel:
+            return .cancel(Text(action.title)) { action.handler?() }
+        case .destructive:
+            return .destructive(Text(action.title)) { action.handler?() }
+        case .default:
+            return .default(Text(action.title)) { action.handler?() }
         }
     }
 }
