@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct DocumentScannerApp: App {
     @State private var metadataStore = MetadataQueryLibraryStore()
-    @State private var inMemoryStore = InMemoryLibraryStore()
+    @State private var inMemoryStore: InMemoryLibraryStore
     @State private var lockSettings = AppLockSettings()
     @State private var alertCenter = AlertCenter()
     @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
@@ -12,12 +12,19 @@ struct DocumentScannerApp: App {
     private let pipeline = ScanPipeline()
     private let scannerPresenter: DocumentScannerPresenting =
         isUITesting ? StubDocumentScanner() : SystemDocumentScanner()
-    private let testStorage: DocumentStorage = {
+    private let testStorage: DocumentStorage
+
+    init() {
         let tmp = FileManager.default.temporaryDirectory
             .appendingPathComponent("uitests-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
-        return DocumentStorage(documentsURL: tmp)
-    }()
+        testStorage = DocumentStorage(documentsURL: tmp)
+        // Point the in-memory store at the same temp dir the stub storage
+        // writes to, so refresh() picks up new PDFs the test creates.
+        let store = InMemoryLibraryStore()
+        store.documentsURL = tmp
+        _inMemoryStore = State(initialValue: store)
+    }
 
     private static var isUITesting: Bool {
         ProcessInfo.processInfo.arguments.contains("-UITestMode")
