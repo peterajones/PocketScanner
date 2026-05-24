@@ -14,6 +14,14 @@ final class DocumentSession {
     var displayName: String
     private(set) var conflicts: [NSFileVersion]
 
+    /// Monotonic counter incremented whenever the PDF's page content changes.
+    /// `PDFDocument` is a reference type and `DocumentMutations` mutates it in
+    /// place — so `pdf`'s identity doesn't change, and `@Observable` never
+    /// notifies dependent views. Views that need to react to page-list
+    /// changes (e.g. `EditModeView`'s thumbnail strip) read `revision` to
+    /// subscribe to it. `save()` bumps it after every persisted mutation.
+    private(set) var revision: Int = 0
+
     private let storage: DocumentStorage
 
     /// Annotation `userName` that marks PDFAnnotations added by the search-highlight
@@ -54,6 +62,7 @@ final class DocumentSession {
         stripSearchHighlightAnnotations()
         let newURL = try storage.write(pdf, replacing: url, withName: displayName)
         self.url = newURL
+        revision &+= 1
         return newURL
     }
 

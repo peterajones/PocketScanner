@@ -8,6 +8,12 @@ struct EditModeView: View {
     let onAddPages: () -> Void
 
     var body: some View {
+        // Read session.revision so SwiftUI subscribes to it; the body
+        // re-evaluates whenever DocumentSession.save() bumps revision after
+        // page-list mutations (add/delete/reorder/replace). Without this,
+        // `currentPages` would be stale because session.pdf's reference
+        // doesn't change when DocumentMutations mutates pages in place.
+        let _ = session.revision
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(currentPages.indices, id: \.self) { index in
