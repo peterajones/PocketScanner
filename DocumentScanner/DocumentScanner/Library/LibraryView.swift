@@ -63,7 +63,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     }
                 }
             }
-            .navigationTitle("Documents")
+            .navigationTitle("Scanned Documents")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
