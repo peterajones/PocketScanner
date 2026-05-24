@@ -44,4 +44,4 @@ Questions or concerns: **<peterjones@mac.com>**
 
 ---
 
-*Mobile Scanner is built and maintained by Peter Jones as an independent project. The source is private; the policy above is the contract.*
+*Mobile Scanner is built and maintained by Peter Jones as an independent project. The source is public at [github.com/peterajones/mobileDocumentScanner](https://github.com/peterajones/mobileDocumentScanner) — you can verify the claims above for yourself.*
