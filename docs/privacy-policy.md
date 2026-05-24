@@ -1,4 +1,4 @@
-# Mobile Scanner — Privacy Policy <img src="<img alt="document-scanner-1024x1024.png" src="https://github.com/peterajones/mobileDocumentScanner/blob/main/images/document-scanner-1024x1024.png?raw=true" data-hpc="true" style="max-width:50px">" alt="logo" width="100%" style="max-width:50px;">
+# Mobile Scanner — Privacy Policy
 
 **Effective date:** May 24, 2026
 
