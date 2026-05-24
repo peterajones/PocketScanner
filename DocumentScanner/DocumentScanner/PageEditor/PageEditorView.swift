@@ -13,10 +13,12 @@ struct PageEditorView: View {
     private let segmenter = DocumentSegmenter()
     private let corrector = PerspectiveCorrector()
     private let ocr = OCREngine()
+    private let filterEngine = ImageFilterEngine()
 
     @State private var pageImage: UIImage?
     @State private var quad: Quad?
     @State private var rotationQuarterTurns = 0  // 0/1/2/3 → 0°/90°/180°/270° CW
+    @State private var filter: ImageFilter = .none
     @State private var isWorking = false
     @State private var errorMessage: String?
 
@@ -25,9 +27,10 @@ struct PageEditorView: View {
             Group {
                 if let pageImage, let quadBinding {
                     VStack(spacing: 8) {
-                        QuadOverlay(image: rotatedImage(pageImage), quad: quadBinding)
+                        QuadOverlay(image: displayedImage(pageImage), quad: quadBinding)
                             .padding()
                         rotationControls
+                        filterControls
                         if let errorMessage {
                             Text(errorMessage).foregroundStyle(.red).font(.footnote)
                         }
@@ -81,6 +84,16 @@ struct PageEditorView: View {
         .padding(.bottom, 16)
     }
 
+    private var filterControls: some View {
+        Picker("Filter", selection: $filter) {
+            ForEach(ImageFilter.allCases) { f in
+                Text(f.displayName).tag(f)
+            }
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal)
+    }
+
     private func prepare() async {
         guard let page = session.pdf.page(at: pageIndex),
               let rendered = renderer.image(from: page) else {
@@ -111,6 +124,11 @@ struct PageEditorView: View {
         }
     }
 
+    private func displayedImage(_ image: UIImage) -> UIImage {
+        let rotated = rotatedImage(image)
+        return filterEngine.apply(filter, to: rotated) ?? rotated
+    }
+
     private func applyEdit() async {
         guard let pageImage, let quad else { return }
         isWorking = true
@@ -120,7 +138,8 @@ struct PageEditorView: View {
                 errorMessage = "Couldn't apply crop."
                 return
             }
-            let finalImage = rotatedImage(corrected)
+            let rotated = rotatedImage(corrected)
+            let finalImage = filterEngine.apply(filter, to: rotated) ?? rotated
             let observations = (try? await ocr.recognizeText(in: finalImage)) ?? []
             let newDoc = try PDFAssembler().assemble(
                 pages: [ScannedPage(image: finalImage, observations: observations)],
