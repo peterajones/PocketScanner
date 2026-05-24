@@ -25,6 +25,7 @@ struct EditModeView: View {
                         Text("Add").font(.caption).foregroundStyle(.tint)
                     }
                 }
+                .accessibilityIdentifier("EditMode.AddPages")
             }
             .padding(.horizontal, 16)
         }
@@ -62,6 +63,7 @@ struct EditModeView: View {
                     }
                 Text("\(index + 1)").font(.caption).foregroundStyle(.secondary)
             }
+            .accessibilityIdentifier("EditMode.Thumbnail.\(index)")
         }
     }
 

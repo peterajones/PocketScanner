@@ -71,6 +71,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     } label: {
                         Image(systemName: "gearshape")
                     }
+                    .accessibilityIdentifier("Library.SettingsButton")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -84,6 +85,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("Library.AddButton")
                 }
             }
             .fullScreenCover(isPresented: $showingCapture) {

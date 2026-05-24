@@ -92,6 +92,7 @@ struct DocumentViewerView: View {
             }
             ToolbarItemGroup(placement: .bottomBar) {
                 Button(editMode ? "Done" : "Edit") { editMode.toggle() }
+                    .accessibilityIdentifier("Viewer.EditToggle")
                 Spacer()
                 if let h = searchHighlight, h.matchCount > 0 {
                     Button { h.previous() } label: { Image(systemName: "chevron.up") }
@@ -108,11 +109,13 @@ struct DocumentViewerView: View {
                     } label: {
                         Label("Rename", systemImage: "pencil")
                     }
+                    .accessibilityIdentifier("Viewer.Rename")
                     Button(role: .destructive) {
                         showDeleteConfirm = true
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
+                    .accessibilityIdentifier("Viewer.Delete")
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }

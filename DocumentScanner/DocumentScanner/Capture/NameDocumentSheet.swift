@@ -21,6 +21,7 @@ struct NameDocumentSheet: View {
                     TextField("Name", text: $name)
                         .textInputAutocapitalization(.words)
                         .disabled(isWorking)
+                        .accessibilityIdentifier("NameSheet.NameField")
                 }
             }
             .navigationTitle("Save Scan")
@@ -30,7 +31,9 @@ struct NameDocumentSheet: View {
                     Button("Cancel") {
                         pipelineTask.cancel()
                         onCancel()
-                    }.disabled(isWorking)
+                    }
+                    .disabled(isWorking)
+                    .accessibilityIdentifier("NameSheet.Cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     if isWorking {
@@ -38,6 +41,7 @@ struct NameDocumentSheet: View {
                     } else {
                         Button("Save") { Task { await save() } }
                             .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                            .accessibilityIdentifier("NameSheet.Save")
                     }
                 }
             }

@@ -31,6 +31,7 @@ struct DocumentRow: View {
             Spacer()
         }
         .padding(.vertical, 4)
+        .accessibilityIdentifier("Library.Row.\(summary.displayName)")
     }
 
     private var formattedSubtitle: String {
