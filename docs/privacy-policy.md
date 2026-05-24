@@ -1,6 +1,6 @@
 # Mobile Scanner — Privacy Policy
 
-**Effective date:** [DATE — fill in when you publish]
+**Effective date:** May 24, 2026
 
 Mobile Scanner is built for people who don't want a scanner app to know anything about them. This policy describes exactly what data the app handles and what it doesn't.
 
@@ -40,7 +40,7 @@ If we ever change what data the app handles, we'll update this page and bump the
 
 ## Contact
 
-Questions or concerns: **[your email address]**
+Questions or concerns: **<peterjones@mac.com>**
 
 ---
 
