@@ -18,7 +18,7 @@ Pocket Scanner is built for people who don't want a scanner app to know anything
 
 - **Camera access** — used to capture document images when you tap the scan button. Images are processed entirely on your iPhone.
 - **Optical character recognition (OCR)** — every scanned page is run through Apple's Vision framework on your device to extract searchable text. Nothing is uploaded to any server, including ours or Apple's, for this step.
-- **iCloud Drive** — if you have iCloud Drive enabled and the app has access, your saved PDFs are written to a folder in *your* iCloud account ("Document Scanner"). This is Apple's storage you already control. We do not have any access to that storage.
+- **iCloud Drive** — if you have iCloud Drive enabled and the app has access, your saved PDFs are written to a folder in *your* iCloud account ("Pocket Scanner"). This is Apple's storage you already control. We do not have any access to that storage.
 - **Local storage** — if iCloud Drive is not available, the app stores your PDFs in its own local sandbox on your device.
 - **Face ID / passcode** — used only to gate the app's library when you enable the App Lock setting. Authentication is handled by Apple's LocalAuthentication framework; we never see or store your biometric data.
 

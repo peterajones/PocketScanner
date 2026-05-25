@@ -8,7 +8,7 @@ A no-subscription iOS document scanner. Scan paper to searchable PDF, synced to 
 
 - **Capture** documents with Apple's VisionKit scanner — automatic edge detection, perspective correction, multi-page in one shot.
 - **OCR** every page on-device via Apple's Vision framework. Resulting PDFs are fully searchable in any reader.
-- **Sync** through your own iCloud Drive — the "Document Scanner" folder appears in the Files app on every device signed into your Apple ID.
+- **Sync** through your own iCloud Drive — the "Pocket Scanner" folder appears in the Files app on every device signed into your Apple ID.
 - **Edit** any page after the fact: re-crop, rotate, apply preset filters (Color / Greyscale / B&W / Photo). Re-OCRs after each edit.
 - **Search** across all your scans by name or by text inside the document; matches highlight on the page with prev/next navigation.
 - **Lock** the library behind optional Face ID with a 30-second background re-lock; app-switcher snapshots are always blurred.
