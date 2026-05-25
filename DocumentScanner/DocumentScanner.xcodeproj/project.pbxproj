@@ -415,7 +415,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DocumentScanner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mobile Scanner";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pocket Scanner";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Document Scanner uses the camera to scan paper documents.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Document Scanner can lock your library behind Face ID.";
@@ -452,7 +452,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DocumentScanner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mobile Scanner";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pocket Scanner";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Document Scanner uses the camera to scan paper documents.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Document Scanner can lock your library behind Face ID.";

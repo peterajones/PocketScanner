@@ -1,4 +1,4 @@
-# Mobile Scanner
+# Pocket Scanner
 
 A no-subscription iOS document scanner. Scan paper to searchable PDF, synced to your own iCloud Drive. No accounts, no ads, no tracking.
 

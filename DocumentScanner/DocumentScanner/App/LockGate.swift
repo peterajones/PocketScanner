@@ -45,7 +45,7 @@ struct LockGate<Content: View>: View {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 72))
                     .foregroundStyle(.tint)
-                Text("Mobile Scanner is locked")
+                Text("Pocket Scanner is locked")
                     .font(.title2.weight(.semibold))
                 Button("Unlock with Face ID") {
                     Task {

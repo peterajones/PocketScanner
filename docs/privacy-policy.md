@@ -1,11 +1,11 @@
 <div style="display: flex; align-items: center; gap: 16px;">
-  <img src="images/document-scanner-1024x1024.png" alt="Mobile Scanner" width="64" height="64" style="border-radius: 14px;" />
-  <h1 style="margin: 0;">Mobile Scanner — Privacy Policy</h1>
+  <img src="images/document-scanner-1024x1024.png" alt="Pocket Scanner" width="64" height="64" style="border-radius: 14px;" />
+  <h1 style="margin: 0;">Pocket Scanner — Privacy Policy</h1>
 </div>
 
 **Effective date:** May 24, 2026
 
-Mobile Scanner is built for people who don't want a scanner app to know anything about them. This policy describes exactly what data the app handles and what it doesn't.
+Pocket Scanner is built for people who don't want a scanner app to know anything about them. This policy describes exactly what data the app handles and what it doesn't.
 
 ## The short version
 
@@ -24,10 +24,10 @@ Mobile Scanner is built for people who don't want a scanner app to know anything
 
 ## What the app does NOT do
 
-- Mobile Scanner does not have a backend server. There is no account to create and no place for your data to be sent.
-- Mobile Scanner does not include any third-party SDKs for analytics, crash reporting, advertising, attribution, or user tracking.
-- Mobile Scanner does not access, transmit, or store the contents of your scanned documents anywhere outside your own device and iCloud account.
-- Mobile Scanner does not read your filenames, search queries, or any usage data.
+- Pocket Scanner does not have a backend server. There is no account to create and no place for your data to be sent.
+- Pocket Scanner does not include any third-party SDKs for analytics, crash reporting, advertising, attribution, or user tracking.
+- Pocket Scanner does not access, transmit, or store the contents of your scanned documents anywhere outside your own device and iCloud account.
+- Pocket Scanner does not read your filenames, search queries, or any usage data.
 
 ## Data Apple may collect
 
@@ -35,7 +35,7 @@ Apple operates the App Store and iCloud Drive, and may collect data related to y
 
 ## Children
 
-Mobile Scanner is not directed at children under 13. It does not collect any data from any user regardless of age. The app's content rating is 4+.
+Pocket Scanner is not directed at children under 13. It does not collect any data from any user regardless of age. The app's content rating is 4+.
 
 ## Changes to this policy
 
@@ -47,4 +47,4 @@ Questions or concerns: **<peterjones@mac.com>**
 
 ---
 
-*Mobile Scanner is built and maintained by Peter Jones as an independent project. The source is public at [github.com/peterajones/mobileDocumentScanner](https://github.com/peterajones/mobileDocumentScanner) — you can verify the claims above for yourself.*
+*Pocket Scanner is built and maintained by Peter Jones as an independent project. The source is public at [github.com/peterajones/mobileDocumentScanner](https://github.com/peterajones/mobileDocumentScanner) — you can verify the claims above for yourself.*

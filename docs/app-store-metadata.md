@@ -1,4 +1,4 @@
-# App Store metadata — Mobile Scanner
+# App Store metadata — Pocket Scanner
 
 Draft copy for App Store Connect. Field-by-field, ready to paste in. Character counts are Apple's hard limits.
 
@@ -6,9 +6,9 @@ Draft copy for App Store Connect. Field-by-field, ready to paste in. Character c
 
 ## App name (30 chars max)
 
-**Recommendation:** `Mobile Scanner` (14 chars)
+**Recommendation:** `Pocket Scanner` (14 chars)
 
-Alternates if `Mobile Scanner` is taken in your locale's store:
+Alternates if `Pocket Scanner` is taken in your locale's store:
 
 - `Plain Scanner` — leans into no-frills
 - `Page Scanner` — descriptive
@@ -48,7 +48,7 @@ Promotional text is the only metadata you can change *without* shipping a new bu
 ```text
 Scan paper documents straight into iCloud Drive.
 
-Mobile Scanner is a no-nonsense document scanner for iPhone. Scan a receipt, a contract, a recipe, a page of notes — and it lands in your library as a searchable PDF, synced to all your devices through your own iCloud account.
+Pocket Scanner is a no-nonsense document scanner for iPhone. Scan a receipt, a contract, a recipe, a page of notes — and it lands in your library as a searchable PDF, synced to all your devices through your own iCloud account.
 
 That's it. No subscription. No ads. No account to sign up for. No upsells. Pay once, scan forever.
 
@@ -71,7 +71,7 @@ WHAT IT DOESN'T DO
 
 PRIVACY
 
-Mobile Scanner doesn't have a server. Your scans never leave your device except to sync to your own iCloud account (Apple's storage you already pay for, or the free tier). The OCR that makes your documents searchable runs entirely on your iPhone using Apple's Vision framework. We don't see your documents, your names, your filenames, your search queries, or your usage patterns.
+Pocket Scanner doesn't have a server. Your scans never leave your device except to sync to your own iCloud account (Apple's storage you already pay for, or the free tier). The OCR that makes your documents searchable runs entirely on your iPhone using Apple's Vision framework. We don't see your documents, your names, your filenames, your search queries, or your usage patterns.
 
 Full privacy policy: [your URL here]
 
@@ -119,7 +119,7 @@ Productivity is more competitive but is what users browse for scanners. Utilitie
 
 ## Age rating
 
-Run through the questionnaire honestly. Expected outcome: **4+** (no objectionable content of any kind). Mobile Scanner is purely a utility — there's no user-generated content, no chat, no web browsing.
+Run through the questionnaire honestly. Expected outcome: **4+** (no objectionable content of any kind). Pocket Scanner is purely a utility — there's no user-generated content, no chat, no web browsing.
 
 ---
 

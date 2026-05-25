@@ -11,7 +11,7 @@ struct CameraDeniedView: View {
                 .foregroundStyle(.secondary)
             Text("Camera access needed")
                 .font(.title2.weight(.semibold))
-            Text("Mobile Scanner uses your camera to capture documents. Enable access in Settings.")
+            Text("Pocket Scanner uses your camera to capture documents. Enable access in Settings.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 32)

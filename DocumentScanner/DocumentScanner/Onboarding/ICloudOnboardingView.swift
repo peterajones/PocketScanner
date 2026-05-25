@@ -11,7 +11,7 @@ struct ICloudOnboardingView: View {
                 .foregroundStyle(.secondary)
             Text("iCloud Drive recommended")
                 .font(.title2.weight(.semibold))
-            Text("Mobile Scanner syncs your documents across devices through iCloud Drive. You can use the app without it — scans will stay on this device only.")
+            Text("Pocket Scanner syncs your documents across devices through iCloud Drive. You can use the app without it — scans will stay on this device only.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 32)
