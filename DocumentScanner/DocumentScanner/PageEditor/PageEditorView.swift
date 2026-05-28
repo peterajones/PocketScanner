@@ -21,22 +21,35 @@ struct PageEditorView: View {
     @State private var filter: ImageFilter = .none
     @State private var isWorking = false
     @State private var errorMessage: String?
+    @State private var showingApplyAllConfirm = false
+    @State private var bulkProgress: BulkProgress?
+
+    private struct BulkProgress: Equatable {
+        let current: Int
+        let total: Int
+    }
 
     var body: some View {
         NavigationStack {
-            Group {
-                if let pageImage, let quadBinding {
-                    VStack(spacing: 8) {
-                        QuadOverlay(image: displayedImage(pageImage), quad: quadBinding)
-                            .padding()
-                        rotationControls
-                        filterControls
-                        if let errorMessage {
-                            Text(errorMessage).foregroundStyle(.red).font(.footnote)
+            ZStack {
+                Group {
+                    if let pageImage, let quadBinding {
+                        VStack(spacing: 8) {
+                            QuadOverlay(image: displayedImage(pageImage), quad: quadBinding)
+                                .padding()
+                            rotationControls
+                            filterControls
+                            if let errorMessage {
+                                Text(errorMessage).foregroundStyle(.red).font(.footnote)
+                            }
                         }
+                    } else {
+                        ProgressView("Preparing page…")
                     }
-                } else {
-                    ProgressView("Preparing page…")
+                }
+
+                if let bulkProgress {
+                    bulkProgressOverlay(bulkProgress)
                 }
             }
             .navigationTitle("Edit Page \(pageIndex + 1)")
@@ -56,6 +69,15 @@ struct PageEditorView: View {
             }
             .task { await prepare() }
             .interactiveDismissDisabled(isWorking)
+            .alert("Apply \(filter.displayName) to all pages?",
+                   isPresented: $showingApplyAllConfirm) {
+                Button("Apply", role: .destructive) {
+                    Task { await applyToAll() }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will re-process all \(session.pdf.pageCount) pages and may take a moment.")
+            }
         }
     }
 
@@ -85,13 +107,41 @@ struct PageEditorView: View {
     }
 
     private var filterControls: some View {
-        Picker("Filter", selection: $filter) {
-            ForEach(ImageFilter.allCases) { f in
-                Text(f.displayName).tag(f)
+        VStack(spacing: 8) {
+            Picker("Filter", selection: $filter) {
+                ForEach(ImageFilter.allCases) { f in
+                    Text(f.displayName).tag(f)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+
+            if filter != .none && session.pdf.pageCount > 1 {
+                Button {
+                    showingApplyAllConfirm = true
+                } label: {
+                    Label("Apply \(filter.displayName) to all pages",
+                          systemImage: "rectangle.stack")
+                        .font(.footnote)
+                }
+                .disabled(isWorking)
             }
         }
-        .pickerStyle(.segmented)
-        .padding(.horizontal)
+    }
+
+    private func bulkProgressOverlay(_ progress: BulkProgress) -> some View {
+        ZStack {
+            Color.black.opacity(0.5).ignoresSafeArea()
+            VStack(spacing: 16) {
+                ProgressView(value: Double(progress.current), total: Double(progress.total))
+                    .frame(width: 200)
+                Text("Processing page \(progress.current) of \(progress.total)")
+                    .font(.subheadline)
+            }
+            .padding(24)
+            .background(.regularMaterial)
+            .cornerRadius(12)
+        }
     }
 
     private func prepare() async {
@@ -130,26 +180,79 @@ struct PageEditorView: View {
     }
 
     private func applyEdit() async {
-        guard let pageImage, let quad else { return }
         isWorking = true
         defer { isWorking = false }
+        guard let pageImage, let quad else { return }
         do {
-            guard let corrected = corrector.correct(pageImage, quad: quad) else {
-                errorMessage = "Couldn't apply crop."
-                return
-            }
-            let rotated = rotatedImage(corrected)
-            let finalImage = filterEngine.apply(filter, to: rotated) ?? rotated
-            let observations = (try? await ocr.recognizeText(in: finalImage)) ?? []
-            let newDoc = try PDFAssembler().assemble(
-                pages: [ScannedPage(image: finalImage, observations: observations)],
-                createdAt: Date()
-            )
-            DocumentMutations.replacePage(in: session.pdf, at: pageIndex, with: newDoc)
+            try await processAndReplaceCurrentPage(pageImage: pageImage, quad: quad)
             _ = try session.save()
             onDismiss()
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func applyToAll() async {
+        isWorking = true
+        defer {
+            isWorking = false
+            bulkProgress = nil
+        }
+        guard let pageImage, let quad else { return }
+        let total = session.pdf.pageCount
+
+        do {
+            // Current page first, with its full edits.
+            bulkProgress = BulkProgress(current: 1, total: total)
+            try await processAndReplaceCurrentPage(pageImage: pageImage, quad: quad)
+
+            // Then every other page, filter only.
+            var done = 1
+            for index in 0..<total where index != pageIndex {
+                done += 1
+                bulkProgress = BulkProgress(current: done, total: total)
+                try await processAndReplaceFilterOnly(at: index)
+            }
+
+            _ = try session.save()
+            onDismiss()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func processAndReplaceCurrentPage(pageImage: UIImage, quad: Quad) async throws {
+        guard let corrected = corrector.correct(pageImage, quad: quad) else {
+            throw PageEditError.cropFailed
+        }
+        let rotated = rotatedImage(corrected)
+        let finalImage = filterEngine.apply(filter, to: rotated) ?? rotated
+        let observations = (try? await ocr.recognizeText(in: finalImage)) ?? []
+        let newDoc = try PDFAssembler().assemble(
+            pages: [ScannedPage(image: finalImage, observations: observations)],
+            createdAt: Date()
+        )
+        DocumentMutations.replacePage(in: session.pdf, at: pageIndex, with: newDoc)
+    }
+
+    private func processAndReplaceFilterOnly(at index: Int) async throws {
+        guard let page = session.pdf.page(at: index),
+              let rendered = renderer.image(from: page) else { return }
+        let filtered = filterEngine.apply(filter, to: rendered) ?? rendered
+        let observations = (try? await ocr.recognizeText(in: filtered)) ?? []
+        let newDoc = try PDFAssembler().assemble(
+            pages: [ScannedPage(image: filtered, observations: observations)],
+            createdAt: Date()
+        )
+        DocumentMutations.replacePage(in: session.pdf, at: index, with: newDoc)
+    }
+}
+
+private enum PageEditError: LocalizedError {
+    case cropFailed
+    var errorDescription: String? {
+        switch self {
+        case .cropFailed: return "Couldn't apply crop."
         }
     }
 }
