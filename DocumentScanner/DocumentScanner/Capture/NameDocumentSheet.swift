@@ -10,7 +10,8 @@ struct NameDocumentSheet: View {
     let onSaved: () -> Void
     let onCancel: () -> Void
 
-    @State private var name: String = NameDocumentSheet.defaultName()
+    @State private var name: String = DefaultDocumentName.fallback()
+    @State private var hasUserEdited = false
     @State private var isWorking = false
     @Environment(\.alertCenter) private var alertCenter
 
@@ -18,7 +19,13 @@ struct NameDocumentSheet: View {
         NavigationStack {
             Form {
                 Section("Name") {
-                    TextField("Name", text: $name)
+                    TextField("Name", text: Binding(
+                        get: { name },
+                        set: { newValue in
+                            hasUserEdited = true
+                            name = newValue
+                        }
+                    ))
                         .textInputAutocapitalization(.words)
                         .disabled(isWorking)
                         .accessibilityIdentifier("NameSheet.NameField")
@@ -45,8 +52,20 @@ struct NameDocumentSheet: View {
                     }
                 }
             }
+            .task { await refineDefaultName() }
         }
         .interactiveDismissDisabled(isWorking)
+    }
+
+    /// While OCR runs, the sheet shows a timestamp default. Once the pipeline
+    /// produces text, swap in a smarter name — but only if the user hasn't
+    /// already started typing their own.
+    private func refineDefaultName() async {
+        guard let result = try? await pipelineTask.value else { return }
+        guard !hasUserEdited else { return }
+        if let suggestion = DefaultDocumentName.suggest(from: result.ocrText) {
+            name = suggestion
+        }
     }
 
     private func save() async {
@@ -72,9 +91,4 @@ struct NameDocumentSheet: View {
         }
     }
 
-    private static func defaultName() -> String {
-        let f = DateFormatter()
-        f.dateFormat = "'Scan' yyyy-MM-dd HH:mm"
-        return f.string(from: Date())
-    }
 }
