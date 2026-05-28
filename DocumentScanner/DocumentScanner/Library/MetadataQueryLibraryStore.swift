@@ -39,15 +39,20 @@ final class MetadataQueryLibraryStore: NSObject, LibraryStoring {
 
     @objc private func queryDidUpdate(_ note: Notification) {
         query.disableUpdates()
-        defer { query.enableUpdates() }
 
         let items = (query.results as? [NSMetadataItem]) ?? []
         let urls = items.compactMap { $0.value(forAttribute: NSMetadataItemURLKey) as? URL }
-        let built = urls.map { DocumentSummary.fromFile(at: $0) }
-            .sorted(by: { $0.createdAt > $1.createdAt })
-        // Hop to main since `@Observable` notifies SwiftUI on whatever queue mutates the value.
-        DispatchQueue.main.async {
+
+        // `fromFile` opens each PDF via mmap to read page count + OCR text.
+        // When iCloud hasn't fully synced, that mmap can block waiting for the
+        // file to download. Doing this on the main thread freezes the launch.
+        Task {
+            let built = await Task.detached(priority: .userInitiated) {
+                urls.map { DocumentSummary.fromFile(at: $0) }
+                    .sorted(by: { $0.createdAt > $1.createdAt })
+            }.value
             self.summaries = built
+            self.query.enableUpdates()
         }
     }
 }

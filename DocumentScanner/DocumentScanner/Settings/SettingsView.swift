@@ -17,6 +17,7 @@ struct SettingsView: View {
             }
             Section("About") {
                 AboutRow()
+                SendFeedbackRow()
             }
         }
         .navigationTitle("Settings")
