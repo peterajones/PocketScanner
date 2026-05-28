@@ -2,7 +2,7 @@
 
 A no-subscription iOS document scanner. Scan paper to searchable PDF, synced to your own iCloud Drive. No accounts, no ads, no tracking.
 
-> Available on the App Store: *coming soon*
+> Available on the App Store: [Pocket Scanner](https://apps.apple.com/app/pocket-scanner/id6773036432)
 
 ## What it does
 

@@ -3,7 +3,7 @@
   <h1 style="margin: 0;">Pocket Scanner — Privacy Policy</h1>
 </div>
 
-**Effective date:** May 24, 2026
+**Effective date:** May 28, 2026
 
 Pocket Scanner is built for people who don't want a scanner app to know anything about them. This policy describes exactly what data the app handles and what it doesn't.
 
