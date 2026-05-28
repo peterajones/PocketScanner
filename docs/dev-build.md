@@ -22,15 +22,36 @@ build settings:
 - **Release**: only used during `Product → Archive`. The archived
   binary uploads to App Store Connect as the user-facing `Pocket Scanner`.
 
-To run Release locally for some reason:
+### Running Release locally (rare — read the warning first)
+
+> **Warning: running Release locally replaces the App Store install.**
+> Release uses the production bundle ID (`ca.peter-jones.DocumentScanner`),
+> which iOS treats as the same app as the one on the App Store. Building
+> from Xcode overwrites the App Store binary with your locally-signed copy.
+>
+> What's lost: the "App Store install" status — the listing shows "Get"
+> instead of "Open" until you reinstall.
+>
+> What's preserved: all your data. The iCloud container is keyed by
+> bundle ID, not signing identity, so scans/settings survive.
+>
+> Recovery: delete the app from your phone (long-press → Remove App),
+> then re-install from the App Store. Two minutes, no data loss.
+>
+> **In almost all cases the Dev build covers what you need.** Only
+> flip to Release locally if you specifically must verify the
+> production-signed binary on a real device.
+
+If you've read the above and still need to:
 
 1. **Product → Scheme → Edit Scheme…** (⌘<)
-2. Select **Run** in the sidebar
-3. Change **Build Configuration** from `Debug` to `Release`
+2. Select **Run** in the left sidebar
+3. In the right panel, **Info** tab (default) → first row is **Build
+   Configuration** — switch from `Debug` to `Release`
 4. ⌘R
 
-Don't forget to switch back to Debug after, or the next `⌘R` will
-overwrite your App Store-installed Pocket Scanner.
+Switch back to Debug as soon as you're done, or the next `⌘R` will
+silently replace your App Store install again.
 
 ## Limitations of the dev build
 
