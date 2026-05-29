@@ -43,6 +43,12 @@ struct DocumentScannerApp: App {
         let local = InMemoryLibraryStore()
         local.documentsURL = container.localDocumentsURL
         _localStore = State(initialValue: local)
+
+        #if DEBUG
+        if DemoSeeder.isRequested {
+            DemoSeeder(documentsURL: container.localDocumentsURL).seed()
+        }
+        #endif
     }
 
     private static var isUITesting: Bool {
