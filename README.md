@@ -86,11 +86,16 @@ open DocumentScanner.xcodeproj
 
 The project uses Xcode's "Automatically manage signing" — you'll need to switch the Team to your own Apple ID. The iCloud capability requires a paid Apple Developer Program membership; in its absence, the app falls back to local-only storage on the device.
 
-To run the test suite:
+To run the test suite (from inside `PocketScanner/DocumentScanner`, the directory that contains `DocumentScanner.xcodeproj`):
 
 ```bash
-xcodebuild test -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 17'
+xcodebuild test -project DocumentScanner.xcodeproj -scheme DocumentScanner -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max'
+```
+
+If you get `'DocumentScanner.xcodeproj' does not exist`, you're a level too high — `cd DocumentScanner` and re-run. To list valid simulators on your machine:
+
+```bash
+xcodebuild -showdestinations -project DocumentScanner.xcodeproj -scheme DocumentScanner | grep iPhone
 ```
 
 ## About
