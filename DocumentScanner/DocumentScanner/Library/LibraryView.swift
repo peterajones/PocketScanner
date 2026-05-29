@@ -93,7 +93,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 )
             }
             .navigationDestination(for: URL.self) { folderURL in
-                FolderContentsView(folderURL: folderURL, store: store, storage: storage)
+                FolderContentsView(
+                    folderURL: folderURL,
+                    store: store,
+                    storage: storage,
+                    scannerPresenter: scannerPresenter,
+                    pipeline: pipeline
+                )
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
