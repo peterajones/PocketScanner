@@ -69,7 +69,7 @@ A few decisions worth calling out:
 
 ## Privacy policy
 
-[[https://peterajones.github.io/mobileDocumentScanner/privacy-policy](https://peterajones.github.io/PocketScanner/privacy-policy)](<https://peterajones.github.io/PocketScanner/privacy-policy>)
+[https://peterajones.github.io/PocketScanner/privacy-policy](https://peterajones.github.io/PocketScanner/privacy-policy)
 
 ## Building from source
 
