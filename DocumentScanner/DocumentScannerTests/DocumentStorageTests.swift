@@ -142,6 +142,40 @@ final class DocumentStorageTests: XCTestCase {
         XCTAssertEqual(names, ["Receipts", "Recipes"])
     }
 
+    func test_renameFolder_movesDirectoryToNewName() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Old")
+        let renamed = try storage.renameFolder(at: folder, to: "New")
+        XCTAssertEqual(renamed.lastPathComponent, "New")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: folder.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: renamed.path))
+    }
+
+    func test_renameFolder_preservesContents() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Old")
+        let docURL = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        let movedURL = try storage.moveDocument(at: docURL, toFolder: folder)
+        let renamed = try storage.renameFolder(at: folder, to: "New")
+        let renamedDocURL = renamed.appendingPathComponent("Receipt.pdf")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: renamedDocURL.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: movedURL.path))
+    }
+
+    func test_renameFolder_resolvesNameCollision() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        _ = try storage.createFolder(named: "Receipts")
+        let other = try storage.createFolder(named: "Recipes")
+        let renamed = try storage.renameFolder(at: other, to: "Receipts")
+        XCTAssertEqual(renamed.lastPathComponent, "Receipts (2)")
+    }
+
+    func test_renameFolder_throwsOnEmptyName() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Folder")
+        XCTAssertThrowsError(try storage.renameFolder(at: folder, to: "   "))
+    }
+
     func test_deleteFolder_removesFolderAndContents() throws {
         let storage = DocumentStorage(documentsURL: tempDir)
         let folder = try storage.createFolder(named: "Receipts")

@@ -140,6 +140,40 @@ struct DocumentStorage {
         }
     }
 
+    /// Rename a folder in place. Sanitizes the new name and resolves
+    /// collisions with the same `(N)` suffix scheme used elsewhere.
+    @discardableResult
+    func renameFolder(at folderURL: URL, to newName: String) throws -> URL {
+        let sanitized = Self.sanitize(newName)
+        guard !sanitized.isEmpty else { throw DocumentStorageError.emptyName }
+        let parent = folderURL.deletingLastPathComponent()
+        let desired = parent.appendingPathComponent(sanitized, isDirectory: true)
+
+        // No-op if the user typed the same name back in.
+        if desired.standardizedFileURL.path == folderURL.standardizedFileURL.path {
+            return folderURL
+        }
+
+        let target = try uniqueFolderURL(in: parent, base: sanitized)
+
+        var coordinatorError: NSError?
+        var moveError: Error?
+        let coordinator = NSFileCoordinator()
+        coordinator.coordinate(
+            writingItemAt: folderURL, options: .forMoving,
+            writingItemAt: target, options: .forReplacing,
+            error: &coordinatorError
+        ) { src, dst in
+            do {
+                try FileManager.default.moveItem(at: src, to: dst)
+            } catch {
+                moveError = error
+            }
+        }
+        if let error = coordinatorError ?? (moveError as NSError?) { throw error }
+        return target
+    }
+
     /// Delete a folder including all of its contents. Coordinated so iCloud
     /// sees the removal as a single operation.
     func deleteFolder(at folderURL: URL) throws {
@@ -157,6 +191,20 @@ struct DocumentStorage {
 
     private func uniqueURL(base: String, allowingMatch: URL? = nil) throws -> URL {
         try uniqueURL(in: documentsURL, base: base, allowingMatch: allowingMatch)
+    }
+
+    private func uniqueFolderURL(in parent: URL, base: String) throws -> URL {
+        let candidate = parent.appendingPathComponent(base, isDirectory: true)
+        if !FileManager.default.fileExists(atPath: candidate.path) {
+            return candidate
+        }
+        for index in 2...999 {
+            let suffixed = parent.appendingPathComponent("\(base) (\(index))", isDirectory: true)
+            if !FileManager.default.fileExists(atPath: suffixed.path) {
+                return suffixed
+            }
+        }
+        throw DocumentStorageError.writeFailed
     }
 
     private func uniqueURL(in parent: URL, base: String, allowingMatch: URL? = nil) throws -> URL {

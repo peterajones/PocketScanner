@@ -17,6 +17,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var showingNewFolderAlert = false
     @State private var newFolderName = ""
     @State private var folderActionError: String?
+    @State private var folderBeingRenamed: URL?
+    @State private var renameFolderName = ""
+    @State private var folderBeingDeleted: URL?
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -41,6 +44,19 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                                         folderRow(folderURL)
                                     }
                                     .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
+                                    .contextMenu {
+                                        Button {
+                                            renameFolderName = folderURL.lastPathComponent
+                                            folderBeingRenamed = folderURL
+                                        } label: {
+                                            Label("Rename", systemImage: "pencil")
+                                        }
+                                        Button(role: .destructive) {
+                                            folderBeingDeleted = folderURL
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -138,6 +154,32 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Enter a name for the new folder.")
+            }
+            .alert("Rename Folder",
+                   isPresented: Binding(
+                    get: { folderBeingRenamed != nil },
+                    set: { if !$0 { folderBeingRenamed = nil } }
+                   )) {
+                TextField("Folder name", text: $renameFolderName)
+                    .autocorrectionDisabled()
+                Button("Rename") { renameFolder() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Choose a new name for this folder.")
+            }
+            .alert("Delete Folder?",
+                   isPresented: Binding(
+                    get: { folderBeingDeleted != nil },
+                    set: { if !$0 { folderBeingDeleted = nil } }
+                   )) {
+                Button("Delete", role: .destructive) { deleteFolder() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                if let folder = folderBeingDeleted, !isFolderEmpty(folder) {
+                    Text("This folder and all documents inside it will be deleted.")
+                } else {
+                    Text("This folder will be deleted.")
+                }
             }
             .alert("Couldn't update folder",
                    isPresented: Binding(
@@ -240,6 +282,39 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             store.refresh()
         } catch {
             folderActionError = error.localizedDescription
+        }
+    }
+
+    private func renameFolder() {
+        guard let folder = folderBeingRenamed else { return }
+        let trimmed = renameFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        do {
+            _ = try storage.renameFolder(at: folder, to: trimmed)
+            refreshFolders()
+            store.refresh()
+        } catch {
+            folderActionError = error.localizedDescription
+        }
+        folderBeingRenamed = nil
+    }
+
+    private func deleteFolder() {
+        guard let folder = folderBeingDeleted else { return }
+        do {
+            try storage.deleteFolder(at: folder)
+            refreshFolders()
+            store.refresh()
+        } catch {
+            folderActionError = error.localizedDescription
+        }
+        folderBeingDeleted = nil
+    }
+
+    private func isFolderEmpty(_ folderURL: URL) -> Bool {
+        let path = folderURL.standardizedFileURL.path
+        return !store.summaries.contains {
+            $0.url.deletingLastPathComponent().standardizedFileURL.path == path
         }
     }
 }
