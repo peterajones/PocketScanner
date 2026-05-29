@@ -45,7 +45,10 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     }
 
     private var docsInFolder: [DocumentSummary] {
-        store.summaries.filter { $0.url.deletingLastPathComponent() == folderURL }
+        let folderPath = folderURL.standardizedFileURL.path
+        return store.summaries.filter {
+            $0.url.deletingLastPathComponent().standardizedFileURL.path == folderPath
+        }
     }
 
     private var filtered: [DocumentSummary] {

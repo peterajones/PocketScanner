@@ -26,11 +26,18 @@ final class InMemoryLibraryStore: LibraryStoring {
 
     func refresh() {
         guard let documentsURL else { return }
-        let urls = (try? FileManager.default.contentsOfDirectory(
+        // Recursive so docs moved into folders still appear in store.summaries.
+        // LibraryView and FolderContentsView each filter to their own scope.
+        var pdfs: [URL] = []
+        if let enumerator = FileManager.default.enumerator(
             at: documentsURL,
-            includingPropertiesForKeys: nil
-        )) ?? []
-        let pdfs = urls.filter { $0.pathExtension.lowercased() == "pdf" }
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ) {
+            for case let url as URL in enumerator where url.pathExtension.lowercased() == "pdf" {
+                pdfs.append(url)
+            }
+        }
         let built = pdfs.map { DocumentSummary.fromFile(at: $0) }
         summaries = built.sorted { $0.createdAt > $1.createdAt }
     }

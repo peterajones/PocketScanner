@@ -194,7 +194,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     private var docsAtRoot: [DocumentSummary] {
-        store.summaries.filter { $0.url.deletingLastPathComponent() == storage.documentsURL }
+        let rootPath = storage.documentsURL.standardizedFileURL.path
+        return store.summaries.filter {
+            $0.url.deletingLastPathComponent().standardizedFileURL.path == rootPath
+        }
     }
 
     private var filteredDocs: [DocumentSummary] {
