@@ -9,8 +9,11 @@ A no-subscription iOS document scanner. Scan paper to searchable PDF, synced to 
 - **Capture** documents with Apple's VisionKit scanner — automatic edge detection, perspective correction, multi-page in one shot.
 - **OCR** every page on-device via Apple's Vision framework. Resulting PDFs are fully searchable in any reader.
 - **Sync** through your own iCloud Drive — the "Pocket Scanner" folder appears in the Files app on every device signed into your Apple ID.
+- **Organize** scans into folders — create, rename, delete; move documents between folders; scan straight into a folder.
 - **Edit** any page after the fact: re-crop, rotate, apply preset filters (Color / Greyscale / B&W / Photo). Re-OCRs after each edit.
+- **Bulk edit** pages — multi-select thumbnails in edit mode to delete several at once, or apply a single filter to every page of a document.
 - **Search** across all your scans by name or by text inside the document; matches highlight on the page with prev/next navigation.
+- **Smart names** — receipts, invoices, and recipes get descriptive default names from on-device OCR.
 - **Lock** the library behind optional Face ID with a 30-second background re-lock; app-switcher snapshots are always blurred.
 
 ## What it doesn't do
@@ -49,7 +52,7 @@ DocumentScanner/                            # Xcode project
 │   ├── Settings/                           # Settings screen, AppLock state machine
 │   ├── Onboarding/                         # iCloud-unavailable explainer
 │   └── Errors/                             # AlertCenter + AppAlert
-├── DocumentScannerTests/                   # 40+ unit tests
+├── DocumentScannerTests/                   # 87 unit tests
 └── DocumentScannerUITests/                 # Hermetic XCUITests with stub scanner
 
 docs/
@@ -76,8 +79,8 @@ A few decisions worth calling out:
 Requires Xcode 26 (or later) and an iOS 17.6+ deployment target.
 
 ```bash
-git clone https://github.com/peterajones/mobileDocumentScanner.git
-cd mobileDocumentScanner/DocumentScanner
+git clone https://github.com/peterajones/PocketScanner.git
+cd PocketScanner/DocumentScanner
 open DocumentScanner.xcodeproj
 ```
 
