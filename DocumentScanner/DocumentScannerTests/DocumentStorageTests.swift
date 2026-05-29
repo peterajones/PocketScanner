@@ -87,6 +87,73 @@ final class DocumentStorageTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
     }
 
+    // MARK: - Folders
+
+    func test_createFolder_createsDirectoryAtRoot() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Receipts")
+        var isDir: ObjCBool = false
+        XCTAssertTrue(FileManager.default.fileExists(atPath: folder.path, isDirectory: &isDir))
+        XCTAssertTrue(isDir.boolValue)
+        XCTAssertEqual(folder.lastPathComponent, "Receipts")
+    }
+
+    func test_createFolder_throwsOnEmptyName() {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        XCTAssertThrowsError(try storage.createFolder(named: "   "))
+    }
+
+    func test_createFolder_sanitizesIllegalCharacters() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Tax/2025")
+        XCTAssertFalse(folder.lastPathComponent.contains("/"))
+    }
+
+    func test_moveDocument_relocatesPDFIntoFolder() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let docURL = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        let folder = try storage.createFolder(named: "Receipts")
+        let newURL = try storage.moveDocument(at: docURL, toFolder: folder)
+        XCTAssertEqual(newURL.deletingLastPathComponent(), folder)
+        XCTAssertEqual(newURL.lastPathComponent, "Receipt.pdf")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: docURL.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: newURL.path))
+    }
+
+    func test_moveDocument_resolvesCollisionsBySuffix() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Receipts")
+        // Pre-existing file in the destination folder
+        let preExisting = folder.appendingPathComponent("Receipt.pdf")
+        try Data().write(to: preExisting)
+
+        let docURL = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        let newURL = try storage.moveDocument(at: docURL, toFolder: folder)
+        XCTAssertEqual(newURL.lastPathComponent, "Receipt (2).pdf")
+    }
+
+    func test_listFolders_returnsOnlyDirectories() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        _ = try storage.createFolder(named: "Receipts")
+        _ = try storage.createFolder(named: "Recipes")
+        _ = try storage.write(makeSinglePagePDF(), preferredName: "loose-doc")
+        let folders = try storage.listFolders()
+        let names = Set(folders.map(\.lastPathComponent))
+        XCTAssertEqual(names, ["Receipts", "Recipes"])
+    }
+
+    func test_deleteFolder_removesFolderAndContents() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Receipts")
+        let docURL = try storage.write(makeSinglePagePDF(), preferredName: "R1")
+        let movedURL = try storage.moveDocument(at: docURL, toFolder: folder)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: movedURL.path))
+
+        try storage.deleteFolder(at: folder)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: folder.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: movedURL.path))
+    }
+
     // MARK: - Helpers
 
     private func makeSinglePagePDF() -> PDFDocument {
