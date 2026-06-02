@@ -48,6 +48,41 @@ final class PDFAssemblerHighlightTests: XCTestCase {
                        "Selection width should align with OCR rect width")
     }
 
+    /// Regression: findString must work after a disk round-trip. The CTM
+    /// scaling in drawInvisibleText could theoretically break PDFKit's
+    /// post-load text indexing even if it works on a fresh in-memory PDF.
+    func test_findString_afterDiskRoundTrip() throws {
+        let pageSize = CGSize(width: 612, height: 792)
+        let normalized = CGRect(x: 0.15, y: 0.25, width: 0.7, height: 0.04)
+        let needle = "RoundTripNeedle"
+        let observation = OCRObservation(string: "Some \(needle) text", boundingBox: normalized)
+        let img = blankImage(size: pageSize)
+
+        // Build in memory.
+        let pdf = try PDFAssembler().assemble(
+            pages: [ScannedPage(image: img, observations: [observation])],
+            createdAt: Date()
+        )
+        // In-memory findString should work.
+        XCTAssertFalse(pdf.findString(needle, withOptions: .caseInsensitive).isEmpty,
+                       "findString failed on in-memory PDF (CTM scaling broke indexing)")
+
+        // Disk round-trip.
+        let tmpURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("findString-roundtrip-\(UUID().uuidString).pdf")
+        defer { try? FileManager.default.removeItem(at: tmpURL) }
+        try XCTUnwrap(pdf.dataRepresentation()).write(to: tmpURL)
+
+        // Reload from URL and findString again.
+        let reloaded = try XCTUnwrap(PDFDocument(url: tmpURL),
+                                     "Reloaded PDF didn't parse")
+        XCTAssertFalse(reloaded.findString(needle, withOptions: .caseInsensitive).isEmpty,
+                       "findString returned empty after disk round-trip — CTM scaling broke post-load indexing")
+        // Also check pdf.string contains the needle (used by ocrSnippet).
+        XCTAssertTrue((reloaded.string ?? "").contains(needle),
+                      "pdf.string missing the needle after disk round-trip")
+    }
+
     /// Regression: same-name save (overwhelmingly common — filter apply,
     /// edit, etc. all save with the same displayName) must overwrite the
     /// existing file in place, not rename to "(2)". The old code did this
