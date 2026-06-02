@@ -6,7 +6,7 @@ struct DocumentViewerView: View {
     let storage: DocumentStorage
     let scannerPresenter: DocumentScannerPresenting
     let pipeline: ScanPipeline
-    let searchTerm: String?
+    let searchContext: SearchContext?
     /// Closure dismissing the viewer; provided by LibraryView so the deletion
     /// path can pop the navigation stack.
     let onDeleted: () -> Void
@@ -167,7 +167,7 @@ struct DocumentViewerView: View {
     }
 
     private func rebuildHighlight(session: DocumentSession) {
-        guard let term = searchTerm, !term.isEmpty else {
+        guard let term = searchContext?.term, !term.isEmpty else {
             searchHighlight = nil
             return
         }

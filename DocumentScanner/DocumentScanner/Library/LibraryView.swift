@@ -1,4 +1,5 @@
 import SwiftUI
+import PDFKit
 
 struct LibraryView<Store: LibraryStoring & Observable>: View {
     @Bindable var store: Store
@@ -85,7 +86,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     storage: storage,
                     scannerPresenter: scannerPresenter,
                     pipeline: pipeline,
-                    searchTerm: searchText.isEmpty ? nil : searchText,
+                    searchContext: searchContextStarting(at: summary),
                     onDeleted: {
                         store.refresh()
                         path.removeLast()
@@ -274,6 +275,32 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             $0.displayName.lowercased().contains(needle)
             || $0.ocrSnippet.lowercased().contains(needle)
         }
+    }
+
+    /// Cross-doc search state: enumerates `filteredDocs` and runs
+    /// PDFKit `findString` against each, recording per-doc match counts.
+    /// Returns nil when the search field is empty or no doc has matches.
+    ///
+    /// `startDocIndex` is set to 0 here; the navigation destination
+    /// overrides it with the tapped doc's index.
+    private var searchContext: SearchContext? {
+        guard !searchText.isEmpty else { return nil }
+        let entries: [SearchContext.DocEntry] = filteredDocs.compactMap { summary in
+            guard let pdf = PDFDocument(url: summary.url) else { return nil }
+            let count = pdf.findString(searchText, withOptions: .caseInsensitive).count
+            return count > 0 ? .init(summary: summary, matchCount: count) : nil
+        }
+        return entries.isEmpty ? nil
+            : SearchContext(term: searchText, docs: entries, startDocIndex: 0)
+    }
+
+    /// Returns the current cross-doc search context with `startDocIndex`
+    /// pointing at the tapped summary's position. Returns nil when there's
+    /// no active search.
+    private func searchContextStarting(at summary: DocumentSummary) -> SearchContext? {
+        guard let ctx = searchContext else { return nil }
+        let idx = ctx.docs.firstIndex(where: { $0.summary.id == summary.id }) ?? 0
+        return SearchContext(term: ctx.term, docs: ctx.docs, startDocIndex: idx)
     }
 
     private func triggerScan() {
