@@ -11,6 +11,24 @@ struct DocumentViewerView: View {
     /// path can pop the navigation stack.
     let onDeleted: () -> Void
 
+    init(summary: DocumentSummary,
+         storage: DocumentStorage,
+         scannerPresenter: DocumentScannerPresenting,
+         pipeline: ScanPipeline,
+         searchContext: SearchContext?,
+         onDeleted: @escaping () -> Void) {
+        self.summary = summary
+        self.storage = storage
+        self.scannerPresenter = scannerPresenter
+        self.pipeline = pipeline
+        self.searchContext = searchContext
+        self.onDeleted = onDeleted
+        // Seed currentDocIndex from the context so the first .task(id:) fires
+        // on the correct doc — avoiding an .onAppear two-phase race where
+        // task(id:0) could briefly start loading docs[0] before being cancelled.
+        _currentDocIndex = State(initialValue: searchContext?.startDocIndex ?? 0)
+    }
+
     private struct PageEditorContext: Identifiable {
         let index: Int
         var id: Int { index }
@@ -25,7 +43,7 @@ struct DocumentViewerView: View {
     @State private var addPagesTask: Task<Void, Never>?
     @State private var editingPageIndex: Int?
     @State private var searchHighlight: SearchHighlight?
-    @State private var currentDocIndex: Int = 0
+    @State private var currentDocIndex: Int
     @State private var pendingJumpToLastMatch: Bool = false
 
     /// The summary the viewer is currently displaying. Falls back to the
@@ -90,11 +108,6 @@ struct DocumentViewerView: View {
             loadError = nil
             do { session = try DocumentSession(summary: activeSummary, storage: storage) }
             catch { loadError = String(describing: error) }
-        }
-        .onAppear {
-            if let start = searchContext?.startDocIndex, currentDocIndex != start {
-                currentDocIndex = start
-            }
         }
     }
 
@@ -227,9 +240,14 @@ struct DocumentViewerView: View {
         }
         let matches = session.pdf.findString(term, withOptions: .caseInsensitive)
         let h = SearchHighlight(matches: matches)
-        if pendingJumpToLastMatch, h.matchCount > 0 {
-            // Jump to the last match — for prev-into-previous-doc transitions.
-            for _ in 0..<(h.matchCount - 1) { h.next() }
+        // Always clear the pending-jump flag once we've built a highlight for
+        // the destination doc — even if matchCount is 0 (e.g., file became
+        // temporarily unreadable). Leaving the flag set would misroute the
+        // next successful doc load to its last match instead of its first.
+        if pendingJumpToLastMatch {
+            if h.matchCount > 0 {
+                for _ in 0..<(h.matchCount - 1) { h.next() }
+            }
             pendingJumpToLastMatch = false
         }
         searchHighlight = h

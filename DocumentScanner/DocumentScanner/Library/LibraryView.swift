@@ -301,6 +301,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     /// findString returned zero (rare but real). In that case the viewer
     /// opens without search context rather than silently displaying the
     /// wrong document.
+    ///
+    /// Note: this is also the path used for taps from `FolderContentsView`
+    /// (which inherits the parent NavigationStack's destination). Folder-
+    /// scoped searches don't currently produce a `SearchContext` of their
+    /// own — `searchText` here is LibraryView's, which is empty when the
+    /// user is searching inside a folder. Cross-doc nav within a folder
+    /// is a known follow-up (v1.3+).
     private func searchContextStarting(at summary: DocumentSummary) -> SearchContext? {
         guard let ctx = searchContext else { return nil }
         guard let idx = ctx.docs.firstIndex(where: { $0.summary.id == summary.id }) else {
