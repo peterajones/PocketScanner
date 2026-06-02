@@ -206,7 +206,7 @@ Text("\(globalIndex) of \(searchContext.totalMatches) · \(searchContext.docs.co
 
 | Target | How |
 | --- | --- |
-| `PDFAssemblerHighlightTests` (new) | Assemble a 1-page PDF from a known `OCRObservation` with a specific boundingBox and string. Call `pdf.findString` on the result, take the first selection, assert its `bounds(for:)` x and width match the observation rect within a small tolerance (~2pt). |
+| `PDFAssemblerHighlightTests` (new) | Assemble a 1-page PDF from a known `OCRObservation` with a specific boundingBox and string. Call `pdf.findString` on the result, take the first selection, assert its `bounds(for:)` x and width match the observation rect within ~5pt tolerance (gives headroom for PDFKit's glyph-position rounding while still being orders of magnitude tighter than the pre-fix drift of 30-100pt). |
 | `SearchContext` tests | Pure value-type tests: `totalMatches` correctness, `Hashable` equality, behaviour when `docs` is empty. |
 | LibraryView `searchContext` builder | Test that a doc whose `ocrSnippet` matches but `findString` returns 0 is dropped from `docs`. |
 | Cross-doc navigation flow | Manual on device — spans LibraryView → DocumentViewerView state with PDFKit rendering, not unit-testable cleanly. Verification: search for a term that hits multiple docs, tap into one, exercise next past end and prev past start, confirm doc transitions + counter updates + highlight jumps. |

@@ -119,12 +119,8 @@ struct PDFAssembler {
             )
             guard rect.height > 0, rect.width > 0 else { continue }
 
-            // Size the font so the rendered glyphs roughly match the observed
-            // line height. Then scale the text matrix horizontally so the
-            // rendered glyphs span exactly the OCR rect's width — PDFKit's
-            // findString reads glyph positions from the post-scale text state,
-            // so highlights snap to the OCR width rather than drifting with
-            // system-font widths.
+            // Size the font so glyphs roughly match the observed line height;
+            // scaleX maps the line's natural width to the OCR rect's width.
             let font = UIFont.systemFont(ofSize: rect.height)
             let attributed = NSAttributedString(
                 string: observation.string,
@@ -138,12 +134,11 @@ struct PDFAssembler {
             let naturalWidth = CGFloat(CTLineGetTypographicBounds(ctLine, nil, nil, nil))
             let scaleX: CGFloat = naturalWidth > 0 ? rect.width / naturalWidth : 1
 
-            // Translate to the origin, then scale the CTM horizontally so the
-            // line's natural width maps to the OCR rect's width. PDFKit's
-            // findString reads glyph positions from the post-CTM content stream,
-            // so highlights snap to the OCR width rather than drifting with
-            // system-font widths. We save/restore the inner state around each
-            // observation so the transforms don't accumulate.
+            // IMPORTANT: use CTM (translate + scale), NOT context.textMatrix.
+            // A non-identity textMatrix causes PDFKit findString to return zero
+            // matches — glyphs drawn under a non-identity text matrix are not
+            // indexed. The CTM achieves the same horizontal stretch and keeps
+            // glyphs indexable. Save/restore so transforms don't accumulate.
             context.saveGState()
             context.translateBy(x: rect.origin.x, y: rect.origin.y)
             context.scaleBy(x: scaleX, y: 1)
