@@ -25,6 +25,53 @@ struct DocumentViewerView: View {
     @State private var addPagesTask: Task<Void, Never>?
     @State private var editingPageIndex: Int?
     @State private var searchHighlight: SearchHighlight?
+    @State private var currentDocIndex: Int = 0
+    @State private var pendingJumpToLastMatch: Bool = false
+
+    /// The summary the viewer is currently displaying. Falls back to the
+    /// `summary` parameter when there's no search context (single-doc nav).
+    private var activeSummary: DocumentSummary {
+        searchContext?.docs[safe: currentDocIndex]?.summary ?? summary
+    }
+
+    private var hasNextDoc: Bool {
+        guard let ctx = searchContext else { return false }
+        return currentDocIndex < ctx.docs.count - 1
+    }
+
+    private var hasPreviousDoc: Bool { currentDocIndex > 0 }
+
+    private func handleNext(_ h: SearchHighlight) {
+        if h.currentIndex == h.matchCount - 1, hasNextDoc {
+            currentDocIndex += 1
+            // Mutating currentDocIndex changes the session-loading task's id,
+            // which triggers a reload and a fresh SearchHighlight pointing at
+            // match 0 of the next doc.
+        } else {
+            h.next()
+        }
+    }
+
+    private func handlePrevious(_ h: SearchHighlight) {
+        if h.currentIndex == 0, hasPreviousDoc {
+            pendingJumpToLastMatch = true
+            currentDocIndex -= 1
+            // rebuildHighlight will see pendingJumpToLastMatch and jump to
+            // matchCount-1 after the new highlight is built.
+        } else {
+            h.previous()
+        }
+    }
+
+    private func counterLabel(highlight h: SearchHighlight) -> String {
+        guard let ctx = searchContext else {
+            return "\((h.currentIndex ?? 0) + 1) of \(h.matchCount)"
+        }
+        let priorMatches = ctx.docs[..<currentDocIndex]
+            .reduce(0) { $0 + $1.matchCount }
+        let global = priorMatches + (h.currentIndex ?? 0) + 1
+        return "\(global) of \(ctx.totalMatches) · \(ctx.docs.count) docs"
+    }
 
     var body: some View {
         Group {
@@ -38,9 +85,16 @@ struct DocumentViewerView: View {
                 ProgressView()
             }
         }
-        .task {
-            do { session = try DocumentSession(summary: summary, storage: storage) }
+        .task(id: currentDocIndex) {
+            session = nil
+            loadError = nil
+            do { session = try DocumentSession(summary: activeSummary, storage: storage) }
             catch { loadError = String(describing: error) }
+        }
+        .onAppear {
+            if let start = searchContext?.startDocIndex, currentDocIndex != start {
+                currentDocIndex = start
+            }
         }
     }
 
@@ -95,11 +149,11 @@ struct DocumentViewerView: View {
                     .accessibilityIdentifier("Viewer.EditToggle")
                 Spacer()
                 if let h = searchHighlight, h.matchCount > 0 {
-                    Button { h.previous() } label: { Image(systemName: "chevron.up") }
-                    Text("\((h.currentIndex ?? 0) + 1) of \(h.matchCount)")
+                    Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
+                    Text(counterLabel(highlight: h))
                         .font(.footnote.monospacedDigit())
                         .foregroundStyle(.secondary)
-                    Button { h.next() } label: { Image(systemName: "chevron.down") }
+                    Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
                     Spacer()
                 }
                 ShareLink(item: session.url)
@@ -172,7 +226,13 @@ struct DocumentViewerView: View {
             return
         }
         let matches = session.pdf.findString(term, withOptions: .caseInsensitive)
-        searchHighlight = SearchHighlight(matches: matches)
+        let h = SearchHighlight(matches: matches)
+        if pendingJumpToLastMatch, h.matchCount > 0 {
+            // Jump to the last match — for prev-into-previous-doc transitions.
+            for _ in 0..<(h.matchCount - 1) { h.next() }
+            pendingJumpToLastMatch = false
+        }
+        searchHighlight = h
     }
 
     private func commitRename(session: DocumentSession) {
@@ -184,6 +244,12 @@ struct DocumentViewerView: View {
         }
         do { try session.save() }
         catch { session.displayName = summary.displayName } // revert on failure
+    }
+}
+
+private extension Collection {
+    subscript(safe index: Index) -> Element? {
+        indices.contains(index) ? self[index] : nil
     }
 }
 
