@@ -28,37 +28,10 @@ final class DocumentSession {
     /// view layer. `save()` strips these before writing so they don't persist.
     static let searchHighlightAnnotationName = "DocumentScanner.searchHighlight"
 
-    enum InitError: Error, LocalizedError {
-        case fileReadFailed(URL, underlying: Error)
-        case pdfParseFailed(URL, byteCount: Int)
-        case unreadablePDF
-
-        var errorDescription: String? {
-            switch self {
-            case .fileReadFailed(let url, let underlying):
-                return "Data(contentsOf:) failed for \(url.lastPathComponent): \(underlying.localizedDescription)"
-            case .pdfParseFailed(let url, let byteCount):
-                return "PDFDocument(data:) returned nil for \(url.lastPathComponent) (\(byteCount) bytes)"
-            case .unreadablePDF:
-                return "Unreadable PDF"
-            }
-        }
-    }
+    enum InitError: Error { case unreadablePDF }
 
     init(summary: DocumentSummary, storage: DocumentStorage) throws {
-        // Load via Data rather than URL: PDFKit caches PDFDocument(url:)
-        // results process-wide and returns stale nils for files that have
-        // been atomic-replaced (e.g. after a filter save). Reading the bytes
-        // and passing to PDFDocument(data:) avoids that cache.
-        let data: Data
-        do {
-            data = try Data(contentsOf: summary.url)
-        } catch {
-            throw InitError.fileReadFailed(summary.url, underlying: error)
-        }
-        guard let pdf = PDFDocument(data: data) else {
-            throw InitError.pdfParseFailed(summary.url, byteCount: data.count)
-        }
+        guard let pdf = PDFDocument(url: summary.url) else { throw InitError.unreadablePDF }
         self.url = summary.url
         self.pdf = pdf
         self.displayName = summary.displayName
