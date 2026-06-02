@@ -130,21 +130,11 @@ struct PDFAssembler {
                 ]
             )
             let ctLine = CTLineCreateWithAttributedString(attributed)
-
-            let naturalWidth = CGFloat(CTLineGetTypographicBounds(ctLine, nil, nil, nil))
-            let scaleX: CGFloat = naturalWidth > 0 ? rect.width / naturalWidth : 1
-
-            // IMPORTANT: use CTM (translate + scale), NOT context.textMatrix.
-            // A non-identity textMatrix causes PDFKit findString to return zero
-            // matches — glyphs drawn under a non-identity text matrix are not
-            // indexed. The CTM achieves the same horizontal stretch and keeps
-            // glyphs indexable. Save/restore so transforms don't accumulate.
-            context.saveGState()
-            context.translateBy(x: rect.origin.x, y: rect.origin.y)
-            context.scaleBy(x: scaleX, y: 1)
-            context.textPosition = .zero
+            // TEMP: reverted CTM scaling to isolate the filter-corrupts-PDF bug.
+            // Highlights are back to system-font-width approximate until we
+            // re-introduce the horizontal-fit fix without the corruption.
+            context.textPosition = CGPoint(x: rect.origin.x, y: rect.origin.y)
             CTLineDraw(ctLine, context)
-            context.restoreGState()
         }
 
         context.restoreGState()
