@@ -1,22 +1,9 @@
 import Foundation
 import PDFKit
 
-enum DocumentStorageError: Error, LocalizedError {
+enum DocumentStorageError: Error {
     case writeFailed
     case emptyName
-    case corruptOutput(badBytesURL: URL?)
-
-    var errorDescription: String? {
-        switch self {
-        case .writeFailed: return "Could not write document."
-        case .emptyName: return "Document name is empty."
-        case .corruptOutput(let url):
-            if let url {
-                return "Save produced an unreadable PDF. Bad bytes saved to \(url.lastPathComponent) for diagnosis."
-            }
-            return "Save produced an unreadable PDF."
-        }
-    }
 }
 
 struct DocumentStorage {
@@ -78,13 +65,6 @@ struct DocumentStorage {
             throw DocumentStorageError.writeFailed
         }
 
-        // Self-check #1: if dataRepresentation produces bytes that PDFKit
-        // can't reparse in memory, refuse to write.
-        if PDFDocument(data: data) == nil {
-            let badURL = try? saveBadBytesForDiagnosis(data, originalName: sanitized, suffix: "memcheck")
-            throw DocumentStorageError.corruptOutput(badBytesURL: badURL)
-        }
-
         var coordinatorError: NSError?
         var writeError: Error?
         let coordinator = NSFileCoordinator()
@@ -97,32 +77,10 @@ struct DocumentStorage {
         }
         if let error = coordinatorError ?? (writeError as NSError?) { throw error }
 
-        // Self-check #2: read back from disk. If PDFDocument(url:) fails on
-        // bytes we just verified in memory, something is mangling the on-disk
-        // representation (NSFileCoordinator interaction, extended attributes,
-        // sync provider, etc). Dump both the in-memory and on-disk bytes.
-        if PDFDocument(url: targetURL) == nil {
-            let memBytesURL = try? saveBadBytesForDiagnosis(data, originalName: sanitized, suffix: "diskcheck-mem")
-            let diskBytes = (try? Data(contentsOf: targetURL)) ?? Data()
-            let diskBytesURL = try? saveBadBytesForDiagnosis(diskBytes, originalName: sanitized, suffix: "diskcheck-disk")
-            // Throw with the disk-bytes URL since that's what failed.
-            throw DocumentStorageError.corruptOutput(badBytesURL: diskBytesURL ?? memBytesURL)
-        }
-
         if targetURL != existingURL {
             try? FileManager.default.removeItem(at: existingURL)
         }
         return targetURL
-    }
-
-    /// Writes corrupt-output bytes to a `_failed-save-<timestamp>-<name>-<suffix>.pdf`
-    /// in the documents directory so the user can share them for debugging.
-    private func saveBadBytesForDiagnosis(_ data: Data, originalName: String, suffix: String) throws -> URL {
-        let stamp = ISO8601DateFormatter().string(from: Date())
-            .replacingOccurrences(of: ":", with: "-")
-        let url = documentsURL.appendingPathComponent("_failed-save-\(stamp)-\(originalName)-\(suffix).pdf")
-        try data.write(to: url, options: .atomic)
-        return url
     }
 
     func delete(at url: URL) throws {
@@ -267,26 +225,13 @@ struct DocumentStorage {
     }
 
     private func uniqueURL(in parent: URL, base: String, allowingMatch: URL? = nil) throws -> URL {
-        // Compare by symlink-resolved path rather than URL == — URL equality
-        // is byte-exact and fails when the existing URL came from a source
-        // that uses /private/var/... (NSMetadataQuery) while the candidate is
-        // built from /var/... (FileManager.documentDirectory). Both resolve
-        // to the same file via the /private symlink, but `URL ==` sees them
-        // as different. A mismatch causes the candidate to be rejected as
-        // "collision," the file to be renamed with " (2)" suffix, and the
-        // original to be deleted — silently moving the doc to a path the
-        // library is no longer holding.
-        let allowedPath = allowingMatch?.resolvingSymlinksInPath().path
-
         let candidate = parent.appendingPathComponent("\(base).pdf")
-        if candidate.resolvingSymlinksInPath().path == allowedPath
-            || !FileManager.default.fileExists(atPath: candidate.path) {
+        if candidate == allowingMatch || !FileManager.default.fileExists(atPath: candidate.path) {
             return candidate
         }
         for index in 2...999 {
             let suffixed = parent.appendingPathComponent("\(base) (\(index)).pdf")
-            if suffixed.resolvingSymlinksInPath().path == allowedPath
-                || !FileManager.default.fileExists(atPath: suffixed.path) {
+            if suffixed == allowingMatch || !FileManager.default.fileExists(atPath: suffixed.path) {
                 return suffixed
             }
         }
