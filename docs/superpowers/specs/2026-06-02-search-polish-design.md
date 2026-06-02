@@ -39,7 +39,7 @@ The items don't interact: Item 1 changes how new PDFs are laid down; Item 2 chan
 
 ### Item 1 — Horizontal highlight accuracy
 
-Modify `PDFAssembler.drawInvisibleText`. After building the CTLine, measure its natural width, then scale the text matrix horizontally so the rendered glyphs span exactly the OCR observation's rect width:
+Modify `PDFAssembler.drawInvisibleText`. After building the CTLine, measure its natural width, then scale the graphics CTM horizontally so the rendered glyphs span exactly the OCR observation's rect width:
 
 ```swift
 let font = UIFont.systemFont(ofSize: rect.height)
@@ -52,12 +52,20 @@ let ctLine = CTLineCreateWithAttributedString(attributed)
 let naturalWidth = CGFloat(CTLineGetTypographicBounds(ctLine, nil, nil, nil))
 let scaleX: CGFloat = naturalWidth > 0 ? rect.width / naturalWidth : 1
 
-context.textPosition = CGPoint(x: rect.origin.x, y: rect.origin.y)
-context.textMatrix = CGAffineTransform(scaleX: scaleX, y: 1)
+// Translate to the OCR rect origin, scale the CTM horizontally, then
+// draw the line at the local origin. Save/restore the inner state around
+// each observation so the transforms don't accumulate.
+context.saveGState()
+context.translateBy(x: rect.origin.x, y: rect.origin.y)
+context.scaleBy(x: scaleX, y: 1)
+context.textPosition = .zero
 CTLineDraw(ctLine, context)
+context.restoreGState()
 ```
 
-Why it works: `context.textMatrix` is part of the PDF text state. PDFKit's `findString` returns `PDFSelection`s whose `bounds(for:)` are computed from the glyph positions in the rendered text stream — positions are scaled by `textMatrix`. Scaling x compresses or stretches the invisible glyphs to fit the OCR rect, and highlights snap to that width.
+Why it works: scaling the CTM horizontally compresses or stretches every drawn glyph's footprint to fit the OCR rect width. PDFKit's `findString` reads glyph positions from the post-CTM content stream, so the returned `PDFSelection`s match the visible OCR width.
+
+**Important: do NOT use `context.textMatrix` for this.** Setting `textMatrix` to a non-identity transform causes PDFKit's `findString` to return zero matches — PDFKit cannot index glyphs drawn under a non-identity text matrix. The CTM (translate + scale) achieves the same horizontal-scaling effect while keeping the glyphs indexable. Verified empirically during v1.2 implementation; the original spec proposed `textMatrix` and had to be corrected.
 
 **Edge cases:**
 - `naturalWidth == 0` (empty string): guard with `scaleX = 1`. Shouldn't occur because observations come from Vision recognition.
