@@ -97,4 +97,4 @@ No new pixel-sampling tests in this rework (per scope decision). Verification is
 
 ## Rollout
 
-Ship as part of the next release (v1.2 or interim point release; release scope TBD separately). No migration, no flags, no feature gate.
+Ships in the next release that includes any code changes. No migration, no flags, no feature gate. Existing scans aren't re-filtered retroactively — the change only affects new filter selections in the per-page editor.
