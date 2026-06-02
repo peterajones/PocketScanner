@@ -31,7 +31,14 @@ final class DocumentSession {
     enum InitError: Error { case unreadablePDF }
 
     init(summary: DocumentSummary, storage: DocumentStorage) throws {
-        guard let pdf = PDFDocument(url: summary.url) else { throw InitError.unreadablePDF }
+        // Load via Data rather than URL: PDFKit caches PDFDocument(url:)
+        // results process-wide and returns stale nils for files that have
+        // been atomic-replaced (e.g. after a filter save). Reading the bytes
+        // and passing to PDFDocument(data:) avoids that cache.
+        guard let data = try? Data(contentsOf: summary.url),
+              let pdf = PDFDocument(data: data) else {
+            throw InitError.unreadablePDF
+        }
         self.url = summary.url
         self.pdf = pdf
         self.displayName = summary.displayName
