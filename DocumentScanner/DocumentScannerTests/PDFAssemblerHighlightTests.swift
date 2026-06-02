@@ -232,6 +232,89 @@ final class PDFAssemblerHighlightTests: XCTestCase {
         XCTAssertEqual(reloaded.pageCount, originalPageCount)
     }
 
+    /// Adds PerspectiveCorrector to the pipeline since that's what Apply
+    /// (single-page) actually invokes (processAndReplaceCurrentPage).
+    func test_fullProductionFlow_greyscaleApply() async throws {
+        let url = URL(fileURLWithPath: "/tmp/demo-lease-before.pdf")
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            throw XCTSkip("demo PDF not present at \(url.path)")
+        }
+        let loaded = try XCTUnwrap(PDFDocument(url: url))
+        let page = try XCTUnwrap(loaded.page(at: 0))
+        let rendered = try XCTUnwrap(PageImageRenderer().image(from: page))
+        let quad = Quad.fullRect(in: rendered.size)
+
+        // The full Apply path: correct + (no rotation) + filter + OCR + assemble + replace.
+        let corrected = try XCTUnwrap(PerspectiveCorrector().correct(rendered, quad: quad),
+                                      "corrector returned nil")
+        print("--- corrected size: \(corrected.size), scale: \(corrected.scale)")
+        let filtered = try XCTUnwrap(ImageFilterEngine().apply(.greyscale, to: corrected),
+                                     "filter returned nil")
+        print("--- filtered size: \(filtered.size)")
+        let observations = (try? await OCREngine().recognizeText(in: filtered)) ?? []
+
+        let replacement = try PDFAssembler().assemble(pages: [
+            ScannedPage(image: filtered, observations: observations),
+        ], createdAt: Date())
+        DocumentMutations.replacePage(in: loaded, at: 0, with: replacement)
+
+        let mutatedBytes = try XCTUnwrap(loaded.dataRepresentation())
+        try mutatedBytes.write(to: URL(fileURLWithPath: "/tmp/demo-lease-greyscale.pdf"))
+        let reloaded = try XCTUnwrap(PDFDocument(data: mutatedBytes),
+                                     "PDFKit couldn't parse — BUG REPRODUCED")
+        XCTAssertEqual(reloaded.pageCount, loaded.pageCount)
+    }
+
+    /// Regression: URL == is byte-exact, so a percent-encoded URL (like the
+    /// ones NSMetadataQuery hands us) doesn't equal the non-encoded URL
+    /// produced by appendingPathComponent — even when they point to the same
+    /// file. The uniqueURL collision check then thinks a different doc exists
+    /// at the candidate path and renames with " (2)" suffix, silently moving
+    /// the file away from the URL the library is holding.
+    func test_storageWrite_percentEncodedExistingURL_doesNotRename() throws {
+        let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("DocStorageEncodingTest-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tmpDir) }
+
+        let storage = DocumentStorage(documentsURL: tmpDir)
+        let img = blankImage(size: CGSize(width: 612, height: 792))
+        let scanned = ScannedPage(image: img, observations: [])
+
+        // Seed a file directly on disk with the em-dash name, then construct
+        // an "existing URL" using percent-encoded form (mimicking what
+        // NSMetadataQuery returns to the library).
+        let onDiskURL = tmpDir.appendingPathComponent("Receipt — Jun 2.pdf")
+        let seed = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
+        try XCTUnwrap(seed.dataRepresentation()).write(to: onDiskURL)
+
+        let baseString = tmpDir.absoluteString.hasSuffix("/")
+            ? tmpDir.absoluteString
+            : tmpDir.absoluteString + "/"
+        let encodedString = "\(baseString)Receipt%20%E2%80%94%20Jun%202.pdf"
+        let encodedURL = try XCTUnwrap(URL(string: encodedString),
+                                       "couldn't construct percent-encoded URL")
+        // Sanity: the two URLs are NOT == but point to the same file.
+        XCTAssertNotEqual(encodedURL, onDiskURL,
+                          "URL == should differ when one is percent-encoded")
+        XCTAssertEqual(encodedURL.standardizedFileURL.path,
+                       onDiskURL.standardizedFileURL.path,
+                       "...but the standardized paths should match")
+
+        // Now "save" replacing the encoded URL.
+        let pdf2 = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
+        let resultURL = try storage.write(pdf2, replacing: encodedURL, withName: "Receipt — Jun 2")
+
+        XCTAssertEqual(resultURL.standardizedFileURL.path,
+                       onDiskURL.standardizedFileURL.path,
+                       "replace should overwrite the existing file, not rename to ' (2)'")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: onDiskURL.path),
+                      "Original on-disk file should still exist after replace")
+        let suffixedPath = tmpDir.appendingPathComponent("Receipt — Jun 2 (2).pdf").path
+        XCTAssertFalse(FileManager.default.fileExists(atPath: suffixedPath),
+                       "Should NOT have written a ' (2)' suffixed file")
+    }
+
     // MARK: - Helpers
 
     private func blankImage(size: CGSize) -> UIImage {
