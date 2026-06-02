@@ -32,6 +32,33 @@ final class ImageFilterTests: XCTestCase {
         XCTAssertEqual(result.size.height, 100, accuracy: 1)
     }
 
+    // MARK: - colorControls parameter table
+
+    func test_none_colorControls_isNil() {
+        XCTAssertNil(ImageFilter.none.colorControls)
+    }
+
+    func test_greyscale_colorControls() throws {
+        let params = try XCTUnwrap(ImageFilter.greyscale.colorControls)
+        XCTAssertEqual(params.saturation, 0, accuracy: 0.001)
+        XCTAssertEqual(params.contrast, 1.3, accuracy: 0.001)
+        XCTAssertEqual(params.brightness, 0, accuracy: 0.001)
+    }
+
+    func test_blackAndWhite_colorControls() throws {
+        let params = try XCTUnwrap(ImageFilter.blackAndWhite.colorControls)
+        XCTAssertEqual(params.saturation, 0, accuracy: 0.001)
+        XCTAssertEqual(params.contrast, 1.8, accuracy: 0.001)
+        XCTAssertEqual(params.brightness, 0.15, accuracy: 0.001)
+    }
+
+    func test_photo_colorControls() throws {
+        let params = try XCTUnwrap(ImageFilter.photo.colorControls)
+        XCTAssertEqual(params.saturation, 1.5, accuracy: 0.001)
+        XCTAssertEqual(params.contrast, 1.3, accuracy: 0.001)
+        XCTAssertEqual(params.brightness, 0, accuracy: 0.001)
+    }
+
     // MARK: - Helpers
 
     private func colorImage(width: CGFloat, height: CGFloat) -> UIImage {
