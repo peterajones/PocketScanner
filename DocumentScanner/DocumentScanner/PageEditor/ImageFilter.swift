@@ -17,6 +17,17 @@ enum ImageFilter: String, CaseIterable, Identifiable {
         case .photo: return "Photo"
         }
     }
+
+    /// Color-controls parameters (saturation, contrast, brightness)
+    /// or nil for the identity / pass-through case.
+    var colorControls: (saturation: Float, contrast: Float, brightness: Float)? {
+        switch self {
+        case .none:          return nil
+        case .greyscale:     return (saturation: 0,   contrast: 1.3, brightness: 0)
+        case .blackAndWhite: return (saturation: 0,   contrast: 1.8, brightness: 0.15)
+        case .photo:         return (saturation: 1.5, contrast: 1.3, brightness: 0)
+        }
+    }
 }
 
 struct ImageFilterEngine {
@@ -37,27 +48,12 @@ struct ImageFilterEngine {
     }
 
     private func filteredImage(_ filter: ImageFilter, input: CIImage) -> CIImage? {
-        switch filter {
-        case .none:
-            return input
-        case .greyscale:
-            let f = CIFilter.colorControls()
-            f.inputImage = input
-            f.saturation = 0
-            return f.outputImage
-        case .blackAndWhite:
-            // CIPhotoEffectNoir is Apple's high-contrast B&W preset —
-            // cleaner than rolling our own monochrome + contrast bump.
-            let f = CIFilter.photoEffectNoir()
-            f.inputImage = input
-            return f.outputImage
-        case .photo:
-            // Punch up contrast + saturation for photos / glossy pages.
-            let f = CIFilter.colorControls()
-            f.inputImage = input
-            f.saturation = 1.2
-            f.contrast = 1.15
-            return f.outputImage
-        }
+        guard let params = filter.colorControls else { return input }
+        let f = CIFilter.colorControls()
+        f.inputImage = input
+        f.saturation = params.saturation
+        f.contrast = params.contrast
+        f.brightness = params.brightness
+        return f.outputImage
     }
 }
