@@ -265,15 +265,15 @@ final class PDFAssemblerHighlightTests: XCTestCase {
         XCTAssertEqual(reloaded.pageCount, loaded.pageCount)
     }
 
-    /// Regression: URL == is byte-exact, so a percent-encoded URL (like the
-    /// ones NSMetadataQuery hands us) doesn't equal the non-encoded URL
-    /// produced by appendingPathComponent — even when they point to the same
-    /// file. The uniqueURL collision check then thinks a different doc exists
-    /// at the candidate path and renames with " (2)" suffix, silently moving
-    /// the file away from the URL the library is holding.
-    func test_storageWrite_percentEncodedExistingURL_doesNotRename() throws {
+    /// Regression: same-name save (overwhelmingly common — filter apply,
+    /// edit, etc. all save with the same displayName) must overwrite the
+    /// existing file in place, not rename to "(2)". The old code did this
+    /// via URL comparison which fails on iOS device when the existing URL
+    /// has a /private/var prefix and the candidate from appendingPathComponent
+    /// has /var. The fix uses a name comparison instead.
+    func test_storageWrite_sameNameReplace_doesNotRename() throws {
         let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("DocStorageEncodingTest-\(UUID().uuidString)")
+            .appendingPathComponent("DocStorageSameNameTest-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tmpDir) }
 
@@ -281,49 +281,32 @@ final class PDFAssemblerHighlightTests: XCTestCase {
         let img = blankImage(size: CGSize(width: 612, height: 792))
         let scanned = ScannedPage(image: img, observations: [])
 
-        // Seed a file directly on disk with the em-dash name, then construct
-        // an "existing URL" using percent-encoded form (mimicking what
-        // NSMetadataQuery returns to the library).
-        let onDiskURL = tmpDir.appendingPathComponent("Receipt — Jun 2.pdf")
-        let seed = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
-        try XCTUnwrap(seed.dataRepresentation()).write(to: onDiskURL)
+        // Seed a file with a name that includes an em-dash (the user's case).
+        let firstURL = try storage.write(
+            try PDFAssembler().assemble(pages: [scanned], createdAt: Date()),
+            preferredName: "Receipt — Jun 2"
+        )
 
-        let baseString = tmpDir.absoluteString.hasSuffix("/")
-            ? tmpDir.absoluteString
-            : tmpDir.absoluteString + "/"
-        let encodedString = "\(baseString)Receipt%20%E2%80%94%20Jun%202.pdf"
-        let encodedURL = try XCTUnwrap(URL(string: encodedString),
-                                       "couldn't construct percent-encoded URL")
-        // Sanity: the two URLs are NOT == but point to the same file.
-        XCTAssertNotEqual(encodedURL, onDiskURL,
-                          "URL == should differ when one is percent-encoded")
-        XCTAssertEqual(encodedURL.standardizedFileURL.path,
-                       onDiskURL.standardizedFileURL.path,
-                       "...but the standardized paths should match")
+        // "Replace" with the same name (mimicking save-after-filter).
+        let secondURL = try storage.write(
+            try PDFAssembler().assemble(pages: [scanned], createdAt: Date()),
+            replacing: firstURL,
+            withName: "Receipt — Jun 2"
+        )
 
-        // Now "save" replacing the encoded URL.
-        let pdf2 = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
-        let resultURL = try storage.write(pdf2, replacing: encodedURL, withName: "Receipt — Jun 2")
-
-        XCTAssertEqual(resultURL.standardizedFileURL.path,
-                       onDiskURL.standardizedFileURL.path,
-                       "replace should overwrite the existing file, not rename to ' (2)'")
-        XCTAssertTrue(FileManager.default.fileExists(atPath: onDiskURL.path),
-                      "Original on-disk file should still exist after replace")
-        let suffixedPath = tmpDir.appendingPathComponent("Receipt — Jun 2 (2).pdf").path
-        XCTAssertFalse(FileManager.default.fileExists(atPath: suffixedPath),
-                       "Should NOT have written a ' (2)' suffixed file")
+        XCTAssertEqual(secondURL, firstURL, "Same-name replace should reuse the original URL")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: firstURL.path),
+                      "Original file should still exist at its URL")
+        XCTAssertFalse(FileManager.default.fileExists(
+            atPath: tmpDir.appendingPathComponent("Receipt — Jun 2 (2).pdf").path),
+            "Should NOT have written a ' (2)' suffixed file")
     }
 
-    /// Regression for the /private/var prefix mismatch that was actually
-    /// causing filter saves to rename docs. NSMetadataQuery hands the
-    /// library URLs with /private/var/...; appendingPathComponent against
-    /// FileManager.documentDirectory produces /var/... . Both resolve via
-    /// the /private symlink, but URL == treats them as different. We need
-    /// the collision check to recognize them as the same file.
-    func test_storageWrite_privatePrefixExistingURL_doesNotRename() throws {
+    /// True-rename case: when the displayName actually changed, save should
+    /// write to the new name (no suffix needed if the new name is free).
+    func test_storageWrite_actualRename_writesToNewName() throws {
         let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("DocStoragePrivateTest-\(UUID().uuidString)")
+            .appendingPathComponent("DocStorageRenameTest-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tmpDir) }
 
@@ -331,39 +314,20 @@ final class PDFAssemblerHighlightTests: XCTestCase {
         let img = blankImage(size: CGSize(width: 612, height: 792))
         let scanned = ScannedPage(image: img, observations: [])
 
-        // Seed a file at the documents URL.
-        let onDiskURL = tmpDir.appendingPathComponent("MyDoc.pdf")
-        let seed = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
-        try XCTUnwrap(seed.dataRepresentation()).write(to: onDiskURL)
+        let originalURL = try storage.write(
+            try PDFAssembler().assemble(pages: [scanned], createdAt: Date()),
+            preferredName: "Original Name"
+        )
+        let renamedURL = try storage.write(
+            try PDFAssembler().assemble(pages: [scanned], createdAt: Date()),
+            replacing: originalURL,
+            withName: "New Name"
+        )
 
-        // Construct an "existing URL" with /private/var prefix when the
-        // tmpDir is under /var (or vice versa) — whichever applies on the
-        // test platform. We use NSString.standardizingPath inverse: prefix
-        // the path with "/private" if it starts with "/var", or strip it.
-        let altPath: String
-        if onDiskURL.path.hasPrefix("/var/") {
-            altPath = "/private" + onDiskURL.path
-        } else if onDiskURL.path.hasPrefix("/private/var/") {
-            altPath = String(onDiskURL.path.dropFirst("/private".count))
-        } else {
-            // Test environment doesn't have a /var symlink in tmp; skip.
-            throw XCTSkip("Test environment doesn't have /var or /private/var prefix on tmp; can't reproduce.")
-        }
-        let altURL = URL(fileURLWithPath: altPath)
-        XCTAssertNotEqual(altURL, onDiskURL, "URL == should distinguish /private/var from /var")
-        XCTAssertEqual(altURL.resolvingSymlinksInPath().path,
-                       onDiskURL.resolvingSymlinksInPath().path,
-                       "...but resolved paths should match")
-
-        // Replace using the alt-prefixed URL — should overwrite in place.
-        let pdf2 = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
-        let resultURL = try storage.write(pdf2, replacing: altURL, withName: "MyDoc")
-        XCTAssertEqual(resultURL.resolvingSymlinksInPath().path,
-                       onDiskURL.resolvingSymlinksInPath().path,
-                       "Replace should hit the same path, not rename to ' (2)'")
-        XCTAssertFalse(FileManager.default.fileExists(
-            atPath: tmpDir.appendingPathComponent("MyDoc (2).pdf").path),
-            "Should NOT have written a ' (2)' suffixed file")
+        XCTAssertEqual(renamedURL.lastPathComponent, "New Name.pdf")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: originalURL.path),
+                       "Old file should be removed after rename")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: renamedURL.path))
     }
 
     // MARK: - Helpers

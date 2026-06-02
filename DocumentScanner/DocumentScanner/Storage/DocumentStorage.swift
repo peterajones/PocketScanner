@@ -55,7 +55,24 @@ struct DocumentStorage {
         let sanitized = Self.sanitize(preferredName)
         guard !sanitized.isEmpty else { throw DocumentStorageError.emptyName }
 
-        let targetURL = try uniqueURL(base: sanitized, allowingMatch: existingURL)
+        // Same-name save (the overwhelming majority case — saving after a
+        // filter or edit, not a rename): overwrite at the existing URL
+        // directly. This sidesteps the entire URL-comparison rabbit hole
+        // where the existing URL (from NSMetadataQuery, possibly with
+        // /private/var prefix and percent-encoding) doesn't reliably ==
+        // the candidate we'd build from FileManager.documentDirectory.
+        let existingNameNoExt = existingURL.deletingPathExtension().lastPathComponent
+        let isSameName = sanitized == existingNameNoExt
+
+        let targetURL: URL
+        if isSameName {
+            targetURL = existingURL
+        } else {
+            // True rename — find a unique URL, allowing match on the existing
+            // file so a rename to the SAME sanitized name (after sanitization
+            // changes) still overwrites in place.
+            targetURL = try uniqueURL(base: sanitized, allowingMatch: existingURL)
+        }
 
         guard let data = pdf.dataRepresentation() else {
             throw DocumentStorageError.writeFailed
