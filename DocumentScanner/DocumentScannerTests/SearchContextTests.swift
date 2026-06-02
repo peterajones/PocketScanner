@@ -1,5 +1,4 @@
 import XCTest
-import Foundation
 @testable import DocumentScanner
 
 final class SearchContextTests: XCTestCase {
@@ -30,6 +29,15 @@ final class SearchContextTests: XCTestCase {
         let b = SearchContext(term: "fox", docs: docs, startDocIndex: 0)
         XCTAssertEqual(a, b)
         XCTAssertEqual(a.hashValue, b.hashValue)
+    }
+
+    func test_hashable_differentTermNotEqual() {
+        let docs: [SearchContext.DocEntry] = [
+            .init(summary: makeSummary(name: "a"), matchCount: 2),
+        ]
+        let a = SearchContext(term: "fox", docs: docs, startDocIndex: 0)
+        let b = SearchContext(term: "dog", docs: docs, startDocIndex: 0)
+        XCTAssertNotEqual(a, b)
     }
 
     func test_hashable_differentStartIndexNotEqual() {
