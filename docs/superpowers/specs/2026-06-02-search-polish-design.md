@@ -143,9 +143,18 @@ The viewer loads the doc at `searchContext.docs[currentDocIndex].summary`. When 
 Override `SearchHighlight.next()` / `previous()` semantics in the viewer:
 
 ```swift
+private var hasNextDoc: Bool {
+    guard let ctx = searchContext else { return false }
+    return currentDocIndex < ctx.docs.count - 1
+}
+private var hasPreviousDoc: Bool { currentDocIndex > 0 }
+
 private func handleNext(_ h: SearchHighlight) {
     if h.currentIndex == h.matchCount - 1, hasNextDoc {
-        currentDocIndex += 1  // triggers session reload + highlight rebuild; jump to match 0 of new doc
+        currentDocIndex += 1
+        // Mutating currentDocIndex changes the viewer's `.task(id: ...)` key,
+        // which reloads the session and runs `rebuildHighlight`, landing on
+        // match 0 of the new doc by SearchHighlight's default init.
     } else {
         h.next()
     }
@@ -153,15 +162,20 @@ private func handleNext(_ h: SearchHighlight) {
 
 private func handlePrevious(_ h: SearchHighlight) {
     if h.currentIndex == 0, hasPreviousDoc {
+        pendingJumpToLastMatch = true
         currentDocIndex -= 1
-        pendingJumpToLastMatch = true  // viewer jumps to match (N-1) after reload
+        // `rebuildHighlight` checks `pendingJumpToLastMatch` after building
+        // SearchHighlight and, if set, advances currentIndex to matchCount-1
+        // before clearing the flag.
     } else {
         h.previous()
     }
 }
 ```
 
-Single-doc behaviour (only one doc in context, or no context at all) collapses to the existing wrap-within-doc semantics because `hasNextDoc` / `hasPreviousDoc` are false.
+The viewer needs `.task(id: currentDocIndex)` on the session-loading block (in addition to / replacing the current one-shot `.task`) so doc changes trigger reloads. `pendingJumpToLastMatch` is a `@State Bool` consumed inside `rebuildHighlight`.
+
+Single-doc behaviour (only one doc in context, or no context at all) collapses to the existing wrap-within-doc semantics because `hasNextDoc` / `hasPreviousDoc` are both false.
 
 The match counter (currently line 99 of `DocumentViewerView.swift`):
 
