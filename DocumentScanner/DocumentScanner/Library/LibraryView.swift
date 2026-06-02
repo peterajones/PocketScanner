@@ -296,10 +296,16 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
 
     /// Returns the current cross-doc search context with `startDocIndex`
     /// pointing at the tapped summary's position. Returns nil when there's
-    /// no active search.
+    /// no active search, OR when the tapped summary isn't in the context's
+    /// docs list — that happens when ocrSnippet matched the term but PDFKit's
+    /// findString returned zero (rare but real). In that case the viewer
+    /// opens without search context rather than silently displaying the
+    /// wrong document.
     private func searchContextStarting(at summary: DocumentSummary) -> SearchContext? {
         guard let ctx = searchContext else { return nil }
-        let idx = ctx.docs.firstIndex(where: { $0.summary.id == summary.id }) ?? 0
+        guard let idx = ctx.docs.firstIndex(where: { $0.summary.id == summary.id }) else {
+            return nil
+        }
         return SearchContext(term: ctx.term, docs: ctx.docs, startDocIndex: idx)
     }
 
