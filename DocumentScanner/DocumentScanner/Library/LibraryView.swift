@@ -285,7 +285,17 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     /// overrides it with the tapped doc's index.
     private var searchContext: SearchContext? {
         guard !searchText.isEmpty else { return nil }
-        let entries: [SearchContext.DocEntry] = filteredDocs.compactMap { summary in
+        // Span ALL docs in the store, not just the root-visible ones — this
+        // lets cross-doc nav reach docs the user has tapped into through a
+        // folder. Filter by displayName/ocrSnippet first to match what the
+        // library list shows, then narrow to docs whose content findString
+        // can actually highlight.
+        let needle = searchText.lowercased()
+        let candidates = store.summaries.filter {
+            $0.displayName.lowercased().contains(needle)
+            || $0.ocrSnippet.lowercased().contains(needle)
+        }
+        let entries: [SearchContext.DocEntry] = candidates.compactMap { summary in
             guard let pdf = PDFDocument(url: summary.url) else { return nil }
             let count = pdf.findString(searchText, withOptions: .caseInsensitive).count
             return count > 0 ? .init(summary: summary, matchCount: count) : nil
