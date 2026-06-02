@@ -250,22 +250,25 @@ struct DocumentStorage {
     }
 
     private func uniqueURL(in parent: URL, base: String, allowingMatch: URL? = nil) throws -> URL {
-        // Compare by standardized path string rather than URL == — URL equality
-        // is byte-exact and fails for paths containing characters that get
-        // percent-encoded inconsistently between sources (e.g. "—" U+2014).
-        // A mismatch causes the candidate to be rejected as "collision," the
-        // file to be renamed with "(2)" suffix, and the original to be deleted
-        // — silently moving the doc away from the URL the library is holding.
-        let allowedPath = allowingMatch?.standardizedFileURL.path
+        // Compare by symlink-resolved path rather than URL == — URL equality
+        // is byte-exact and fails when the existing URL came from a source
+        // that uses /private/var/... (NSMetadataQuery) while the candidate is
+        // built from /var/... (FileManager.documentDirectory). Both resolve
+        // to the same file via the /private symlink, but `URL ==` sees them
+        // as different. A mismatch causes the candidate to be rejected as
+        // "collision," the file to be renamed with " (2)" suffix, and the
+        // original to be deleted — silently moving the doc to a path the
+        // library is no longer holding.
+        let allowedPath = allowingMatch?.resolvingSymlinksInPath().path
 
         let candidate = parent.appendingPathComponent("\(base).pdf")
-        if candidate.standardizedFileURL.path == allowedPath
+        if candidate.resolvingSymlinksInPath().path == allowedPath
             || !FileManager.default.fileExists(atPath: candidate.path) {
             return candidate
         }
         for index in 2...999 {
             let suffixed = parent.appendingPathComponent("\(base) (\(index)).pdf")
-            if suffixed.standardizedFileURL.path == allowedPath
+            if suffixed.resolvingSymlinksInPath().path == allowedPath
                 || !FileManager.default.fileExists(atPath: suffixed.path) {
                 return suffixed
             }

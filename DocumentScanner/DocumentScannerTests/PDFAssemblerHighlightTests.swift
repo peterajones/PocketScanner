@@ -315,6 +315,57 @@ final class PDFAssemblerHighlightTests: XCTestCase {
                        "Should NOT have written a ' (2)' suffixed file")
     }
 
+    /// Regression for the /private/var prefix mismatch that was actually
+    /// causing filter saves to rename docs. NSMetadataQuery hands the
+    /// library URLs with /private/var/...; appendingPathComponent against
+    /// FileManager.documentDirectory produces /var/... . Both resolve via
+    /// the /private symlink, but URL == treats them as different. We need
+    /// the collision check to recognize them as the same file.
+    func test_storageWrite_privatePrefixExistingURL_doesNotRename() throws {
+        let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("DocStoragePrivateTest-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tmpDir) }
+
+        let storage = DocumentStorage(documentsURL: tmpDir)
+        let img = blankImage(size: CGSize(width: 612, height: 792))
+        let scanned = ScannedPage(image: img, observations: [])
+
+        // Seed a file at the documents URL.
+        let onDiskURL = tmpDir.appendingPathComponent("MyDoc.pdf")
+        let seed = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
+        try XCTUnwrap(seed.dataRepresentation()).write(to: onDiskURL)
+
+        // Construct an "existing URL" with /private/var prefix when the
+        // tmpDir is under /var (or vice versa) — whichever applies on the
+        // test platform. We use NSString.standardizingPath inverse: prefix
+        // the path with "/private" if it starts with "/var", or strip it.
+        let altPath: String
+        if onDiskURL.path.hasPrefix("/var/") {
+            altPath = "/private" + onDiskURL.path
+        } else if onDiskURL.path.hasPrefix("/private/var/") {
+            altPath = String(onDiskURL.path.dropFirst("/private".count))
+        } else {
+            // Test environment doesn't have a /var symlink in tmp; skip.
+            throw XCTSkip("Test environment doesn't have /var or /private/var prefix on tmp; can't reproduce.")
+        }
+        let altURL = URL(fileURLWithPath: altPath)
+        XCTAssertNotEqual(altURL, onDiskURL, "URL == should distinguish /private/var from /var")
+        XCTAssertEqual(altURL.resolvingSymlinksInPath().path,
+                       onDiskURL.resolvingSymlinksInPath().path,
+                       "...but resolved paths should match")
+
+        // Replace using the alt-prefixed URL — should overwrite in place.
+        let pdf2 = try PDFAssembler().assemble(pages: [scanned], createdAt: Date())
+        let resultURL = try storage.write(pdf2, replacing: altURL, withName: "MyDoc")
+        XCTAssertEqual(resultURL.resolvingSymlinksInPath().path,
+                       onDiskURL.resolvingSymlinksInPath().path,
+                       "Replace should hit the same path, not rename to ' (2)'")
+        XCTAssertFalse(FileManager.default.fileExists(
+            atPath: tmpDir.appendingPathComponent("MyDoc (2).pdf").path),
+            "Should NOT have written a ' (2)' suffixed file")
+    }
+
     // MARK: - Helpers
 
     private func blankImage(size: CGSize) -> UIImage {
