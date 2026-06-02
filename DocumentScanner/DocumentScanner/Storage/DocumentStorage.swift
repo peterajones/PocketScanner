@@ -1,9 +1,22 @@
 import Foundation
 import PDFKit
 
-enum DocumentStorageError: Error {
+enum DocumentStorageError: Error, LocalizedError {
     case writeFailed
     case emptyName
+    case corruptOutput(badBytesURL: URL?)
+
+    var errorDescription: String? {
+        switch self {
+        case .writeFailed: return "Could not write document."
+        case .emptyName: return "Document name is empty."
+        case .corruptOutput(let url):
+            if let url {
+                return "Save produced an unreadable PDF. Bad bytes saved to \(url.lastPathComponent) for diagnosis."
+            }
+            return "Save produced an unreadable PDF."
+        }
+    }
 }
 
 struct DocumentStorage {
@@ -48,6 +61,15 @@ struct DocumentStorage {
             throw DocumentStorageError.writeFailed
         }
 
+        // Self-check: if dataRepresentation produces bytes that PDFKit
+        // can't subsequently parse, refuse to write — we'd just be
+        // persisting a corrupt file. Dump the bad bytes to a sibling
+        // location for offline diagnosis.
+        if PDFDocument(data: data) == nil {
+            let badURL = try? saveBadBytesForDiagnosis(data, originalName: sanitized)
+            throw DocumentStorageError.corruptOutput(badBytesURL: badURL)
+        }
+
         var coordinatorError: NSError?
         var writeError: Error?
         let coordinator = NSFileCoordinator()
@@ -64,6 +86,17 @@ struct DocumentStorage {
             try? FileManager.default.removeItem(at: existingURL)
         }
         return targetURL
+    }
+
+    /// Writes corrupt-output bytes to a `_failed-save-<timestamp>-<name>.pdf`
+    /// in the documents directory so the user can share them for debugging.
+    /// Returns the URL of the written file, or throws if it couldn't write.
+    private func saveBadBytesForDiagnosis(_ data: Data, originalName: String) throws -> URL {
+        let stamp = ISO8601DateFormatter().string(from: Date())
+            .replacingOccurrences(of: ":", with: "-")
+        let url = documentsURL.appendingPathComponent("_failed-save-\(stamp)-\(originalName).pdf")
+        try data.write(to: url, options: .atomic)
+        return url
     }
 
     func delete(at url: URL) throws {
