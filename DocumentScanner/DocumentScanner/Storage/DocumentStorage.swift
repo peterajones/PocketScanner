@@ -61,12 +61,10 @@ struct DocumentStorage {
             throw DocumentStorageError.writeFailed
         }
 
-        // Self-check: if dataRepresentation produces bytes that PDFKit
-        // can't subsequently parse, refuse to write — we'd just be
-        // persisting a corrupt file. Dump the bad bytes to a sibling
-        // location for offline diagnosis.
+        // Self-check #1: if dataRepresentation produces bytes that PDFKit
+        // can't reparse in memory, refuse to write.
         if PDFDocument(data: data) == nil {
-            let badURL = try? saveBadBytesForDiagnosis(data, originalName: sanitized)
+            let badURL = try? saveBadBytesForDiagnosis(data, originalName: sanitized, suffix: "memcheck")
             throw DocumentStorageError.corruptOutput(badBytesURL: badURL)
         }
 
@@ -82,19 +80,30 @@ struct DocumentStorage {
         }
         if let error = coordinatorError ?? (writeError as NSError?) { throw error }
 
+        // Self-check #2: read back from disk. If PDFDocument(url:) fails on
+        // bytes we just verified in memory, something is mangling the on-disk
+        // representation (NSFileCoordinator interaction, extended attributes,
+        // sync provider, etc). Dump both the in-memory and on-disk bytes.
+        if PDFDocument(url: targetURL) == nil {
+            let memBytesURL = try? saveBadBytesForDiagnosis(data, originalName: sanitized, suffix: "diskcheck-mem")
+            let diskBytes = (try? Data(contentsOf: targetURL)) ?? Data()
+            let diskBytesURL = try? saveBadBytesForDiagnosis(diskBytes, originalName: sanitized, suffix: "diskcheck-disk")
+            // Throw with the disk-bytes URL since that's what failed.
+            throw DocumentStorageError.corruptOutput(badBytesURL: diskBytesURL ?? memBytesURL)
+        }
+
         if targetURL != existingURL {
             try? FileManager.default.removeItem(at: existingURL)
         }
         return targetURL
     }
 
-    /// Writes corrupt-output bytes to a `_failed-save-<timestamp>-<name>.pdf`
+    /// Writes corrupt-output bytes to a `_failed-save-<timestamp>-<name>-<suffix>.pdf`
     /// in the documents directory so the user can share them for debugging.
-    /// Returns the URL of the written file, or throws if it couldn't write.
-    private func saveBadBytesForDiagnosis(_ data: Data, originalName: String) throws -> URL {
+    private func saveBadBytesForDiagnosis(_ data: Data, originalName: String, suffix: String) throws -> URL {
         let stamp = ISO8601DateFormatter().string(from: Date())
             .replacingOccurrences(of: ":", with: "-")
-        let url = documentsURL.appendingPathComponent("_failed-save-\(stamp)-\(originalName).pdf")
+        let url = documentsURL.appendingPathComponent("_failed-save-\(stamp)-\(originalName)-\(suffix).pdf")
         try data.write(to: url, options: .atomic)
         return url
     }
