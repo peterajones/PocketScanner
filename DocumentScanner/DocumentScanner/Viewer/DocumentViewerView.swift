@@ -83,12 +83,12 @@ struct DocumentViewerView: View {
 
     private func counterLabel(highlight h: SearchHighlight) -> String {
         guard let ctx = searchContext else {
-            return "\((h.currentIndex ?? 0) + 1) of \(h.matchCount)"
+            return "\((h.currentIndex ?? 0) + 1)/\(h.matchCount)"
         }
         let priorMatches = ctx.docs[..<currentDocIndex]
             .reduce(0) { $0 + $1.matchCount }
         let global = priorMatches + (h.currentIndex ?? 0) + 1
-        return "\(global) of \(ctx.totalMatches) · \(ctx.docs.count) docs"
+        return "\(global)/\(ctx.totalMatches) · \(ctx.docs.count) docs"
     }
 
     var body: some View {
@@ -166,6 +166,8 @@ struct DocumentViewerView: View {
                     Text(counterLabel(highlight: h))
                         .font(.footnote.monospacedDigit())
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                     Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
                     Spacer()
                 }
