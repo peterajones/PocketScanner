@@ -18,6 +18,15 @@ final class MoveDestinationsTests: XCTestCase {
                        root.standardizedFileURL.path)
     }
 
+    func test_docInOnlyFolder_offersOnlyMainLibrary() {
+        // The doc lives in the single existing folder, so the only place left
+        // to move it is back to the main library.
+        let result = MoveDestinations.list(
+            currentParent: folder("B"), root: root, folders: [folder("B")]
+        )
+        XCTAssertEqual(result.map(\.name), ["Main Library"])
+    }
+
     func test_docAtRoot_hidesMainLibraryAndListsAllFolders() {
         let folders = [folder("A"), folder("B")]
         let result = MoveDestinations.list(

@@ -166,16 +166,21 @@ final class DocumentStorageTests: XCTestCase {
     func test_moveDocument_toRootResolvesCollisionBySuffix() throws {
         let storage = DocumentStorage(documentsURL: tempDir)
         let folder = try storage.createFolder(named: "Receipts")
-        // A doc already living at root with the name we'll collide with.
-        _ = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
-        // Another doc with the same name, moved into a folder then back to root.
-        let second = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
-        let inFolder = try storage.moveDocument(at: second, toFolder: folder)
+        // Root already contains Receipt.pdf.
+        let atRoot = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        // A separate document, also named Receipt.pdf, living inside the folder.
+        let inFolder = folder.appendingPathComponent("Receipt.pdf")
+        let data = try XCTUnwrap(makeSinglePagePDF().dataRepresentation())
+        try data.write(to: inFolder)
 
+        // Moving the folder copy back to root must NOT clobber the existing
+        // Receipt.pdf — it gets a (2) suffix via collision resolution.
         let backAtRoot = try storage.moveDocument(at: inFolder, toFolder: tempDir)
 
         XCTAssertEqual(backAtRoot.lastPathComponent, "Receipt (2).pdf")
         XCTAssertTrue(FileManager.default.fileExists(atPath: backAtRoot.path))
+        // The original root document is untouched.
+        XCTAssertTrue(FileManager.default.fileExists(atPath: atRoot.path))
     }
 
     func test_listFolders_returnsOnlyDirectories() throws {
