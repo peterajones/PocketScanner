@@ -17,7 +17,7 @@
   ```bash
   cd DocumentScanner && xcodebuild test \
     -scheme DocumentScanner \
-    -destination 'platform=iOS Simulator,name=iPhone 16' \
+    -destination 'platform=iOS Simulator,name=iPhone 17' \
     -only-testing:DocumentScannerTests/<ClassName>
   ```
 
@@ -125,7 +125,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild test \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:DocumentScannerTests/DocumentStorageTests
 ```
 Expected: PASS, including the three new tests. (No production change needed — if
@@ -204,7 +204,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild test \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:DocumentScannerTests/MoveDestinationsTests
 ```
 Expected: FAIL to compile — "Cannot find 'MoveDestinations' in scope".
@@ -256,7 +256,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild test \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:DocumentScannerTests/MoveDestinationsTests
 ```
 Expected: PASS (4 tests).
@@ -323,7 +323,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild build \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 Expected: BUILD SUCCEEDED. (If the file isn't a target member you'll get
 "Cannot find 'MoveToMenu' in scope" only once it's referenced — it's referenced
@@ -389,7 +389,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild build \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 Expected: BUILD SUCCEEDED.
 
@@ -527,7 +527,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild build \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 Expected: BUILD SUCCEEDED.
 
@@ -537,7 +537,7 @@ Run:
 ```bash
 cd DocumentScanner && xcodebuild test \
   -scheme DocumentScanner \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 Expected: PASS (all tests, including Tasks 1–2 additions).
 
