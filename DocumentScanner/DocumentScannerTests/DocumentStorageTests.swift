@@ -132,6 +132,52 @@ final class DocumentStorageTests: XCTestCase {
         XCTAssertEqual(newURL.lastPathComponent, "Receipt (2).pdf")
     }
 
+    func test_moveDocument_relocatesFromFolderBackToRoot() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Receipts")
+        let docURL = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        let inFolder = try storage.moveDocument(at: docURL, toFolder: folder)
+
+        // Move it back out to the root documents directory.
+        let backAtRoot = try storage.moveDocument(at: inFolder, toFolder: tempDir)
+
+        XCTAssertEqual(backAtRoot.deletingLastPathComponent().standardizedFileURL.path,
+                       tempDir.standardizedFileURL.path)
+        XCTAssertEqual(backAtRoot.lastPathComponent, "Receipt.pdf")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: inFolder.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: backAtRoot.path))
+    }
+
+    func test_moveDocument_relocatesBetweenFolders() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folderA = try storage.createFolder(named: "A")
+        let folderB = try storage.createFolder(named: "B")
+        let docURL = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        let inA = try storage.moveDocument(at: docURL, toFolder: folderA)
+
+        let inB = try storage.moveDocument(at: inA, toFolder: folderB)
+
+        XCTAssertEqual(inB.deletingLastPathComponent(), folderB)
+        XCTAssertEqual(inB.lastPathComponent, "Receipt.pdf")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: inA.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: inB.path))
+    }
+
+    func test_moveDocument_toRootResolvesCollisionBySuffix() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let folder = try storage.createFolder(named: "Receipts")
+        // A doc already living at root with the name we'll collide with.
+        _ = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        // Another doc with the same name, moved into a folder then back to root.
+        let second = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
+        let inFolder = try storage.moveDocument(at: second, toFolder: folder)
+
+        let backAtRoot = try storage.moveDocument(at: inFolder, toFolder: tempDir)
+
+        XCTAssertEqual(backAtRoot.lastPathComponent, "Receipt (2).pdf")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: backAtRoot.path))
+    }
+
     func test_listFolders_returnsOnlyDirectories() throws {
         let storage = DocumentStorage(documentsURL: tempDir)
         _ = try storage.createFolder(named: "Receipts")
