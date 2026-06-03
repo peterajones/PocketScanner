@@ -6,7 +6,7 @@ Versions earlier than the current shipping release are deleted from this doc as 
 
 ---
 
-## Enhancements v1.2 and beyond
+## Enhancements v1.3 and beyond
 
 Lower priority. Some of these may never ship. The list exists to capture what we considered.
 
@@ -17,16 +17,11 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Filters
 
-- **Make all filter presets more pronounced** — each filter currently looks almost identical to "Color" when you flip through them, which defeats the picker. Goal: when the user cycles through Color → Greyscale → B&W → Photo, each step looks visibly different even at thumbnail size. Concretely:
-    - **B&W** — replace `CIPhotoEffectNoir` with high-contrast monochrome (`CIColorControls` saturation=0, contrast≈1.8, brightness≈+0.15) so backgrounds go paper-white and text goes solid black, matching Apple Notes' scanner output.
-    - **Greyscale** — keep saturation=0 but bump contrast (~1.3) so the page isn't muddy grey.
-    - **Photo** — increase saturation to ~1.5 and contrast to ~1.3 so the difference vs Color is obvious.
 - **Filter at scan time** — pick a filter in the Name & Save sheet before the initial save, applied to every page of that scan. Faster than entering per-page editor for each.
 
 ### Search
 
-- **Horizontal highlight accuracy** — currently highlights are vertically accurate but horizontally approximate (system font width ≠ original glyph width). Fix: scale the invisible text horizontally to match each `VNRecognizedTextObservation`'s `boundingBox` width.
-- **Cross-document match navigation** — search results currently break context when you tap into a document. Could surface "Match 1 of 7 across 3 documents" with cross-doc prev/next.
+- **In-folder cross-doc search** — `FolderContentsView`'s own searchText doesn't feed the inherited `navigationDestination`; cross-doc nav only works off `LibraryView`'s search field. Have `FolderContentsView` build its own `SearchContext` or share `LibraryView`'s binding.
 
 ### Editing
 
@@ -46,7 +41,7 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Error handling (verification)
 
-These code paths exist but were never exercised on a real device. v1.2 should provoke each and confirm the UX works:
+These code paths exist but were never exercised on a real device. A future release should provoke each and confirm the UX works:
 
 - **Storage-full save failure** — fill the device, attempt a scan, verify the AlertCenter retry path works.
 - **NSFileVersion conflict** — edit the same doc on two devices simultaneously, verify the picker UI works.
