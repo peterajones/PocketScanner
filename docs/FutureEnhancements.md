@@ -28,10 +28,10 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 - **Rotate-in-strip** — a context-menu rotate option on edit-mode thumbnails, avoiding a trip through the per-page editor.
 - **Page extraction** — multi-select + "Save as new document" to break apart a scan.
 - **Annotations (highlight + strikethrough)** — let users emphasise or cross out parts of a scan: a small fixed highlight palette (yellow / green / pink / blue) plus strikethrough lines. Useful for flagging things that need attention or marking things that no longer do. Design notes:
-    - Reuse the invisible OCR text layer — the user drag-selects words (same mechanism as search highlighting) and applies a highlight/strikethrough; bounds come straight from the `PDFSelection`, exactly like the existing search-highlight code. No freehand-drawing engine needed for v1.
-    - Persistence is essentially free: `PDFAnnotation`s are written into the file by `dataRepresentation()`, so the existing save path covers it and the marks travel with the PDF via Share / iCloud.
-    - Keep the first cut simple — highlight + strikethrough + tap-an-annotation-to-delete. No notes, shapes, or freehand. Those are a later expansion.
-    - Caveat: text selection is only as good as the OCR; on a poorly-recognised scan, drag-select may be imprecise. A drag-a-rectangle fallback for highlights is possible later, but leave it out of the first cut.
+  - Reuse the invisible OCR text layer — the user drag-selects words (same mechanism as search highlighting) and applies a highlight/strikethrough; bounds come straight from the `PDFSelection`, exactly like the existing search-highlight code. No freehand-drawing engine needed for v1.
+  - Persistence is essentially free: `PDFAnnotation`s are written into the file by `dataRepresentation()`, so the existing save path covers it and the marks travel with the PDF via Share / iCloud.
+  - Keep the first cut simple — highlight + strikethrough + tap-an-annotation-to-delete. No notes, shapes, or freehand. Those are a later expansion.
+  - Caveat: text selection is only as good as the OCR; on a poorly-recognised scan, drag-select may be imprecise. A drag-a-rectangle fallback for highlights is possible later, but leave it out of the first cut.
 
 ### Library
 
