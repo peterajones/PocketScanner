@@ -241,14 +241,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 DocumentRow(summary: summary)
             }
             .contextMenu {
-                if showFolders && !folders.isEmpty {
-                    Menu("Move to Folder") {
-                        ForEach(folders, id: \.self) { folder in
-                            Button(folder.lastPathComponent) {
-                                moveDocument(summary, to: folder)
-                            }
-                        }
-                    }
+                if showFolders {
+                    MoveToMenu(
+                        currentParent: summary.url.deletingLastPathComponent(),
+                        root: storage.documentsURL,
+                        folders: folders,
+                        move: { moveDocument(summary, to: $0) }
+                    )
                 }
             }
         }

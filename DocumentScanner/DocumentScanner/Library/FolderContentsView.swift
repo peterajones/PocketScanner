@@ -19,6 +19,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var showingCapture = false
     @State private var showingCameraDenied = false
     @State private var nameSheet: NameSheetContext?
+    @State private var folders: [URL] = []
+    @State private var folderActionError: String?
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -54,13 +56,34 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                         NavigationLink(value: summary) {
                             DocumentRow(summary: summary)
                         }
+                        .contextMenu {
+                            MoveToMenu(
+                                currentParent: folderURL,
+                                root: storage.documentsURL,
+                                folders: folders,
+                                move: { moveDocument(summary, to: $0) }
+                            )
+                        }
                     }
                 }
                 .searchable(text: $searchText, prompt: "Search this folder")
-                .refreshable { store.refresh() }
+                .refreshable {
+                    store.refresh()
+                    refreshFolders()
+                }
             }
         }
         .navigationTitle(folderURL.lastPathComponent)
+        .task { refreshFolders() }
+        .alert("Couldn't move document",
+               isPresented: Binding(
+                get: { folderActionError != nil },
+                set: { _ in folderActionError = nil }
+               )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(folderActionError ?? "")
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -112,6 +135,20 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         return docsInFolder.filter {
             $0.displayName.lowercased().contains(needle)
             || $0.ocrSnippet.lowercased().contains(needle)
+        }
+    }
+
+    private func refreshFolders() {
+        folders = (try? storage.listFolders())?
+            .sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) ?? []
+    }
+
+    private func moveDocument(_ summary: DocumentSummary, to destination: URL) {
+        do {
+            _ = try storage.moveDocument(at: summary.url, toFolder: destination)
+            store.refresh()
+        } catch {
+            folderActionError = error.localizedDescription
         }
     }
 
