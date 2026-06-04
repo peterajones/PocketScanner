@@ -1,5 +1,6 @@
 import SwiftUI
 import PDFKit
+import UIKit
 
 struct DocumentViewerView: View {
     let summary: DocumentSummary
@@ -34,6 +35,12 @@ struct DocumentViewerView: View {
         var id: Int { index }
     }
 
+    private struct PendingDeletion: Identifiable {
+        let id = UUID()
+        let annotation: PDFAnnotation
+        let page: PDFPage
+    }
+
     @State private var session: DocumentSession?
     @State private var loadError: String?
     @State private var isRenaming = false
@@ -45,6 +52,8 @@ struct DocumentViewerView: View {
     @State private var searchHighlight: SearchHighlight?
     @State private var currentDocIndex: Int
     @State private var pendingJumpToLastMatch: Bool = false
+    @State private var annotationRevision: Int = 0
+    @State private var pendingDeletion: PendingDeletion?
 
     /// The summary the viewer is currently displaying. Falls back to the
     /// `summary` parameter when there's no search context (single-doc nav).
@@ -123,9 +132,32 @@ struct DocumentViewerView: View {
             PDFKitView(
                 document: session.pdf,
                 highlightedSelections: searchHighlight?.matches ?? [],
-                currentSelection: searchHighlight?.current
+                currentSelection: searchHighlight?.current,
+                annotationRevision: annotationRevision,
+                onApplyTool: { tool, selection in
+                    applyTool(tool, to: selection, session: session)
+                },
+                onRequestDelete: { annotation, page in
+                    pendingDeletion = PendingDeletion(annotation: annotation, page: page)
+                }
             )
             .ignoresSafeArea(edges: editMode ? [] : .bottom)
+            .confirmationDialog(
+                "Remove this mark?",
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { if !$0 { pendingDeletion = nil } }
+                ),
+                presenting: pendingDeletion
+            ) { item in
+                Button("Delete", role: .destructive) {
+                    item.page.removeAnnotation(item.annotation)
+                    try? session.save()
+                    annotationRevision &+= 1
+                    pendingDeletion = nil
+                }
+                Button("Cancel", role: .cancel) { pendingDeletion = nil }
+            }
             if editMode {
                 EditModeView(
                     session: session,
@@ -233,6 +265,18 @@ struct DocumentViewerView: View {
         }
     }
 
+    private func applyTool(_ tool: AnnotationTool, to selection: PDFSelection, session: DocumentSession) {
+        let made = AnnotationFactory.annotations(for: selection, tool: tool)
+        guard !made.isEmpty else { return }
+        for (page, annotation) in made {
+            page.addAnnotation(annotation)
+        }
+        // Persist immediately (consistent with edit-mode saves). save() strips
+        // only search highlights, so these user marks are written to disk.
+        try? session.save()
+        annotationRevision &+= 1
+    }
+
     private func rebuildHighlight(session: DocumentSession) {
         guard let term = searchContext?.term, !term.isEmpty else {
             searchHighlight = nil
@@ -271,10 +315,72 @@ private extension Collection {
     }
 }
 
+private final class MarkupPDFView: PDFView {
+    /// Called when the user picks a tool from the selection menu.
+    var onMark: ((AnnotationTool, PDFSelection) -> Void)?
+    /// Called when the user taps an existing, deletable mark.
+    var onTapAnnotation: ((PDFAnnotation, PDFPage) -> Void)?
+
+    private var didInstallTap = false
+
+    func installTapIfNeeded() {
+        guard !didInstallTap else { return }
+        didInstallTap = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tap.delegate = self
+        addGestureRecognizer(tap)
+    }
+
+    override func buildMenu(with builder: UIMenuBuilder) {
+        super.buildMenu(with: builder)
+        guard currentSelection != nil else { return }
+
+        let highlightActions = AnnotationColor.allCases.map { color in
+            UIAction(title: color.displayName) { [weak self] _ in
+                guard let self, let selection = self.currentSelection else { return }
+                self.onMark?(.highlight(color), selection)
+                self.clearSelection()
+            }
+        }
+        let highlightMenu = UIMenu(title: "Highlight",
+                                   image: UIImage(systemName: "highlighter"),
+                                   children: highlightActions)
+        let strikeAction = UIAction(title: "Strikethrough",
+                                    image: UIImage(systemName: "strikethrough")) { [weak self] _ in
+            guard let self, let selection = self.currentSelection else { return }
+            self.onMark?(.strikethrough, selection)
+            self.clearSelection()
+        }
+        let group = UIMenu(title: "", options: .displayInline,
+                           children: [highlightMenu, strikeAction])
+        builder.insertChild(group, atEndOfMenu: .standardEdit)
+    }
+
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        let viewPoint = gesture.location(in: self)
+        guard let page = page(for: viewPoint, nearest: true) else { return }
+        let pagePoint = convert(viewPoint, to: page)
+        guard let annotation = page.annotation(at: pagePoint),
+              AnnotationFactory.isUserDeletable(annotation) else { return }
+        onTapAnnotation?(annotation, page)
+    }
+}
+
+extension MarkupPDFView {
+    override func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                                    shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+        true
+    }
+}
+
 private struct PDFKitView: UIViewRepresentable {
     let document: PDFDocument
     let highlightedSelections: [PDFSelection]
     let currentSelection: PDFSelection?
+    /// Bumped by the parent after add/delete to force a redraw of annotations.
+    let annotationRevision: Int
+    let onApplyTool: (AnnotationTool, PDFSelection) -> Void
+    let onRequestDelete: (PDFAnnotation, PDFPage) -> Void
 
     /// Tag we attach to highlight annotations so we can remove the ones we
     /// added on the next update without disturbing any annotations that
@@ -282,14 +388,19 @@ private struct PDFKitView: UIViewRepresentable {
     private static let annotationUserName = DocumentSession.searchHighlightAnnotationName
 
     func makeUIView(context: Context) -> PDFView {
-        let v = PDFView()
+        let v = MarkupPDFView()
         v.autoScales = true
         v.displayMode = .singlePageContinuous
         v.usePageViewController(false)
+        v.installTapIfNeeded()
         return v
     }
 
     func updateUIView(_ view: PDFView, context: Context) {
+        guard let view = view as? MarkupPDFView else { return }
+        view.onMark = onApplyTool
+        view.onTapAnnotation = onRequestDelete
+
         // PDFView.highlightedSelections doesn't reliably render on iOS — use
         // real PDFAnnotation highlights, which are guaranteed to draw.
         removeOurAnnotations(from: document)
