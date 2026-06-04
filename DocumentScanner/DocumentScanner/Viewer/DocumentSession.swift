@@ -28,6 +28,10 @@ final class DocumentSession {
     /// view layer. `save()` strips these before writing so they don't persist.
     static let searchHighlightAnnotationName = "DocumentScanner.searchHighlight"
 
+    /// Annotation `userName` that marks PDFAnnotations the USER created
+    /// (highlights / strikethroughs). These persist across save.
+    static let userAnnotationName = "DocumentScanner.userAnnotation"
+
     enum InitError: Error { case unreadablePDF }
 
     init(summary: DocumentSummary, storage: DocumentStorage) throws {
@@ -67,20 +71,18 @@ final class DocumentSession {
     }
 
     private func stripSearchHighlightAnnotations() {
-        // We rely on annotation type rather than the userName tag because
-        // PDFKit doesn't reliably preserve userName on .highlight subtypes
-        // through the page's annotation lifecycle. Since the app doesn't add
-        // any non-search highlight annotations of its own, removing every
-        // .highlight is safe — if that ever changes, fall back to userName
-        // tagging or track our annotations explicitly.
-        //
-        // Note: PDFAnnotation.type returns the subtype string without the
-        // leading slash ("Highlight"), while PDFAnnotationSubtype.highlight
-        // .rawValue includes it ("/Highlight"). Compare against the bare
-        // form.
+        // Remove ONLY the ephemeral search highlights, identified by the tag
+        // the view layer sets. Search highlights are added in-session by
+        // PDFKitView and never loaded from disk, so their userName is always
+        // freshly set and reliable here (the same in-session reliability
+        // PDFKitView.removeOurAnnotations already depends on). User marks
+        // (highlights / strikethroughs) are not search-tagged, so they survive
+        // and persist into the saved PDF.
         for i in 0..<pdf.pageCount {
             guard let page = pdf.page(at: i) else { continue }
-            let toRemove = page.annotations.filter { $0.type == "Highlight" }
+            let toRemove = page.annotations.filter {
+                $0.userName == Self.searchHighlightAnnotationName
+            }
             for annotation in toRemove {
                 page.removeAnnotation(annotation)
             }

@@ -5,11 +5,9 @@ import PDFKit
 @MainActor
 final class DocumentSessionStripHighlightsTests: XCTestCase {
 
-    func test_save_stripsHighlightAnnotations() throws {
-        // The strip removes ALL .highlight-subtype annotations because PDFKit
-        // doesn't reliably preserve the userName tag we tried to use to
-        // discriminate. Non-highlight annotations (e.g., free-text notes)
-        // should still survive a save.
+    /// New semantics: save() strips only annotations tagged as SEARCH highlights.
+    /// User marks (highlight + strikethrough) and other annotations survive.
+    func test_save_stripsOnlySearchHighlights() throws {
         let tempDir = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -23,39 +21,40 @@ final class DocumentSessionStripHighlightsTests: XCTestCase {
             pages: [ScannedPage(image: image, observations: [])],
             createdAt: Date()
         )
-        let page = try XCTUnwrap(pdf.page(at: 0))
-        let pageBounds = page.bounds(for: .mediaBox)
-
-        // A free-text annotation (NOT a highlight) — should survive the strip.
-        let freeTextAnnotation = PDFAnnotation(bounds: pageBounds, forType: .freeText, withProperties: nil)
-        freeTextAnnotation.contents = "note that should survive"
-        page.addAnnotation(freeTextAnnotation)
-
         let storage = DocumentStorage(documentsURL: tempDir)
         let initialURL = try storage.write(pdf, preferredName: "Test")
-
         let summary = DocumentSummary(url: initialURL, displayName: "Test",
                                       createdAt: Date(), pageCount: 1, ocrSnippet: "",
                                       isCorrupt: false)
         let session = try DocumentSession(summary: summary, storage: storage)
 
-        // Add a highlight annotation to the session's in-memory PDF (mimics what
-        // the viewer's search-highlight code does at runtime).
-        let sessionPage = try XCTUnwrap(session.pdf.page(at: 0))
-        let highlight = PDFAnnotation(bounds: pageBounds, forType: .highlight, withProperties: nil)
-        sessionPage.addAnnotation(highlight)
+        let page = try XCTUnwrap(session.pdf.page(at: 0))
+        let bounds = page.bounds(for: .mediaBox)
+
+        // (a) A SEARCH highlight — must be stripped.
+        let searchHL = PDFAnnotation(bounds: bounds, forType: .highlight, withProperties: nil)
+        searchHL.userName = DocumentSession.searchHighlightAnnotationName
+        page.addAnnotation(searchHL)
+
+        // (b) A USER highlight — must survive.
+        let userHL = PDFAnnotation(bounds: bounds, forType: .highlight, withProperties: nil)
+        userHL.userName = DocumentSession.userAnnotationName
+        page.addAnnotation(userHL)
+
+        // (c) A USER strikethrough — must survive.
+        let userStrike = PDFAnnotation(bounds: bounds, forType: .strikeOut, withProperties: nil)
+        userStrike.userName = DocumentSession.userAnnotationName
+        page.addAnnotation(userStrike)
 
         _ = try session.save()
 
-        // Reload from disk: free-text survives, highlight is gone.
         let reloaded = try XCTUnwrap(PDFDocument(url: initialURL))
         let reloadedPage = try XCTUnwrap(reloaded.page(at: 0))
         let types = reloadedPage.annotations.map(\.type)
-        // PDFAnnotation.type returns the bare subtype name, not the slash-prefixed
-        // PDFAnnotationSubtype.rawValue form.
-        XCTAssertTrue(types.contains("FreeText"),
-                      "free-text annotation should survive, got types: \(types)")
-        XCTAssertFalse(types.contains("Highlight"),
-                       "highlight annotations should be stripped, got types: \(types)")
+
+        XCTAssertEqual(types.filter { $0 == "Highlight" }.count, 1,
+                       "exactly the user highlight should survive; search highlight stripped. types: \(types)")
+        XCTAssertTrue(types.contains("StrikeOut"),
+                      "user strikethrough should survive. types: \(types)")
     }
 }
