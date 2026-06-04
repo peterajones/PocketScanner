@@ -46,6 +46,12 @@ final class DocumentSessionStripHighlightsTests: XCTestCase {
         userStrike.userName = DocumentSession.userAnnotationName
         page.addAnnotation(userStrike)
 
+        // (d) A non-mark annotation (free text) — must survive (only search
+        // highlights are stripped).
+        let note = PDFAnnotation(bounds: bounds, forType: .freeText, withProperties: nil)
+        note.contents = "note that should survive"
+        page.addAnnotation(note)
+
         _ = try session.save()
 
         let reloaded = try XCTUnwrap(PDFDocument(url: initialURL))
@@ -56,5 +62,7 @@ final class DocumentSessionStripHighlightsTests: XCTestCase {
                        "exactly the user highlight should survive; search highlight stripped. types: \(types)")
         XCTAssertTrue(types.contains("StrikeOut"),
                       "user strikethrough should survive. types: \(types)")
+        XCTAssertTrue(types.contains("FreeText"),
+                      "non-mark annotations should survive. types: \(types)")
     }
 }

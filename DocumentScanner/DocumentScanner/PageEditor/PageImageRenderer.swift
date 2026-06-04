@@ -15,10 +15,13 @@ struct PageImageRenderer {
         let renderer = UIGraphicsImageRenderer(size: bounds.size, format: format)
 
         // Temporarily hide all annotations during rasterization. The editor
-        // wants the original page content, not whatever transient overlays
-        // the viewer may have added (e.g., search highlights). Without this,
-        // highlight overlays get rasterized into the new page image and end
-        // up baked into the saved PDF.
+        // wants the original page content, not the overlays drawn on top of it
+        // (search highlights, and now persistent user marks — highlights /
+        // strikethroughs). Without this they'd be baked into the new page image.
+        // NOTE: the page editor replaces the page wholesale (see
+        // DocumentMutations.replacePage), so user marks on an edited page are
+        // NOT carried onto the re-assembled page — a known limitation, since a
+        // cropped / perspective-corrected page has different geometry anyway.
         let savedDisplay = page.annotations.map { ($0, $0.shouldDisplay) }
         for annotation in page.annotations { annotation.shouldDisplay = false }
         defer {
