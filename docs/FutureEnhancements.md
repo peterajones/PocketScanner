@@ -35,7 +35,6 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Library
 
-- **Move documents between folders** — currently a document can be placed in a folder but not relocated. Add a single "Move to…" action (from the viewer and/or a library context menu) with a folder picker that handles every case: folder → another folder, folder → main view, and main view → folder. One action, one picker — supersedes the never-implemented "remove from folder". Real-world case: a doc lands in folder A, then a later, more-related scan makes it clear it belongs in folder B.
 - **Sort options** — by date, by name, by page count. Currently always newest-first.
 - **Grid view** — alternate to list view, larger thumbnails. Useful for visually-driven workflows.
 
