@@ -27,11 +27,8 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 - **Rotate-in-strip** — a context-menu rotate option on edit-mode thumbnails, avoiding a trip through the per-page editor.
 - **Page extraction** — multi-select + "Save as new document" to break apart a scan.
-- **Annotations (highlight + strikethrough)** — let users emphasise or cross out parts of a scan: a small fixed highlight palette (yellow / green / pink / blue) plus strikethrough lines. Useful for flagging things that need attention or marking things that no longer do. Design notes:
-  - Reuse the invisible OCR text layer — the user drag-selects words (same mechanism as search highlighting) and applies a highlight/strikethrough; bounds come straight from the `PDFSelection`, exactly like the existing search-highlight code. No freehand-drawing engine needed for v1.
-  - Persistence is essentially free: `PDFAnnotation`s are written into the file by `dataRepresentation()`, so the existing save path covers it and the marks travel with the PDF via Share / iCloud.
-  - Keep the first cut simple — highlight + strikethrough + tap-an-annotation-to-delete. No notes, shapes, or freehand. Those are a later expansion.
-  - Caveat: text selection is only as good as the OCR; on a poorly-recognised scan, drag-select may be imprecise. A drag-a-rectangle fallback for highlights is possible later, but leave it out of the first cut.
+- **Preserve annotations across page edits** — annotations shipped in v1.4, but editing a page in the per-page editor (crop / rotate / filter) rebuilds the page from scratch via `DocumentMutations.replacePage`, dropping any highlights/strikethroughs on that page. A correct fix is non-trivial because a cropped / perspective-corrected page has different geometry, so marks would need re-mapping rather than re-attaching. Uncommon sequence; deferred from v1.4.
+- **Annotation rectangle-drag fallback** — annotation marks anchor to the OCR text selection, so on a poorly-recognised scan the drag-select can be imprecise. A drag-a-rectangle highlight mode would let users mark regions the OCR missed.
 
 ### Library
 
