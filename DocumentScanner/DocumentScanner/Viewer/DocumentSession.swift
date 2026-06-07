@@ -26,11 +26,14 @@ final class DocumentSession {
 
     /// Annotation `userName` that marks PDFAnnotations added by the search-highlight
     /// view layer. `save()` strips these before writing so they don't persist.
-    static let searchHighlightAnnotationName = "DocumentScanner.searchHighlight"
+    /// `nonisolated` so the pure, nonisolated AnnotationFactory can read it
+    /// (immutable Sendable String — safe outside the main actor).
+    nonisolated static let searchHighlightAnnotationName = "DocumentScanner.searchHighlight"
 
     /// Annotation `userName` that marks PDFAnnotations the USER created
-    /// (highlights / strikethroughs). These persist across save.
-    static let userAnnotationName = "DocumentScanner.userAnnotation"
+    /// (highlights / strikethroughs). These persist across save. `nonisolated`
+    /// for the same reason as above.
+    nonisolated static let userAnnotationName = "DocumentScanner.userAnnotation"
 
     enum InitError: Error { case unreadablePDF }
 

@@ -152,7 +152,7 @@ struct DocumentViewerView: View {
             ) { item in
                 Button("Delete", role: .destructive) {
                     item.page.removeAnnotation(item.annotation)
-                    try? session.save()
+                    _ = try? session.save()
                     annotationRevision &+= 1
                     pendingDeletion = nil
                 }
@@ -273,7 +273,7 @@ struct DocumentViewerView: View {
         }
         // Persist immediately (consistent with edit-mode saves). save() strips
         // only search highlights, so these user marks are written to disk.
-        try? session.save()
+        _ = try? session.save()
         annotationRevision &+= 1
     }
 
