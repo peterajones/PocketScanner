@@ -23,6 +23,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var folderActionError: String?
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
+    @AppStorage("libraryUsesGrid") private var usesGrid = false
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -42,37 +43,10 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                     systemImage: "folder",
                     description: Text("Tap + to scan a document into this folder, or move existing ones in from the main library.")
                 )
+            } else if usesGrid {
+                gridBody
             } else {
-                List(filtered) { summary in
-                    if summary.isCorrupt {
-                        DocumentRow(summary: summary)
-                            .contextMenu {
-                                Button(role: .destructive) {
-                                    try? storage.delete(at: summary.url)
-                                    store.refresh()
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                    } else {
-                        NavigationLink(value: summary) {
-                            DocumentRow(summary: summary)
-                        }
-                        .contextMenu {
-                            MoveToMenu(
-                                currentParent: folderURL,
-                                root: storage.documentsURL,
-                                folders: folders,
-                                move: { moveDocument(summary, to: $0) }
-                            )
-                        }
-                    }
-                }
-                .searchable(text: $searchText, prompt: "Search this folder")
-                .refreshable {
-                    store.refresh()
-                    refreshFolders()
-                }
+                listBody
             }
         }
         .navigationTitle(folderURL.lastPathComponent)
@@ -89,6 +63,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 SortMenu(sort: sort, onSelect: selectSort)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                LayoutToggle(usesGrid: usesGrid, onToggle: { usesGrid.toggle() })
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -172,6 +149,85 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         } else {
             sortKeyRaw = key.rawValue
             sortAscending = DocumentSort.defaultAscending(for: key)
+        }
+    }
+
+    @ViewBuilder
+    private func docContextMenu(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            Button(role: .destructive) {
+                try? storage.delete(at: summary.url)
+                store.refresh()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        } else {
+            MoveToMenu(
+                currentParent: folderURL,
+                root: storage.documentsURL,
+                folders: folders,
+                move: { moveDocument(summary, to: $0) }
+            )
+        }
+    }
+
+    private var gridColumns: [GridItem] {
+        [GridItem(.adaptive(minimum: 110), spacing: 12)]
+    }
+
+    @ViewBuilder
+    private func docRow(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            DocumentRow(summary: summary)
+                .contextMenu { docContextMenu(summary) }
+        } else {
+            NavigationLink(value: summary) {
+                DocumentRow(summary: summary)
+            }
+            .contextMenu { docContextMenu(summary) }
+        }
+    }
+
+    @ViewBuilder
+    private func docTile(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            DocumentTile(summary: summary)
+                .contextMenu { docContextMenu(summary) }
+        } else {
+            NavigationLink(value: summary) {
+                DocumentTile(summary: summary)
+            }
+            .buttonStyle(.plain)
+            .contextMenu { docContextMenu(summary) }
+        }
+    }
+
+    @ViewBuilder
+    private var listBody: some View {
+        List(filtered) { summary in
+            docRow(summary)
+        }
+        .searchable(text: $searchText, prompt: "Search this folder")
+        .refreshable {
+            store.refresh()
+            refreshFolders()
+        }
+    }
+
+    @ViewBuilder
+    private var gridBody: some View {
+        ScrollView {
+            LazyVGrid(columns: gridColumns, spacing: 16) {
+                ForEach(filtered) { summary in
+                    docTile(summary)
+                }
+            }
+            .padding()
+        }
+        .searchable(text: $searchText, prompt: "Search this folder")
+        .refreshable {
+            store.refresh()
+            refreshFolders()
         }
     }
 
