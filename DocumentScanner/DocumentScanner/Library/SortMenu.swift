@@ -15,8 +15,10 @@ struct SortMenu: View {
                     onSelect(key)
                 } label: {
                     if key == sort.key {
-                        Label(key.title,
-                              systemImage: sort.ascending ? "chevron.up" : "chevron.down")
+                        // Checkmark marks the active key (standard iOS selection
+                        // affordance); the arrow shows the current direction.
+                        Label("\(key.title)  \(sort.ascending ? "↑" : "↓")",
+                              systemImage: "checkmark")
                     } else {
                         Text(key.title)
                     }
