@@ -22,6 +22,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var renameFolderName = ""
     @State private var folderBeingDeleted: URL?
     @AppStorage("showFolders") private var showFolders = true
+    @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
+    @AppStorage("sortAscending") private var sortAscending = false
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -110,6 +112,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                         Image(systemName: "gearshape")
                     }
                     .accessibilityIdentifier("Library.SettingsButton")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    SortMenu(sort: sort, onSelect: selectSort)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if showFolders {
@@ -268,12 +273,17 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     private var filteredDocs: [DocumentSummary] {
-        guard !searchText.isEmpty else { return visibleDocs }
-        let needle = searchText.lowercased()
-        return visibleDocs.filter {
-            $0.displayName.lowercased().contains(needle)
-            || $0.ocrSnippet.lowercased().contains(needle)
+        let matched: [DocumentSummary]
+        if searchText.isEmpty {
+            matched = visibleDocs
+        } else {
+            let needle = searchText.lowercased()
+            matched = visibleDocs.filter {
+                $0.displayName.lowercased().contains(needle)
+                || $0.ocrSnippet.lowercased().contains(needle)
+            }
         }
+        return sort.sorted(matched)
     }
 
     /// Cross-doc search state: enumerates `filteredDocs` and runs
@@ -323,6 +333,19 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             return nil
         }
         return SearchContext(term: ctx.term, docs: ctx.docs, startDocIndex: idx)
+    }
+
+    private var sort: DocumentSort {
+        DocumentSort(key: SortKey(rawValue: sortKeyRaw) ?? .date, ascending: sortAscending)
+    }
+
+    private func selectSort(_ key: SortKey) {
+        if key == sort.key {
+            sortAscending.toggle()
+        } else {
+            sortKeyRaw = key.rawValue
+            sortAscending = DocumentSort.defaultAscending(for: key)
+        }
     }
 
     private func triggerScan() {
