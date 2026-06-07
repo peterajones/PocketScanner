@@ -42,43 +42,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                             : "Tap + to scan a document.")
                     )
                 } else {
-                    List {
-                        if showFolders && !folders.isEmpty {
-                            Section {
-                                ForEach(folders, id: \.self) { folderURL in
-                                    NavigationLink(value: folderURL) {
-                                        folderRow(folderURL)
-                                    }
-                                    .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
-                                    .contextMenu {
-                                        Button {
-                                            renameFolderName = folderURL.lastPathComponent
-                                            folderBeingRenamed = folderURL
-                                        } label: {
-                                            Label("Rename", systemImage: "pencil")
-                                        }
-                                        Button(role: .destructive) {
-                                            folderBeingDeleted = folderURL
-                                        } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if !filteredDocs.isEmpty {
-                            Section {
-                                ForEach(filteredDocs) { summary in
-                                    docRow(summary)
-                                }
-                            }
-                        }
-                    }
-                    .searchable(text: $searchText, prompt: "Search documents")
-                    .refreshable {
-                        store.refresh()
-                        refreshFolders()
-                    }
+                    listBody
                 }
             }
             .navigationTitle("Scanned Documents")
@@ -230,31 +194,78 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     @ViewBuilder
+    private func folderContextMenu(_ url: URL) -> some View {
+        Button {
+            renameFolderName = url.lastPathComponent
+            folderBeingRenamed = url
+        } label: {
+            Label("Rename", systemImage: "pencil")
+        }
+        Button(role: .destructive) {
+            folderBeingDeleted = url
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+    }
+
+    @ViewBuilder
+    private func docContextMenu(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            Button(role: .destructive) {
+                try? storage.delete(at: summary.url)
+                store.refresh()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        } else if showFolders {
+            MoveToMenu(
+                currentParent: summary.url.deletingLastPathComponent(),
+                root: storage.documentsURL,
+                folders: folders,
+                move: { moveDocument(summary, to: $0) }
+            )
+        }
+    }
+
+    @ViewBuilder
     private func docRow(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
             DocumentRow(summary: summary)
-                .contextMenu {
-                    Button(role: .destructive) {
-                        try? storage.delete(at: summary.url)
-                        store.refresh()
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
+                .contextMenu { docContextMenu(summary) }
         } else {
             NavigationLink(value: summary) {
                 DocumentRow(summary: summary)
             }
-            .contextMenu {
-                if showFolders {
-                    MoveToMenu(
-                        currentParent: summary.url.deletingLastPathComponent(),
-                        root: storage.documentsURL,
-                        folders: folders,
-                        move: { moveDocument(summary, to: $0) }
-                    )
+            .contextMenu { docContextMenu(summary) }
+        }
+    }
+
+    @ViewBuilder
+    private var listBody: some View {
+        List {
+            if showFolders && !folders.isEmpty {
+                Section {
+                    ForEach(folders, id: \.self) { folderURL in
+                        NavigationLink(value: folderURL) {
+                            folderRow(folderURL)
+                        }
+                        .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
+                        .contextMenu { folderContextMenu(folderURL) }
+                    }
                 }
             }
+            if !filteredDocs.isEmpty {
+                Section {
+                    ForEach(filteredDocs) { summary in
+                        docRow(summary)
+                    }
+                }
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search documents")
+        .refreshable {
+            store.refresh()
+            refreshFolders()
         }
     }
 
