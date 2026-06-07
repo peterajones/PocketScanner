@@ -32,7 +32,6 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Library
 
-- **Grid view** — alternate to list view, larger thumbnails. Useful for visually-driven workflows.
 
 ### Platform reach
 
