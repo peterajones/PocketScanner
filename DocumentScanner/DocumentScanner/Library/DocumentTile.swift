@@ -26,18 +26,11 @@ struct DocumentTile: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
-            Text(subtitle)
+            Text(summary.formattedSubtitle)
                 .font(.caption)
                 .foregroundStyle(summary.isCorrupt ? .orange : .secondary)
                 .lineLimit(1)
         }
         .accessibilityIdentifier("Library.Tile.\(summary.displayName)")
-    }
-
-    private var subtitle: String {
-        if summary.isCorrupt { return "Couldn't read this file" }
-        let date = summary.createdAt.formatted(date: .abbreviated, time: .omitted)
-        let pages = summary.pageCount == 1 ? "1 page" : "\(summary.pageCount) pages"
-        return "\(date) · \(pages)"
     }
 }

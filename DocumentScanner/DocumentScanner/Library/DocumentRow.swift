@@ -23,7 +23,7 @@ struct DocumentRow: View {
                 Text(summary.displayName)
                     .font(.body.weight(.semibold))
                     .lineLimit(1)
-                Text(formattedSubtitle)
+                Text(summary.formattedSubtitle)
                     .font(.footnote)
                     .foregroundStyle(summary.isCorrupt ? .orange : .secondary)
             }
@@ -31,12 +31,5 @@ struct DocumentRow: View {
         }
         .padding(.vertical, 4)
         .accessibilityIdentifier("Library.Row.\(summary.displayName)")
-    }
-
-    private var formattedSubtitle: String {
-        if summary.isCorrupt { return "Couldn't read this file" }
-        let date = summary.createdAt.formatted(date: .abbreviated, time: .omitted)
-        let pages = summary.pageCount == 1 ? "1 page" : "\(summary.pageCount) pages"
-        return "\(date) · \(pages)"
     }
 }

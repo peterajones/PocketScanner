@@ -283,7 +283,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     private var gridBody: some View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 16) {
-                if showFolders {
+                if showFolders && !folders.isEmpty {
                     ForEach(folders, id: \.self) { folderURL in
                         NavigationLink(value: folderURL) {
                             FolderTile(url: folderURL)
