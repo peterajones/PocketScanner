@@ -24,6 +24,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
+    @AppStorage("libraryUsesGrid") private var usesGrid = false
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -41,6 +42,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                             ? "Tap + to scan a document or create a folder."
                             : "Tap + to scan a document.")
                     )
+                } else if usesGrid {
+                    gridBody
                 } else {
                     listBody
                 }
@@ -79,6 +82,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     SortMenu(sort: sort, onSelect: selectSort)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    LayoutToggle(usesGrid: usesGrid, onToggle: { usesGrid.toggle() })
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if showFolders {
@@ -266,6 +272,50 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         .refreshable {
             store.refresh()
             refreshFolders()
+        }
+    }
+
+    private var gridColumns: [GridItem] {
+        [GridItem(.adaptive(minimum: 110), spacing: 12)]
+    }
+
+    @ViewBuilder
+    private var gridBody: some View {
+        ScrollView {
+            LazyVGrid(columns: gridColumns, spacing: 16) {
+                if showFolders {
+                    ForEach(folders, id: \.self) { folderURL in
+                        NavigationLink(value: folderURL) {
+                            FolderTile(url: folderURL)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu { folderContextMenu(folderURL) }
+                    }
+                }
+                ForEach(filteredDocs) { summary in
+                    docTile(summary)
+                }
+            }
+            .padding()
+        }
+        .searchable(text: $searchText, prompt: "Search documents")
+        .refreshable {
+            store.refresh()
+            refreshFolders()
+        }
+    }
+
+    @ViewBuilder
+    private func docTile(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            DocumentTile(summary: summary)
+                .contextMenu { docContextMenu(summary) }
+        } else {
+            NavigationLink(value: summary) {
+                DocumentTile(summary: summary)
+            }
+            .buttonStyle(.plain)
+            .contextMenu { docContextMenu(summary) }
         }
     }
 
