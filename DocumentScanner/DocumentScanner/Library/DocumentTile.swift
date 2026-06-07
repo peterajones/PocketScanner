@@ -1,0 +1,43 @@
+import SwiftUI
+
+/// Grid tile for a document: thumbnail over name + "date · pages" subtitle.
+/// Pure presentation — the parent wraps it in a NavigationLink / contextMenu.
+struct DocumentTile: View {
+    let summary: DocumentSummary
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6).fill(Color(.systemGray6))
+                if summary.isCorrupt {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                        .font(.title2)
+                } else {
+                    DocumentThumbnail(url: summary.url, size: CGSize(width: 220, height: 280))
+                        .padding(4)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .aspectRatio(0.78, contentMode: .fit)
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(.systemGray4)))
+
+            Text(summary.displayName)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+            Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(summary.isCorrupt ? .orange : .secondary)
+                .lineLimit(1)
+        }
+        .accessibilityIdentifier("Library.Tile.\(summary.displayName)")
+    }
+
+    private var subtitle: String {
+        if summary.isCorrupt { return "Couldn't read this file" }
+        let date = summary.createdAt.formatted(date: .abbreviated, time: .omitted)
+        let pages = summary.pageCount == 1 ? "1 page" : "\(summary.pageCount) pages"
+        return "\(date) · \(pages)"
+    }
+}
