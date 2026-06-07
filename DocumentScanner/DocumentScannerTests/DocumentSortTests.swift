@@ -55,6 +55,26 @@ final class DocumentSortTests: XCTestCase {
         XCTAssertEqual(sort.sorted([a, b, c]).map(\.displayName), ["B", "C", "A"])
     }
 
+    func test_pageCount_ascending_isLeastFirst() {
+        let a = doc("A", 1, 2)
+        let b = doc("B", 2, 9)
+        let c = doc("C", 3, 5)
+        let sort = DocumentSort(key: .pageCount, ascending: true)
+        XCTAssertEqual(sort.sorted([b, c, a]).map(\.displayName), ["A", "C", "B"])
+    }
+
+    func test_tieBreak_isNameAscending_evenWhenPrimaryAscending() {
+        // Equal primary key (date) with an ASCENDING primary direction: the
+        // tie-break must still order by name ascending, not reverse with the
+        // primary direction.
+        let x = doc("Xerox", 5, 3)
+        let a = doc("apple", 5, 3)
+        let m = doc("Mango", 5, 3)
+        let sort = DocumentSort(key: .date, ascending: true)
+        XCTAssertEqual(sort.sorted([x, a, m]).map(\.displayName),
+                       ["apple", "Mango", "Xerox"])
+    }
+
     func test_tieBreak_isStableByNameThenURL() {
         // Same date and page count → tie-break by case-insensitive name.
         let x = doc("Xerox", 5, 3)
