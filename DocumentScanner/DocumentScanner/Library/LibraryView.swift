@@ -24,6 +24,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
+    @AppStorage("libraryUsesGrid") private var usesGrid = false
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -41,44 +42,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                             ? "Tap + to scan a document or create a folder."
                             : "Tap + to scan a document.")
                     )
+                } else if usesGrid {
+                    gridBody
                 } else {
-                    List {
-                        if showFolders && !folders.isEmpty {
-                            Section {
-                                ForEach(folders, id: \.self) { folderURL in
-                                    NavigationLink(value: folderURL) {
-                                        folderRow(folderURL)
-                                    }
-                                    .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
-                                    .contextMenu {
-                                        Button {
-                                            renameFolderName = folderURL.lastPathComponent
-                                            folderBeingRenamed = folderURL
-                                        } label: {
-                                            Label("Rename", systemImage: "pencil")
-                                        }
-                                        Button(role: .destructive) {
-                                            folderBeingDeleted = folderURL
-                                        } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if !filteredDocs.isEmpty {
-                            Section {
-                                ForEach(filteredDocs) { summary in
-                                    docRow(summary)
-                                }
-                            }
-                        }
-                    }
-                    .searchable(text: $searchText, prompt: "Search documents")
-                    .refreshable {
-                        store.refresh()
-                        refreshFolders()
-                    }
+                    listBody
                 }
             }
             .navigationTitle("Scanned Documents")
@@ -115,6 +82,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     SortMenu(sort: sort, onSelect: selectSort)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    LayoutToggle(usesGrid: usesGrid, onToggle: { usesGrid.toggle() })
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     if showFolders {
@@ -230,31 +200,122 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     @ViewBuilder
+    private func folderContextMenu(_ url: URL) -> some View {
+        Button {
+            renameFolderName = url.lastPathComponent
+            folderBeingRenamed = url
+        } label: {
+            Label("Rename", systemImage: "pencil")
+        }
+        Button(role: .destructive) {
+            folderBeingDeleted = url
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+    }
+
+    @ViewBuilder
+    private func docContextMenu(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            Button(role: .destructive) {
+                try? storage.delete(at: summary.url)
+                store.refresh()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        } else if showFolders {
+            MoveToMenu(
+                currentParent: summary.url.deletingLastPathComponent(),
+                root: storage.documentsURL,
+                folders: folders,
+                move: { moveDocument(summary, to: $0) }
+            )
+        }
+    }
+
+    @ViewBuilder
     private func docRow(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
             DocumentRow(summary: summary)
-                .contextMenu {
-                    Button(role: .destructive) {
-                        try? storage.delete(at: summary.url)
-                        store.refresh()
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
+                .contextMenu { docContextMenu(summary) }
         } else {
             NavigationLink(value: summary) {
                 DocumentRow(summary: summary)
             }
-            .contextMenu {
-                if showFolders {
-                    MoveToMenu(
-                        currentParent: summary.url.deletingLastPathComponent(),
-                        root: storage.documentsURL,
-                        folders: folders,
-                        move: { moveDocument(summary, to: $0) }
-                    )
+            .contextMenu { docContextMenu(summary) }
+        }
+    }
+
+    @ViewBuilder
+    private var listBody: some View {
+        List {
+            if showFolders && !folders.isEmpty {
+                Section {
+                    ForEach(folders, id: \.self) { folderURL in
+                        NavigationLink(value: folderURL) {
+                            folderRow(folderURL)
+                        }
+                        .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
+                        .contextMenu { folderContextMenu(folderURL) }
+                    }
                 }
             }
+            if !filteredDocs.isEmpty {
+                Section {
+                    ForEach(filteredDocs) { summary in
+                        docRow(summary)
+                    }
+                }
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search documents")
+        .refreshable {
+            store.refresh()
+            refreshFolders()
+        }
+    }
+
+    private var gridColumns: [GridItem] {
+        [GridItem(.adaptive(minimum: 110), spacing: 12)]
+    }
+
+    @ViewBuilder
+    private var gridBody: some View {
+        ScrollView {
+            LazyVGrid(columns: gridColumns, spacing: 16) {
+                if showFolders && !folders.isEmpty {
+                    ForEach(folders, id: \.self) { folderURL in
+                        NavigationLink(value: folderURL) {
+                            FolderTile(url: folderURL)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu { folderContextMenu(folderURL) }
+                    }
+                }
+                ForEach(filteredDocs) { summary in
+                    docTile(summary)
+                }
+            }
+            .padding()
+        }
+        .searchable(text: $searchText, prompt: "Search documents")
+        .refreshable {
+            store.refresh()
+            refreshFolders()
+        }
+    }
+
+    @ViewBuilder
+    private func docTile(_ summary: DocumentSummary) -> some View {
+        if summary.isCorrupt {
+            DocumentTile(summary: summary)
+                .contextMenu { docContextMenu(summary) }
+        } else {
+            NavigationLink(value: summary) {
+                DocumentTile(summary: summary)
+            }
+            .buttonStyle(.plain)
+            .contextMenu { docContextMenu(summary) }
         }
     }
 

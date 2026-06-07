@@ -28,3 +28,15 @@ struct DocumentSummary: Identifiable, Hashable {
                                ocrSnippet: pdf.string ?? "", isCorrupt: false)
     }
 }
+
+extension DocumentSummary {
+    /// The "date · pages" line shown under the name in list rows and grid tiles
+    /// (or a read-error message for corrupt documents). Shared so the two
+    /// presentations never diverge.
+    var formattedSubtitle: String {
+        if isCorrupt { return "Couldn't read this file" }
+        let date = createdAt.formatted(date: .abbreviated, time: .omitted)
+        let pages = pageCount == 1 ? "1 page" : "\(pageCount) pages"
+        return "\(date) · \(pages)"
+    }
+}
