@@ -21,6 +21,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var nameSheet: NameSheetContext?
     @State private var folders: [URL] = []
     @State private var folderActionError: String?
+    @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
+    @AppStorage("sortAscending") private var sortAscending = false
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
@@ -86,6 +88,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                SortMenu(sort: sort, onSelect: selectSort)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     triggerScan()
                 } label: {
@@ -130,12 +135,17 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     }
 
     private var filtered: [DocumentSummary] {
-        guard !searchText.isEmpty else { return docsInFolder }
-        let needle = searchText.lowercased()
-        return docsInFolder.filter {
-            $0.displayName.lowercased().contains(needle)
-            || $0.ocrSnippet.lowercased().contains(needle)
+        let matched: [DocumentSummary]
+        if searchText.isEmpty {
+            matched = docsInFolder
+        } else {
+            let needle = searchText.lowercased()
+            matched = docsInFolder.filter {
+                $0.displayName.lowercased().contains(needle)
+                || $0.ocrSnippet.lowercased().contains(needle)
+            }
         }
+        return sort.sorted(matched)
     }
 
     private func refreshFolders() {
@@ -149,6 +159,19 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             store.refresh()
         } catch {
             folderActionError = error.localizedDescription
+        }
+    }
+
+    private var sort: DocumentSort {
+        DocumentSort(key: SortKey(rawValue: sortKeyRaw) ?? .date, ascending: sortAscending)
+    }
+
+    private func selectSort(_ key: SortKey) {
+        if key == sort.key {
+            sortAscending.toggle()
+        } else {
+            sortKeyRaw = key.rawValue
+            sortAscending = DocumentSort.defaultAscending(for: key)
         }
     }
 
