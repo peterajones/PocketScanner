@@ -44,4 +44,14 @@ enum DocumentMutations {
         pdf.removePage(at: index)
         pdf.insert(newPage, at: index)
     }
+
+    /// Rotate the page at `index` 90° clockwise (or counter-clockwise) by setting
+    /// its `/Rotate` attribute. Lossless: the page image, the invisible OCR text
+    /// layer, and any annotations all rotate together. Normalized to
+    /// {0, 90, 180, 270}. No-op if the index is out of range.
+    static func rotatePage(in pdf: PDFDocument, at index: Int, clockwise: Bool) {
+        guard index >= 0, index < pdf.pageCount, let page = pdf.page(at: index) else { return }
+        let delta = clockwise ? 90 : -90
+        page.rotation = ((page.rotation + delta) % 360 + 360) % 360
+    }
 }
