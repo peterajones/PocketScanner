@@ -130,6 +130,16 @@ struct EditModeView: View {
                     } label: {
                         Label("Select Multiple", systemImage: "checkmark.circle")
                     }
+                    Button {
+                        rotatePage(at: index, clockwise: false)
+                    } label: {
+                        Label("Rotate Left", systemImage: "rotate.left")
+                    }
+                    Button {
+                        rotatePage(at: index, clockwise: true)
+                    } label: {
+                        Label("Rotate Right", systemImage: "rotate.right")
+                    }
                     Button(role: .destructive) {
                         deletePage(at: index)
                     } label: {
@@ -165,6 +175,11 @@ struct EditModeView: View {
         DocumentMutations.deletePages(in: session.pdf, at: selectedIndices)
         _ = try? session.save()
         exitMultiSelect()
+    }
+
+    private func rotatePage(at index: Int, clockwise: Bool) {
+        DocumentMutations.rotatePage(in: session.pdf, at: index, clockwise: clockwise)
+        _ = try? session.save()
     }
 
     private func deletePage(at index: Int) {
