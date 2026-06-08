@@ -84,6 +84,13 @@ final class DocumentMutationsTests: XCTestCase {
         XCTAssertEqual(pageMarkers(pdf), ["A", "B", "C"])
     }
 
+    func test_rotatePage_negativeIndexIsNoOp() throws {
+        let pdf = try threePagePDF()
+        DocumentMutations.rotatePage(in: pdf, at: -1, clockwise: true)
+        XCTAssertEqual(pageMarkers(pdf), ["A", "B", "C"])
+        XCTAssertEqual(pdf.page(at: 0)?.rotation, 0)
+    }
+
     func test_rotatePage_persistsRotationAndKeepsTextLayer_afterDiskRoundTrip() throws {
         let pdf = try singlePagePDF(marker: "Rotated")
         DocumentMutations.rotatePage(in: pdf, at: 0, clockwise: true)
