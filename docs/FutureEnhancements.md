@@ -10,10 +10,6 @@ Versions earlier than the current shipping release are deleted from this doc as 
 
 Lower priority. Some of these may never ship. The list exists to capture what we considered.
 
-### Filters
-
-- **Filter at scan time** — pick a filter in the Name & Save sheet before the initial save, applied to every page of that scan. Faster than entering per-page editor for each.
-
 ### Search
 
 - **In-folder cross-doc search** — `FolderContentsView`'s own searchText doesn't feed the inherited `navigationDestination`; cross-doc nav only works off `LibraryView`'s search field. Have `FolderContentsView` build its own `SearchContext` or share `LibraryView`'s binding.
