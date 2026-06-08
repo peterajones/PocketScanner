@@ -1,11 +1,13 @@
 import SwiftUI
 import PDFKit
 
-/// Modal shown after capture. Lets the user name the document while the pipeline
-/// processes in the background. Save waits for the pipeline (showing a spinner)
-/// before writing to disk.
+/// Modal shown after capture. Lets the user name the document while OCR runs in
+/// the background; Save applies the chosen filter (none for now — the picker is
+/// added in a later step) and writes the assembled PDF to disk.
 struct NameDocumentSheet: View {
-    let pipelineTask: Task<ScanResult, Error>
+    let images: [UIImage]
+    let recognizeTask: Task<[ScannedPage], Never>
+    let pipeline: ScanPipeline
     let storage: DocumentStorage
     let onSaved: () -> Void
     let onCancel: () -> Void
@@ -36,7 +38,7 @@ struct NameDocumentSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        pipelineTask.cancel()
+                        recognizeTask.cancel()
                         onCancel()
                     }
                     .disabled(isWorking)
@@ -57,13 +59,14 @@ struct NameDocumentSheet: View {
         .interactiveDismissDisabled(isWorking)
     }
 
-    /// While OCR runs, the sheet shows a timestamp default. Once the pipeline
-    /// produces text, swap in a smarter name — but only if the user hasn't
-    /// already started typing their own.
+    /// While OCR runs, the sheet shows a timestamp default. Once recognition
+    /// finishes, swap in a smarter name — but only if the user hasn't already
+    /// started typing their own.
     private func refineDefaultName() async {
-        guard let result = try? await pipelineTask.value else { return }
+        let pages = await recognizeTask.value
         guard !hasUserEdited else { return }
-        if let suggestion = DefaultDocumentName.suggest(from: result.ocrText) {
+        let ocrText = pages.flatMap(\.observations).map(\.string).joined(separator: "\n")
+        if let suggestion = DefaultDocumentName.suggest(from: ocrText) {
             name = suggestion
         }
     }
@@ -72,11 +75,10 @@ struct NameDocumentSheet: View {
         isWorking = true
         defer { isWorking = false }
         do {
-            let result = try await pipelineTask.value
+            let pages = await recognizeTask.value
+            let result = try await pipeline.assemble(pages: pages, filter: .none)
             _ = try storage.write(result.pdf, preferredName: name)
             onSaved()
-        } catch is CancellationError {
-            onCancel()
         } catch {
             alertCenter.present(AppAlert(
                 title: "Couldn't save",
@@ -90,5 +92,4 @@ struct NameDocumentSheet: View {
             ))
         }
     }
-
 }

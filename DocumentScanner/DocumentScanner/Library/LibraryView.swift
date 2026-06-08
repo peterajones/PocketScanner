@@ -28,7 +28,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
 
     private struct NameSheetContext: Identifiable {
         let id = UUID()
-        let task: Task<ScanResult, Error>
+        let images: [UIImage]
+        let recognizeTask: Task<[ScannedPage], Never>
     }
 
     var body: some View {
@@ -119,8 +120,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     presenter: scannerPresenter,
                     onFinish: { images in
                         showingCapture = false
-                        let task = Task { try await pipeline.process(images: images) }
-                        nameSheet = NameSheetContext(task: task)
+                        let captured = images
+                        let recognizeTask = Task { await pipeline.recognize(images: captured) }
+                        nameSheet = NameSheetContext(images: captured, recognizeTask: recognizeTask)
                     },
                     onCancel: { showingCapture = false }
                 )
@@ -131,7 +133,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             }
             .sheet(item: $nameSheet) { ctx in
                 NameDocumentSheet(
-                    pipelineTask: ctx.task,
+                    images: ctx.images,
+                    recognizeTask: ctx.recognizeTask,
+                    pipeline: pipeline,
                     storage: storage,
                     onSaved: {
                         nameSheet = nil
