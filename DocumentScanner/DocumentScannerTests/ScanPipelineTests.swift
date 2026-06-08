@@ -28,6 +28,27 @@ final class ScanPipelineTests: XCTestCase {
         XCTAssertTrue(result.ocrText.contains("world"))
     }
 
+    func test_recognize_returnsPagePerImageWithObservations() async throws {
+        let images = [whiteImage(), whiteImage()]
+        let pipeline = ScanPipeline(ocr: StubOCR(returning: ["alpha"]))
+        let pages = await pipeline.recognize(images: images)
+        XCTAssertEqual(pages.count, 2)
+        XCTAssertTrue(pages.allSatisfy { page in
+            page.observations.contains { $0.string == "alpha" }
+        })
+    }
+
+    func test_assemble_withFilter_keepsSearchableTextLayer() async throws {
+        let needle = "FilterNeedle"
+        let pipeline = ScanPipeline(ocr: StubOCR(returning: [needle]))
+        let pages = await pipeline.recognize(images: [whiteImage()])
+        let result = try await pipeline.assemble(pages: pages, filter: .blackAndWhite)
+        XCTAssertEqual(result.pdf.pageCount, 1)
+        XCTAssertFalse(result.pdf.findString(needle, withOptions: .caseInsensitive).isEmpty,
+                       "the B&W filter must not break the OCR text layer")
+        XCTAssertTrue(result.ocrText.contains(needle))
+    }
+
     // MARK: - Helpers
 
     private func whiteImage() -> UIImage {
