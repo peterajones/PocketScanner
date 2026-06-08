@@ -15,11 +15,38 @@ struct NameDocumentSheet: View {
     @State private var name: String = DefaultDocumentName.fallback()
     @State private var hasUserEdited = false
     @State private var isWorking = false
+    @State private var filter: ImageFilter = .none
+    @State private var previewBase: UIImage?     // downscaled page 1
+    @State private var previewImage: UIImage?    // previewBase with `filter` applied
+    private let filterEngine = ImageFilterEngine()
     @Environment(\.alertCenter) private var alertCenter
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    if let previewImage {
+                        Image(uiImage: previewImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .frame(maxHeight: 280)
+                            .accessibilityIdentifier("NameSheet.Preview")
+                    } else {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, minHeight: 160)
+                    }
+                }
+                Section("Filter") {
+                    Picker("Filter", selection: $filter) {
+                        ForEach(ImageFilter.allCases) { f in
+                            Text(f.displayName).tag(f)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(isWorking)
+                    .accessibilityIdentifier("NameSheet.FilterPicker")
+                }
                 Section("Name") {
                     TextField("Name", text: Binding(
                         get: { name },
@@ -55,6 +82,8 @@ struct NameDocumentSheet: View {
                 }
             }
             .task { await refineDefaultName() }
+            .task { loadPreviewBase() }
+            .onChange(of: filter) { _, _ in applyFilterToPreview() }
         }
         .interactiveDismissDisabled(isWorking)
     }
@@ -76,7 +105,7 @@ struct NameDocumentSheet: View {
         defer { isWorking = false }
         do {
             let pages = await recognizeTask.value
-            let result = try await pipeline.assemble(pages: pages, filter: .none)
+            let result = try await pipeline.assemble(pages: pages, filter: filter)
             _ = try storage.write(result.pdf, preferredName: name)
             onSaved()
         } catch {
@@ -90,6 +119,34 @@ struct NameDocumentSheet: View {
                     onCancel()
                 })
             ))
+        }
+    }
+
+    /// Downscale page 1 so live filtering stays snappy regardless of scan size.
+    /// Done on the main actor (a single resize) to avoid a non-Sendable UIImage
+    /// capture across a detached task (a Swift 6 concurrency error).
+    private func loadPreviewBase() {
+        guard let first = images.first else { return }
+        let base = Self.downscaled(first, maxDimension: 1000)
+        previewBase = base
+        previewImage = base   // filter defaults to .none
+    }
+
+    private func applyFilterToPreview() {
+        guard let base = previewBase else { return }
+        previewImage = filterEngine.apply(filter, to: base) ?? base
+    }
+
+    private static func downscaled(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
+        let size = image.size
+        let longest = max(size.width, size.height)
+        guard longest > maxDimension else { return image }
+        let scale = maxDimension / longest
+        let target = CGSize(width: size.width * scale, height: size.height * scale)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: target, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: target))
         }
     }
 }
