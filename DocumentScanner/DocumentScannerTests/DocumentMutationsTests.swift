@@ -58,6 +58,50 @@ final class DocumentMutationsTests: XCTestCase {
         XCTAssertEqual(pageMarkers(pdf), ["A", "B", "C"])
     }
 
+    func test_rotatePage_clockwise_from0is90() throws {
+        let pdf = try threePagePDF()
+        DocumentMutations.rotatePage(in: pdf, at: 0, clockwise: true)
+        XCTAssertEqual(pdf.page(at: 0)?.rotation, 90)
+    }
+
+    func test_rotatePage_counterclockwise_from0is270() throws {
+        let pdf = try threePagePDF()
+        DocumentMutations.rotatePage(in: pdf, at: 0, clockwise: false)
+        XCTAssertEqual(pdf.page(at: 0)?.rotation, 270)
+    }
+
+    func test_rotatePage_clockwise_wrapsFrom270to0() throws {
+        let pdf = try threePagePDF()
+        let page = try XCTUnwrap(pdf.page(at: 0))
+        page.rotation = 270
+        DocumentMutations.rotatePage(in: pdf, at: 0, clockwise: true)
+        XCTAssertEqual(page.rotation, 0)
+    }
+
+    func test_rotatePage_outOfRangeIsNoOp() throws {
+        let pdf = try threePagePDF()
+        DocumentMutations.rotatePage(in: pdf, at: 99, clockwise: true)
+        XCTAssertEqual(pageMarkers(pdf), ["A", "B", "C"])
+    }
+
+    func test_rotatePage_persistsRotationAndKeepsTextLayer_afterDiskRoundTrip() throws {
+        let pdf = try singlePagePDF(marker: "Rotated")
+        DocumentMutations.rotatePage(in: pdf, at: 0, clockwise: true)
+
+        // Round-trip through disk and reload via URL (PDFDocument(url:), NOT
+        // PDFDocument(data:), which is known to break findString in this project).
+        let tmpURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("rotate-roundtrip-\(UUID().uuidString).pdf")
+        defer { try? FileManager.default.removeItem(at: tmpURL) }
+        try XCTUnwrap(pdf.dataRepresentation()).write(to: tmpURL)
+
+        let reloaded = try XCTUnwrap(PDFDocument(url: tmpURL))
+        XCTAssertEqual(reloaded.page(at: 0)?.rotation, 90,
+                       "/Rotate must persist across a save + reload")
+        XCTAssertFalse(reloaded.findString("Rotated", withOptions: .caseInsensitive).isEmpty,
+                       "the OCR text layer must survive rotation + round-trip")
+    }
+
     // MARK: - Helpers
 
     private func threePagePDF() throws -> PDFDocument {
