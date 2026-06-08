@@ -33,6 +33,9 @@ actor ScanPipeline {
         var pages: [ScannedPage] = []
         pages.reserveCapacity(images.count)
         for (index, image) in images.enumerated() {
+            // Bail early if the caller (e.g. the Save sheet, on cancel/dismiss)
+            // abandoned the scan — don't keep OCR'ing pages no one will use.
+            if Task.isCancelled { break }
             let observations: [OCRObservation]
             do {
                 observations = try await ocr.recognizeText(in: image)

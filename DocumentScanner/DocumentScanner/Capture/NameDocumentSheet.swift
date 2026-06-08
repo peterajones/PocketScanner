@@ -1,9 +1,9 @@
 import SwiftUI
 import PDFKit
 
-/// Modal shown after capture. Lets the user name the document while OCR runs in
-/// the background; Save applies the chosen filter (none for now — the picker is
-/// added in a later step) and writes the assembled PDF to disk.
+/// Modal shown after capture. Shows a page-1 filter preview + picker and lets the
+/// user name the document while OCR runs in the background; Save applies the chosen
+/// filter to every page and writes the assembled PDF to disk.
 struct NameDocumentSheet: View {
     let images: [UIImage]
     let recognizeTask: Task<[ScannedPage], Never>
@@ -82,8 +82,9 @@ struct NameDocumentSheet: View {
                 }
             }
             .task { await refineDefaultName() }
-            .task { loadPreviewBase() }
+            .task { await loadPreviewBase() }
             .onChange(of: filter) { _, _ in applyFilterToPreview() }
+            .onDisappear { recognizeTask.cancel() }
         }
         .interactiveDismissDisabled(isWorking)
     }
@@ -123,11 +124,13 @@ struct NameDocumentSheet: View {
     }
 
     /// Downscale page 1 so live filtering stays snappy regardless of scan size.
-    /// Done on the main actor (a single resize) to avoid a non-Sendable UIImage
-    /// capture across a detached task (a Swift 6 concurrency error).
-    private func loadPreviewBase() {
+    /// `byPreparingThumbnail` does the resize off the main thread and is
+    /// concurrency-safe, so there's no main-thread hitch and no non-Sendable
+    /// UIImage capture.
+    private func loadPreviewBase() async {
         guard let first = images.first else { return }
-        let base = Self.downscaled(first, maxDimension: 1000)
+        let target = Self.previewSize(for: first.size, maxDimension: 1000)
+        let base = await first.byPreparingThumbnail(ofSize: target) ?? first
         previewBase = base
         previewImage = base   // filter defaults to .none
     }
@@ -137,16 +140,11 @@ struct NameDocumentSheet: View {
         previewImage = filterEngine.apply(filter, to: base) ?? base
     }
 
-    private static func downscaled(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
-        let size = image.size
+    /// Aspect-preserving target size whose longest side is at most `maxDimension`.
+    private static func previewSize(for size: CGSize, maxDimension: CGFloat) -> CGSize {
         let longest = max(size.width, size.height)
-        guard longest > maxDimension else { return image }
+        guard longest > maxDimension else { return size }
         let scale = maxDimension / longest
-        let target = CGSize(width: size.width * scale, height: size.height * scale)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        return UIGraphicsImageRenderer(size: target, format: format).image { _ in
-            image.draw(in: CGRect(origin: .zero, size: target))
-        }
+        return CGSize(width: size.width * scale, height: size.height * scale)
     }
 }
