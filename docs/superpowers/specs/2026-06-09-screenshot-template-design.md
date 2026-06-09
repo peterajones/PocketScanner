@@ -16,8 +16,9 @@ of the broader "App Store presence" effort; the App Preview *video* is explicitl
 
 - **Static screenshots only.** The App Preview video is deferred; a video cannot be
   a layer in a raster image file, so it gets its own workflow later.
-- **Tool: Krita** (primary). **Figma** is a sanctioned fallback if Krita becomes
-  annoying for this task — the layer model maps cleanly either way.
+- **Tool: Krita** (primary), using Apple's iPhone 17 bezel **PNG** (no Photoshop
+  available). **Figma** is a sanctioned fallback — the four-layer model maps cleanly
+  either way.
 - **Target size: 1290×2796 px** — the App Store 6.9" display slot.
 - **Look: hybrid** — framed device on a solid background, **no captions by default**,
   but a caption layer is built in (hidden) for per-shot use when space allows.
@@ -59,13 +60,17 @@ over the lavender background so it is fully opaque.
 
 ## Asset sources
 
-- **Device chrome:** Apple Design Resources (official iPhone bezel art with a
-  transparent screen area), or an equivalent device-frame kit. **Fallback:** if an
-  exact iPhone 17 bezel is unavailable, use the **iPhone 16 Pro** frame — visually
-  near-identical and the same screen resolution, so the screen content still aligns.
-- **Screen content:** iOS Simulator screenshots. A simulator screenshot is the raw
-  1290×2796 screen content (what goes *inside* the viewport); it does **not** include
-  device chrome.
+- **Device chrome:** Apple's **official iPhone 17 bezel**, free and explicitly
+  licensed for marketing materials, shipped as **Photoshop + PNG** with a transparent
+  screen area:
+  [Bezel-iPhone-17.dmg](https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-17.dmg)
+  (index: [Apple Design Resources](https://developer.apple.com/design/resources/)).
+  - Apple ships an iPhone **17** bezel but not a 17 **Pro Max** one. The base 17's
+    native screen is 1206×2622; it scales into the 1290×2796 canvas without distortion
+    because all current iPhone screens share the ~19.5:9 aspect ratio.
+- **Screen content:** iOS Simulator, **iPhone 17 device** (to match the bezel). A
+  simulator screenshot is the raw screen content (what goes *inside* the viewport);
+  it does **not** include device chrome.
 - **Background:** flat fill, `#F2E9F7`, no external asset needed.
 
 ## Per-shot workflow
@@ -80,7 +85,8 @@ over the lavender background so it is fully opaque.
 ## Deliverables
 
 1. The master template file committed to the repo under `marketing/templates/`
-   (e.g. `marketing/templates/screenshot-iphone17-6.9.kra`).
+   (`marketing/templates/screenshot-iphone17-6.9.kra`, built in Krita on Apple's
+   bezel PNG).
 2. A short `marketing/templates/README.md` documenting the swap-and-export workflow,
    the output spec, and the asset sources/fallbacks above.
 

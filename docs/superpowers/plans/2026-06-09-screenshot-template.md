@@ -6,16 +6,16 @@
 > tracking. There is no code/TDD here — "verification" means visual checks plus a
 > dimension/color check on the exported PNG.
 
-**Goal:** Produce a reusable Krita layered master that frames a 1290×2796 Pocket
-Scanner screenshot inside iPhone 17 chrome on a pale-lavender background, with a
-hidden caption layer for optional per-shot use.
+**Goal:** Produce a reusable Krita layered master that frames a Pocket Scanner
+screenshot inside Apple's official iPhone 17 bezel (PNG) on a pale-lavender
+background, with a hidden caption layer for optional per-shot use.
 
 **Architecture:** Four-layer raster composite (background fill → clipped screen
 content → device chrome → hidden caption), exported as a flattened opaque PNG at the
 App Store 6.9" slot size. Manual swap-and-export workflow, one PNG per slot.
 
-**Tech Stack:** Krita (primary; Figma sanctioned fallback), iOS Simulator, macOS
-`sips` for export verification.
+**Tech Stack:** Krita (Figma is a sanctioned fallback); Apple's iPhone 17 bezel PNG;
+iOS Simulator; macOS `sips` for export verification.
 
 **Spec:** `docs/superpowers/specs/2026-06-09-screenshot-template-design.md`
 
@@ -25,7 +25,8 @@ App Store 6.9" slot size. Manual swap-and-export workflow, one PNG per slot.
 
 - Create: `marketing/templates/README.md` — workflow + output spec + asset sources **[Claude]**
 - Create: `marketing/templates/screenshot-iphone17-6.9.kra` — the layered master **[Peter, in Krita]**
-- Working/throwaway (not committed): a sample simulator screenshot used to build & test the template
+- Working/throwaway (not committed): the downloaded Apple bezel PNG and a sample
+  simulator screenshot used to build & test the template
 
 Only the `.kra` master and the README are committed. Simulator screenshots and the
 exported gallery PNGs are outputs, produced per-release, and live outside this deliverable.
@@ -37,68 +38,9 @@ exported gallery PNGs are outputs, produced per-release, and live outside this d
 **Files:**
 - Create: `marketing/templates/README.md`
 
-- [x] **Step 1: Create the directory and README with the exact content below**
+- [x] **Step 1: Create the directory and README** (done — see committed README)
 
-```markdown
-# App Store screenshot templates
-
-Layered masters for framing Pocket Scanner screenshots for the App Store gallery.
-
-Spec: `docs/superpowers/specs/2026-06-09-screenshot-template-design.md`
-
-## Files
-
-- `screenshot-iphone17-6.9.kra` — Krita master for the **6.9" iPhone slot**
-  (iPhone 17 chrome). Four layers, bottom → top:
-  1. **Background** — solid pale lavender `#F2E9F7`, fills the canvas.
-  2. **Screen content** — the simulator screenshot, clipped to the screen shape.
-  3. **Device chrome** — iPhone 17 frame, transparent screen, centered with margin.
-  4. **Caption** — empty text layer in the top ~18%, **hidden by default**.
-
-## Output spec
-
-| Property   | Value             |
-|------------|-------------------|
-| Format     | PNG               |
-| Dimensions | 1290 × 2796 px    |
-| Color      | sRGB              |
-| Alpha      | None (flattened)  |
-
-## Make a screenshot (per slot)
-
-1. Capture the screen content from the simulator:
-   `xcrun simctl io booted screenshot ~/Desktop/scan.png`
-   (Use a 6.9" sim — iPhone 17 Pro Max / 16 Pro Max — so it is 1290×2796.)
-2. Open `screenshot-iphone17-6.9.kra` in Krita.
-3. Select the **Screen content** layer → replace its pixels with the new screenshot
-   (Layer ▸ Import/Export ▸ Import Layer, or paste and re-fit). It re-clips to the
-   screen shape automatically.
-4. Optional: unhide the **Caption** layer and edit the text for this slot.
-5. File ▸ Export ▸ PNG. Confirm the canvas is exactly 1290×2796, flatten on export.
-6. Repeat for each of the up to 10 App Store slots.
-
-## Verify an export
-
-    sips -g pixelWidth -g pixelHeight -g hasAlpha -g space export.png
-
-Expect: pixelWidth 1290, pixelHeight 2796, hasAlpha no, space RGB.
-
-## Asset sources
-
-- **Device chrome:** Apple Design Resources (official iPhone bezel, transparent
-  screen). Fallback: iPhone 16 Pro frame — visually near-identical, same screen
-  resolution.
-- **Screen content:** iOS Simulator (raw 1290×2796 screen; no chrome).
-- **Background:** flat `#F2E9F7` fill.
-
-## Fallback tool
-
-Krita is primary. If it gets annoying, Figma works the same way: a 1290×2796 frame,
-the screenshot placed inside a screen frame with "clip content", the chrome on top,
-and a hidden text layer. Keep the same layer order and output spec.
-```
-
-- [x] **Step 2: Commit**
+- [x] **Step 2: Commit** (done)
 
 ```bash
 git add marketing/templates/README.md
@@ -107,22 +49,30 @@ git commit -m "docs: marketing screenshot template README + workflow"
 
 ---
 
-## Task 2: Acquire the device chrome and a test screenshot [Peter]
+## Task 2: Acquire the Apple bezel PNG and a test screenshot [Peter]
 
 **Files:**
-- Working: an iPhone 17 chrome PNG (transparent screen) + one sample screenshot
+- Working: Apple's iPhone 17 bezel PNG + one sample screenshot
 
-- [ ] **Step 1: Get the iPhone 17 chrome art**
+- [ ] **Step 1: Download Apple's official iPhone 17 bezel**
 
-Download Apple Design Resources (https://developer.apple.com/design/resources/) and
-extract an **iPhone 17** device frame as a PNG with a **transparent screen area**.
-If iPhone 17 is not yet in the resources, use the **iPhone 16 Pro** frame — it is
-visually near-identical and shares the 1290×2796 screen resolution.
+Download and mount the bezel (free, licensed for marketing materials):
+
+```bash
+curl -L -o ~/Downloads/Bezel-iPhone-17.dmg \
+  https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-17.dmg
+open ~/Downloads/Bezel-iPhone-17.dmg
+```
+
+From the mounted volume, grab the iPhone 17 bezel **PNG** (transparent screen area).
+We use the PNG, not the PSD (no Photoshop). Copy it somewhere handy, e.g.
+`~/Desktop/iphone17-bezel.png`.
+(Index page, for reference: [Apple Design Resources](https://developer.apple.com/design/resources/).)
 
 - [ ] **Step 2: Capture a sample simulator screenshot**
 
-Boot a 6.9" simulator (iPhone 17 Pro Max or iPhone 16 Pro Max), open Pocket Scanner
-to a good-looking screen (e.g. a scanned document), then run:
+Boot an **iPhone 17** simulator (to match the bezel), open Pocket Scanner to a
+good-looking screen (e.g. a scanned document), then run:
 
 ```bash
 xcrun simctl io booted screenshot ~/Desktop/scan-sample.png
@@ -133,112 +83,58 @@ xcrun simctl io booted screenshot ~/Desktop/scan-sample.png
 ```bash
 sips -g pixelWidth -g pixelHeight ~/Desktop/scan-sample.png
 ```
-Expected: `pixelWidth: 1290`, `pixelHeight: 2796`. If different, you booted a
-non-6.9" device — switch sims and re-capture.
+Expected: `pixelWidth: 1206`, `pixelHeight: 2622` (iPhone 17, 6.3"). The exact pixel
+size does not need to match the 1290×2796 canvas — it scales to fit the bezel's screen
+region, same ~19.5:9 aspect, so no distortion. If you booted a different device you'll
+see different numbers; that's fine as long as it's a portrait iPhone screenshot.
 
 ---
 
-## Task 3: Create the canvas, background, and chrome layers [Peter, in Krita]
+## Task 3: Build the composite in Krita [Peter]
 
 **Files:**
 - Create (in progress): `marketing/templates/screenshot-iphone17-6.9.kra`
 
-- [ ] **Step 1: New image**
+- [ ] **Step 1: New image + background**
 
-Krita ▸ File ▸ New: Width **1290 px**, Height **2796 px**, Color model **RGB/Alpha**,
-Profile **sRGB**. Create.
+File ▸ New: **1290 × 2796 px**, RGB/Alpha, sRGB. Rename the default layer
+**Background**, set foreground to `#F2E9F7`, fill it (Shift+Backspace).
 
-- [ ] **Step 2: Background layer**
+- [ ] **Step 2: Import and place the chrome**
 
-Rename the default layer to **Background**. Set the foreground color to `#F2E9F7`
-and fill the layer (Edit ▸ Fill with Foreground Color, or Shift+Backspace).
+Layer ▸ Import/Export ▸ Import Layer → `~/Desktop/iphone17-bezel.png`. Rename it
+**Device chrome**, keep it on **top**. Transform (Ctrl+T) to scale down so the whole
+device is visible with margin and ~top 18% empty headroom; center horizontally; apply.
 
-- [ ] **Step 3: Import the chrome**
-
-Layer ▸ Import/Export ▸ Import Layer → select the iPhone chrome PNG. Rename the new
-layer **Device chrome**. Make sure it is the **top** layer.
-
-- [ ] **Step 4: Position and scale the chrome**
-
-With the **Device chrome** layer selected, use the Transform tool (Ctrl+T) to scale
-it down so the **whole device is visible** with a comfortable lavender margin on all
-sides, and roughly the **top ~18% of the canvas is empty headroom** above the device
-(reserved for the caption). Center it horizontally. Apply the transform.
-
-- [ ] **Step 5: Visual check**
-
-You should see the full iPhone frame centered on lavender, with its screen area
-showing through as transparent (the lavender shows inside the screen for now), and
-clear empty space across the top. If the device touches the canvas edges, scale it
-down a bit more.
-
----
-
-## Task 4: Add the clipped screen-content layer [Peter, in Krita]
-
-**Files:**
-- Modify (in progress): `marketing/templates/screenshot-iphone17-6.9.kra`
-
-- [ ] **Step 1: Import the screenshot below the chrome**
+- [ ] **Step 3: Import and fit the screen content**
 
 Layer ▸ Import/Export ▸ Import Layer → `~/Desktop/scan-sample.png`. Rename it
-**Screen content**. Drag it in the Layers docker so it sits **directly below Device
-chrome** and **above Background**.
+**Screen content**, place it **directly below Device chrome** and above Background.
+Transform to cover the chrome's screen opening exactly; apply.
 
-- [ ] **Step 2: Fit it to the screen region**
+- [ ] **Step 4: Clip it to the screen shape**
 
-With **Screen content** selected, use the Transform tool (Ctrl+T) to scale/position
-it so it exactly covers the chrome's screen opening (use the chrome's bezel as the
-visual guide). Apply.
-
-- [ ] **Step 3: Clip it to the screen shape**
-
-So the screenshot's corners don't poke past the rounded screen, clip it:
-- Duplicate the **Device chrome** layer, move the copy directly **below** Screen
-  content, and rename it **Screen mask**.
-- On **Screen mask**, erase everything except a solid fill of the screen opening
-  (quickest: Select the transparent screen hole via Select ▸ Opaque on the chrome,
-  Select ▸ Invert to get the screen area, fill it solid on Screen mask, clear the
-  rest).
-- Select the **Screen content** layer → right-click ▸ **Inherit Alpha** (the
-  alpha icon). It now shows only where **Screen mask** below it is opaque — i.e.
+- Duplicate **Device chrome**, move the copy **below** Screen content, rename it
+  **Screen mask**.
+- On **Screen mask**, keep only a solid fill of the screen opening: Select ▸ Opaque
+  on the chrome, Select ▸ Invert to get the screen area, fill it solid, clear the rest.
+- Select **Screen content** → right-click ▸ **Inherit Alpha**. It now shows only
   inside the screen.
 
-(Figma fallback: instead of all this, place the screenshot inside the screen frame
-and enable "Clip content".)
+- [ ] **Step 5: Add the hidden Caption layer**
 
-- [ ] **Step 4: Visual check**
+Text tool → click in the top ~18% headroom → type `Caption goes here`. Rename
+**Caption**, topmost layer, clean sans-serif, color `#2B2B2B` or brand purple
+`#7B12A1`, centered. Toggle its visibility **off** (stays in the file for per-shot use).
 
-The screenshot now fills the screen exactly, with crisp rounded corners and no
-overspill past the bezel. The chrome bezel sits cleanly on top.
+- [ ] **Step 6: Visual check**
 
----
-
-## Task 5: Add the hidden caption layer [Peter, in Krita]
-
-**Files:**
-- Modify (in progress): `marketing/templates/screenshot-iphone17-6.9.kra`
-
-- [ ] **Step 1: Add a text layer**
-
-Select the Text tool, click in the **top ~18% headroom**, and type a placeholder
-like `Caption goes here`. This creates a vector text layer. Rename it **Caption**.
-Make sure it is the **topmost** layer.
-
-- [ ] **Step 2: Style it**
-
-Set a clean sans-serif (e.g. system default), a size that reads well in the headroom,
-and a color with good contrast on lavender (dark grey `#2B2B2B` or the brand purple
-`#7B12A1`). Center it horizontally.
-
-- [ ] **Step 3: Hide it by default**
-
-Toggle the **Caption** layer's visibility **off** (eye icon) in the Layers docker.
-It stays in the file for per-shot use but is hidden in the default template.
+Full iPhone centered on lavender, screenshot filling the screen with crisp rounded
+corners and no overspill past the bezel, empty headroom on top, caption hidden.
 
 ---
 
-## Task 6: Save the master, export, and verify [Peter + Claude]
+## Task 4: Save the master, export, and verify [Peter + Claude]
 
 **Files:**
 - Create: `marketing/templates/screenshot-iphone17-6.9.kra`
@@ -247,13 +143,12 @@ It stays in the file for per-shot use but is hidden in the default template.
 - [ ] **Step 1: Save the master [Peter]**
 
 File ▸ Save As → `marketing/templates/screenshot-iphone17-6.9.kra` (native Krita
-format, preserves all four layers). Confirm all layers are present and the **Caption**
-layer is hidden.
+format, preserves all four layers). Confirm the **Caption** layer is hidden.
 
 - [ ] **Step 2: Export a test PNG [Peter]**
 
-File ▸ Export → `~/Desktop/export-test.png`, PNG format. Ensure it exports the
-flattened, opaque canvas (no alpha). Keep dimensions at 1290×2796.
+File ▸ Export → `~/Desktop/export-test.png`, PNG, flattened and **opaque** (no alpha),
+canvas 1290×2796.
 
 - [ ] **Step 3: Verify the export [Claude]**
 
@@ -267,8 +162,7 @@ pixelHeight: 2796
 hasAlpha: no
 space: RGB
 ```
-If `hasAlpha: yes`, re-export with the background flattened (the lavender Background
-layer must be visible and the image flattened on export).
+If `hasAlpha: yes`, re-export flattened with the lavender Background visible.
 
 - [ ] **Step 4: Commit the master [Claude]**
 
@@ -279,16 +173,17 @@ git commit -m "feat: iPhone 17 App Store screenshot template (Krita master)"
 
 - [ ] **Step 5: Clean up throwaways [Peter]**
 
-Delete `~/Desktop/scan-sample.png` and `~/Desktop/export-test.png` (not part of the
-deliverable).
+Delete `~/Desktop/iphone17-bezel.png`, `~/Desktop/scan-sample.png`, and
+`~/Desktop/export-test.png`.
 
 ---
 
 ## Done
 
-After Task 6: a committed Krita master (`marketing/templates/screenshot-iphone17-6.9.kra`)
-frames any 1290×2796 simulator screenshot in iPhone 17 chrome on pale lavender, with a
-hidden caption layer, plus a README documenting the swap-and-export workflow. Producing
-the actual App Store gallery (replace screen content → export → repeat per slot) is the
-ongoing per-release use of this template, not part of this plan. Next steps outside this
-plan: the App Preview video (deferred), and refreshing the live gallery.
+After Task 4: a committed Krita master
+(`marketing/templates/screenshot-iphone17-6.9.kra`) frames any iPhone 17 simulator
+screenshot in Apple's official iPhone 17 bezel on pale lavender, with a hidden caption
+layer, plus a README documenting the swap-and-export workflow. Producing the actual
+App Store gallery (replace screen content → export → repeat per slot) is the ongoing
+per-release use of this template, not part of this plan. Next steps outside this plan:
+the App Preview video (deferred), and refreshing the live gallery.
