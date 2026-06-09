@@ -37,7 +37,7 @@ exported gallery PNGs are outputs, produced per-release, and live outside this d
 **Files:**
 - Create: `marketing/templates/README.md`
 
-- [ ] **Step 1: Create the directory and README with the exact content below**
+- [x] **Step 1: Create the directory and README with the exact content below**
 
 ```markdown
 # App Store screenshot templates
@@ -98,7 +98,7 @@ the screenshot placed inside a screen frame with "clip content", the chrome on t
 and a hidden text layer. Keep the same layer order and output spec.
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add marketing/templates/README.md
