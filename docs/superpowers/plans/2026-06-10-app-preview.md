@@ -117,10 +117,12 @@ git commit -m "docs: app preview README + storyboard/workflow"
 
 **Files:** none (physical + device prep)
 
-- [ ] **Step 1: Make the sample papers**
+- [ ] **Step 1: Print the sample papers**
 
-Print 3–4 realistic but fake documents: a receipt, a recipe, a one-page lease or
-letter. No real names/account numbers. Set one aside to scan **live** during the take.
+Print the ready-made fake documents in `marketing/app-preview/sample-docs/` (Costco
+receipt, banana-bread recipe, lease, travel itinerary, and a 3-page legal document).
+Open each in a browser and print (Cmd+P, US Letter, 100%). Set one aside to scan
+**live** during the take; see `sample-docs/README.md`.
 
 - [ ] **Step 2: Seed the on-device library**
 
