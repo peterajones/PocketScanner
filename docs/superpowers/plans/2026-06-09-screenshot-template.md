@@ -7,12 +7,15 @@
 > dimension/color check on the exported PNG.
 
 **Goal:** Produce a reusable Krita layered master that frames a Pocket Scanner
-screenshot inside Apple's official iPhone 17 bezel (PNG) on a pale-lavender
-background, with a hidden caption layer for optional per-shot use.
+screenshot inside Apple's official iPhone 17 bezel (PNG), **full-bleed** (screenshot
+fills the viewport), exported flattened to white.
 
-**Architecture:** Four-layer raster composite (background fill → clipped screen
-content → device chrome → hidden caption), exported as a flattened opaque PNG at the
-App Store 6.9" slot size. Manual swap-and-export workflow, one PNG per slot.
+**Architecture:** Full-bleed composite — Apple's iPhone 17 bezel (transparent screen)
+on top, one screenshot layer per slot behind it filling the viewport, exported as a
+flattened opaque PNG (transparent → white) at the App Store 6.9" slot size. Manual
+per-shot layer-and-export workflow, one PNG per slot. No background tint, no captions
+(a lavender margin would "halo" against the App Store's white background, and a
+full-bleed screen leaves no caption headroom).
 
 **Tech Stack:** Krita (Figma is a sanctioned fallback); Apple's iPhone 17 bezel PNG;
 iOS Simulator; macOS `sips` for export verification.
@@ -24,7 +27,7 @@ iOS Simulator; macOS `sips` for export verification.
 ## File Structure
 
 - Create: `marketing/templates/README.md` — workflow + output spec + asset sources **[Claude]**
-- Create: `marketing/templates/screenshot-iphone17-6.9.kra` — the layered master **[Peter, in Krita]**
+- Create: `marketing/templates/PocketScannerAppPreview.kra` — the layered master **[Peter, in Krita]**
 - Working/throwaway (not committed): the downloaded Apple bezel PNG and a sample
   simulator screenshot used to build & test the template
 
@@ -93,67 +96,54 @@ see different numbers; that's fine as long as it's a portrait iPhone screenshot.
 ## Task 3: Build the composite in Krita [Peter]
 
 **Files:**
-- Create (in progress): `marketing/templates/screenshot-iphone17-6.9.kra`
+- Create (in progress): `marketing/templates/PocketScannerAppPreview.kra`
 
-- [ ] **Step 1: New image + background**
+- [ ] **Step 1: New image**
 
-File ▸ New: **1290 × 2796 px**, RGB/Alpha, sRGB. Rename the default layer
-**Background**, set foreground to `#F2E9F7`, fill it (Shift+Backspace).
+File ▸ New: **1290 × 2796 px**, RGB/Alpha, sRGB. (No background fill — transparent
+areas flatten to white on export.)
 
-- [ ] **Step 2: Import and place the chrome**
+- [ ] **Step 2: Import and place the chrome (full-bleed)**
 
 Layer ▸ Import/Export ▸ Import Layer → `~/Desktop/iphone17-bezel.png`. Rename it
-**Device chrome**, keep it on **top**. Transform (Ctrl+T) to scale down so the whole
-device is visible with margin and ~top 18% empty headroom; center horizontally; apply.
+**Device chrome**, keep it on **top**. Transform (Ctrl+T) so the device fills the
+canvas (full-bleed); center it; apply.
 
-- [ ] **Step 3: Import and fit the screen content**
+- [ ] **Step 3: Import and fit the screen content (one per slot)**
 
-Layer ▸ Import/Export ▸ Import Layer → `~/Desktop/scan-sample.png`. Rename it
-**Screen content**, place it **directly below Device chrome** and above Background.
-Transform to cover the chrome's screen opening exactly; apply.
+Layer ▸ Import/Export ▸ Import Layer → `~/Desktop/scan-sample.png`. Rename it after
+the slot (e.g. **LoadingView**), place it **directly below Device chrome**. Transform
+it to fill the chrome's viewport edge-to-edge; apply. Add one such layer per
+screenshot, keeping only the one you're exporting visible.
 
-- [ ] **Step 4: Clip it to the screen shape**
+- [ ] **Step 4: Visual check**
 
-- Duplicate **Device chrome**, move the copy **below** Screen content, rename it
-  **Screen mask**.
-- On **Screen mask**, keep only a solid fill of the screen opening: Select ▸ Opaque
-  on the chrome, Select ▸ Invert to get the screen area, fill it solid, clear the rest.
-- Select **Screen content** → right-click ▸ **Inherit Alpha**. It now shows only
-  inside the screen.
-
-- [ ] **Step 5: Add the hidden Caption layer**
-
-Text tool → click in the top ~18% headroom → type `Caption goes here`. Rename
-**Caption**, topmost layer, clean sans-serif, color `#2B2B2B` or brand purple
-`#7B12A1`, centered. Toggle its visibility **off** (stays in the file for per-shot use).
-
-- [ ] **Step 6: Visual check**
-
-Full iPhone centered on lavender, screenshot filling the screen with crisp rounded
-corners and no overspill past the bezel, empty headroom on top, caption hidden.
+Full-bleed iPhone, the screenshot filling the viewport behind the bezel with no
+overspill, and the area outside the device transparent (will flatten to white).
 
 ---
 
 ## Task 4: Save the master, export, and verify [Peter + Claude]
 
 **Files:**
-- Create: `marketing/templates/screenshot-iphone17-6.9.kra`
+- Create: `marketing/templates/PocketScannerAppPreview.kra`
 - Verify: a throwaway exported PNG
 
 - [ ] **Step 1: Save the master [Peter]**
 
-File ▸ Save As → `marketing/templates/screenshot-iphone17-6.9.kra` (native Krita
-format, preserves all four layers). Confirm the **Caption** layer is hidden.
+File ▸ Save As → `marketing/templates/PocketScannerAppPreview.kra` (native Krita
+format, preserves the chrome + all per-slot screenshot layers).
 
-- [ ] **Step 2: Export a test PNG [Peter]**
+- [ ] **Step 2: Export the PNG [Peter]**
 
-File ▸ Export → `~/Desktop/export-test.png`, PNG, flattened and **opaque** (no alpha),
-canvas 1290×2796.
+With only the target slot's screenshot layer visible: File ▸ Export → the slot's PNG
+(e.g. `marketing/templates/LoadingView.png`), PNG, flattened and **opaque** (no alpha,
+transparent → white), canvas 1290×2796.
 
 - [ ] **Step 3: Verify the export [Claude]**
 
 ```bash
-sips -g pixelWidth -g pixelHeight -g hasAlpha -g space ~/Desktop/export-test.png
+sips -g pixelWidth -g pixelHeight -g hasAlpha -g space marketing/templates/LoadingView.png
 ```
 Expected:
 ```
@@ -162,28 +152,29 @@ pixelHeight: 2796
 hasAlpha: no
 space: RGB
 ```
-If `hasAlpha: yes`, re-export flattened with the lavender Background visible.
+If `hasAlpha: yes`, re-export flattened (no "Store alpha channel / transparency" in
+Krita's PNG export) so transparent areas become white.
 
-- [ ] **Step 4: Commit the master [Claude]**
+- [ ] **Step 4: Commit the master + exported shots [Claude]**
 
 ```bash
-git add marketing/templates/screenshot-iphone17-6.9.kra
-git commit -m "feat: iPhone 17 App Store screenshot template (Krita master)"
+git add marketing/templates/PocketScannerAppPreview.kra marketing/templates/*.png
+git commit -m "feat: iPhone 17 App Store screenshot template (Krita master) + first shots"
 ```
 
 - [ ] **Step 5: Clean up throwaways [Peter]**
 
-Delete `~/Desktop/iphone17-bezel.png`, `~/Desktop/scan-sample.png`, and
-`~/Desktop/export-test.png`.
+Delete the downloaded bezel and any sample captures left on the Desktop. The exported
+slot PNGs in `marketing/templates/` are kept.
 
 ---
 
 ## Done
 
 After Task 4: a committed Krita master
-(`marketing/templates/screenshot-iphone17-6.9.kra`) frames any iPhone 17 simulator
-screenshot in Apple's official iPhone 17 bezel on pale lavender, with a hidden caption
-layer, plus a README documenting the swap-and-export workflow. Producing the actual
-App Store gallery (replace screen content → export → repeat per slot) is the ongoing
-per-release use of this template, not part of this plan. Next steps outside this plan:
-the App Preview video (deferred), and refreshing the live gallery.
+(`marketing/templates/PocketScannerAppPreview.kra`) frames any iPhone 17 simulator
+screenshot full-bleed in Apple's official iPhone 17 bezel, flattened to white, plus a
+README documenting the per-shot layer-and-export workflow. Producing the full App Store
+gallery (add a screenshot layer → export → repeat per slot) is the ongoing per-release
+use of this template, not part of this plan. Next steps outside this plan: the App
+Preview video (deferred), and refreshing the live gallery.
