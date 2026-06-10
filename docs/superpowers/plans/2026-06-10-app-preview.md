@@ -37,7 +37,7 @@ intermediate stay local (too large for git).
 **Files:**
 - Create: `marketing/app-preview/README.md`
 
-- [ ] **Step 1: Create the directory and README with the exact content below**
+- [x] **Step 1: Create the directory and README with the exact content below**
 
 ```markdown
 # App Preview video
@@ -104,7 +104,7 @@ Expect width 1290, height 2796, duration ≤ 30.
 App Store Connect ▸ the version ▸ 6.9" media ▸ App Preview slot 1.
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add marketing/app-preview/README.md
