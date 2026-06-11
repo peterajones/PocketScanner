@@ -57,6 +57,7 @@ struct DocumentScannerApp: App {
 
     var body: some Scene {
         WindowGroup {
+            Group {
             if Self.isUITesting {
                 // Hermetic wiring: no iCloud, no real scanner, no lock gate.
                 LibraryView(
@@ -115,6 +116,8 @@ struct DocumentScannerApp: App {
                     appAlert(alert)
                 }
             }
+            }
+            .touchIndicators()
         }
     }
 
