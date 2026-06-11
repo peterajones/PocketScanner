@@ -4,6 +4,9 @@ struct SettingsView: View {
     @Bindable var lockSettings: AppLockSettings
     @State private var authError: String?
     @AppStorage("showFolders") private var showFolders = true
+    #if DEBUG
+    @AppStorage(TouchIndicatorSettings.key) private var touchIndicatorsEnabled = TouchIndicatorSettings.defaultEnabled
+    #endif
 
     var body: some View {
         Form {
@@ -23,6 +26,15 @@ struct SettingsView: View {
             } footer: {
                 Text("When off, all documents appear in a single flat list.")
             }
+            #if DEBUG
+            Section {
+                Toggle("Touch Indicators", isOn: $touchIndicatorsEnabled)
+            } header: {
+                Text("Developer")
+            } footer: {
+                Text("Shows a circle at each touch — for recording App Preview videos. Debug builds only.")
+            }
+            #endif
             Section("About") {
                 AboutRow()
                 SendFeedbackRow()
