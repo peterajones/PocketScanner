@@ -1,8 +1,15 @@
 # Spec: Pocket Scanner App Preview video (v1)
 
 **Date:** 2026-06-10
-**Status:** Approved (design) — ready for implementation plan
+**Status:** Shipped (v1.8) — built differently than planned; see as-built note.
 **Roadmap entry:** `docs/FutureEnhancements.md` → *App Store presence → App Preview video*
+
+> **As-built (2026-06-15):** the iMovie route in this spec did not pan out (iMovie
+> letterboxes portrait footage and can't composite a transparent frame). The shipped
+> video was edited in **CapCut** (4K export) and framed in iPhone 17 chrome via an
+> **ffmpeg** overlay. The authoritative, reproducible workflow — including the exact
+> ffmpeg command and the infinite-render gotcha — lives in
+> `marketing/app-preview/README.md`. Final asset: `PocketScanner-v1.8-Framed.mp4`.
 
 ## Goal
 

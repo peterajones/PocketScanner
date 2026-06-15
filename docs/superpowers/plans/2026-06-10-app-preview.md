@@ -1,5 +1,10 @@
 # Pocket Scanner App Preview Implementation Plan
 
+> **Superseded (2026-06-15):** this plan's iMovie/Storyboard-A approach was abandoned
+> during execution. The video that shipped (v1.8) was edited in **CapCut** and framed
+> in iPhone 17 chrome via **ffmpeg**. For the real, reproducible workflow and the exact
+> ffmpeg command, see `marketing/app-preview/README.md`. This file is kept for history.
+
 > **For agentic workers:** This is a manual video-production deliverable shot on a
 > physical iPhone 17 and edited in iMovie. Most tasks are performed by the human at
 > the keyboard/camera (marked **[Peter]**); a few are scriptable (marked **[Claude]**).
