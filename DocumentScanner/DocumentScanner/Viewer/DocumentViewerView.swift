@@ -41,6 +41,11 @@ struct DocumentViewerView: View {
         let page: PDFPage
     }
 
+    private struct PendingExtraction: Identifiable {
+        let id = UUID()
+        let pdf: PDFDocument
+    }
+
     @State private var session: DocumentSession?
     @State private var loadError: String?
     @State private var isRenaming = false
@@ -54,6 +59,9 @@ struct DocumentViewerView: View {
     @State private var pendingJumpToLastMatch: Bool = false
     @State private var annotationRevision: Int = 0
     @State private var pendingDeletion: PendingDeletion?
+    @State private var pendingExtraction: PendingExtraction?
+    @State private var extractName: String = ""
+    @State private var extractError: String?
 
     /// The summary the viewer is currently displaying. Falls back to the
     /// `summary` parameter when there's no search context (single-doc nav).
@@ -162,7 +170,13 @@ struct DocumentViewerView: View {
                 EditModeView(
                     session: session,
                     onEditPage: { editingPageIndex = $0 },
-                    onAddPages: { showAddPages = true }
+                    onAddPages: { showAddPages = true },
+                    onExtract: { indices in
+                        let extracted = DocumentMutations.extractPages(from: session.pdf, at: indices)
+                        guard extracted.pageCount > 0 else { return }
+                        extractName = "\(session.displayName) extract"
+                        pendingExtraction = PendingExtraction(pdf: extracted)
+                    }
                 )
                 .transition(.move(edge: .bottom))
             }
@@ -228,6 +242,24 @@ struct DocumentViewerView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This will permanently remove \"\(session.displayName).pdf\" from iCloud.")
+        }
+        .alert("Save as New Document", isPresented: Binding(
+            get: { pendingExtraction != nil },
+            set: { if !$0 { pendingExtraction = nil } }
+        )) {
+            TextField("Name", text: $extractName)
+            Button("Save") { saveExtraction(session: session) }
+            Button("Cancel", role: .cancel) { pendingExtraction = nil }
+        } message: {
+            Text("Adds a new document with the selected pages to this folder. The original is unchanged.")
+        }
+        .alert("Couldn't Save", isPresented: Binding(
+            get: { extractError != nil },
+            set: { if !$0 { extractError = nil } }
+        )) {
+            Button("OK", role: .cancel) { extractError = nil }
+        } message: {
+            Text(extractError ?? "")
         }
         .onReceive(NotificationCenter.default.publisher(for: .requestDeleteDocument)) { _ in
             showDeleteConfirm = true
@@ -295,6 +327,22 @@ struct DocumentViewerView: View {
             pendingJumpToLastMatch = false
         }
         searchHighlight = h
+    }
+
+    private func saveExtraction(session: DocumentSession) {
+        guard let extraction = pendingExtraction else { return }
+        let name = extractName.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty else { return }
+        // Write next to the source document so the new doc lands in the same
+        // folder (consistent with folder-aware scan saving). DocumentStorage
+        // sanitizes the name and resolves collisions with a " (N)" suffix.
+        let folderStorage = DocumentStorage(documentsURL: session.url.deletingLastPathComponent())
+        do {
+            _ = try folderStorage.write(extraction.pdf, preferredName: name)
+        } catch {
+            extractError = "Couldn't save \"\(name)\". Please try again."
+        }
+        pendingExtraction = nil
     }
 
     private func commitRename(session: DocumentSession) {
