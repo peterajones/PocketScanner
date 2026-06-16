@@ -59,6 +59,8 @@ final class TouchIndicatorOverlay {
                 CATransaction.commit()
             case .ended, .cancelled:
                 if let layer = layers.removeValue(forKey: id) { animateOut(layer) }
+            case .regionEntered, .regionMoved, .regionExited:
+                break // hover/region phases (indirect pointer / Pencil) — no touch indicator
             @unknown default:
                 break
             }
