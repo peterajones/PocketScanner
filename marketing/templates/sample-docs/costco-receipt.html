@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Costco Receipt</title>
+<style>
+  @page { size: letter; margin: 0.75in; }
+  * { box-sizing: border-box; }
+  body { font-family: "Courier New", monospace; color: #111; margin: 0; }
+  .tape { max-width: 3.2in; margin: 0 auto; font-size: 12px; line-height: 1.5; }
+  .center { text-align: center; }
+  .big { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
+  hr { border: none; border-top: 1px dashed #333; margin: 8px 0; }
+  .row { display: flex; justify-content: space-between; }
+  .muted { color: #444; }
+</style>
+</head>
+<body>
+  <div class="tape">
+    <div class="center big">COSTCO WHOLESALE</div>
+    <div class="center muted">#1234 &nbsp; Anytown Warehouse</div>
+    <div class="center muted">1000 Membership Way</div>
+    <div class="center muted">(555) 018-2200</div>
+    <hr>
+    <div class="row"><span>E 0049618 ORG BANANAS</span><span>2.49</span></div>
+    <div class="row"><span>E 0073241 ROTISSERIE CHKN</span><span>4.99</span></div>
+    <div class="row"><span>0091833 PAPER TOWELS</span><span>21.99</span></div>
+    <div class="row"><span>E 0011920 ORG SPINACH</span><span>5.49</span></div>
+    <div class="row"><span>0044187 COFFEE 3LB</span><span>15.99</span></div>
+    <div class="row"><span>0088421 OLIVE OIL 2L</span><span>18.99</span></div>
+    <div class="row"><span>E 0066310 EGGS 24CT</span><span>7.49</span></div>
+    <div class="row"><span>0033102 DISH SOAP</span><span>9.99</span></div>
+    <hr>
+    <div class="row"><span>SUBTOTAL</span><span>87.42</span></div>
+    <div class="row"><span>TAX</span><span>0.00</span></div>
+    <div class="row big"><span>TOTAL</span><span>87.42</span></div>
+    <hr>
+    <div class="row"><span>VISA ************4218</span><span>87.42</span></div>
+    <div class="row muted"><span>APPROVED</span><span>AUTH 008217</span></div>
+    <hr>
+    <div class="center muted">ITEMS SOLD: 8</div>
+    <div class="center muted">05/29/2026 &nbsp; 14:03</div>
+    <div class="center muted">Thank you! Please come again</div>
+    <div class="center muted">*** SAMPLE — NOT A REAL RECEIPT ***</div>
+  </div>
+</body>
+</html>

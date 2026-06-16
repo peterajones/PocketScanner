@@ -21,3 +21,10 @@ Package.resolved
 
 #Markdownlint rules so I don't go crazy with the formatting of my markdown files.
 .markdownlint.cjs
+
+# App Preview working/source files (large takes, CapCut source, sample docs, bezel) —
+# kept locally as an archive, not committed. Final deliverables live in marketing/app-preview/.
+marketing/templates/App Preview Files/
+
+# 4K CapCut intermediate master — regenerable, too big for git (60MB). Framed finals are kept.
+marketing/app-preview/v1.7/PocketScanner-v1.7.mp4
