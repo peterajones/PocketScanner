@@ -1,7 +1,8 @@
 import Foundation
 import PDFKit
 
-/// Pure helpers that mutate a `PDFDocument` in place. No disk I/O.
+/// Pure, in-memory helpers operating on `PDFDocument`. No disk I/O.
+/// Most mutate the document in place; `extractPages` returns a new document.
 /// Save the document via `DocumentStorage.write(_:replacing:withName:)` after.
 enum DocumentMutations {
 
@@ -53,5 +54,30 @@ enum DocumentMutations {
         guard index >= 0, index < pdf.pageCount, let page = pdf.page(at: index) else { return }
         let delta = clockwise ? 90 : -90
         page.rotation = ((page.rotation + delta) % 360 + 360) % 360
+    }
+
+    /// Build a NEW `PDFDocument` containing deep copies of the pages at `indices`,
+    /// in ascending index order. The source `pdf` is NOT mutated. Out-of-range
+    /// indices are skipped; an empty set yields an empty document. Pages are
+    /// extracted via a byte-level copy of the source so that the full content
+    /// stream (incl. the invisible OCR text layer) and `/Rotate` value are
+    /// preserved. Save the result via `DocumentStorage.write(_:preferredName:)`.
+    static func extractPages(from pdf: PDFDocument, at indices: Set<Int>) -> PDFDocument {
+        let result = PDFDocument()
+        let sorted = indices.sorted().filter { $0 >= 0 && $0 < pdf.pageCount }
+        guard !sorted.isEmpty else { return result }
+
+        // Snapshot the source to data so we can pull byte-backed pages from it
+        // without re-parenting any page of the original document. Pages taken
+        // from `snapshot` will have their full content streams (including the
+        // invisible OCR text layer) intact and extractable via `PDFPage.string`.
+        guard let data = pdf.dataRepresentation(),
+              let snapshot = PDFDocument(data: data) else { return result }
+
+        for index in sorted {
+            guard let page = snapshot.page(at: index) else { continue }
+            result.insert(page, at: result.pageCount)
+        }
+        return result
     }
 }
