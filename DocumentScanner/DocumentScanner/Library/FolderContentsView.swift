@@ -21,6 +21,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var nameSheet: NameSheetContext?
     @State private var folders: [URL] = []
     @State private var folderActionError: String?
+    @State private var docBeingDeleted: DocumentSummary?
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
     @AppStorage("libraryUsesGrid") private var usesGrid = false
@@ -60,6 +61,22 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(folderActionError ?? "")
+        }
+        .alert(
+            "Delete this document?",
+            isPresented: Binding(
+                get: { docBeingDeleted != nil },
+                set: { if !$0 { docBeingDeleted = nil } }
+            ),
+            presenting: docBeingDeleted
+        ) { summary in
+            Button("Delete", role: .destructive) {
+                try? storage.delete(at: summary.url)
+                store.refresh()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { summary in
+            Text("This will permanently remove \"\(summary.displayName).pdf\".")
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -160,8 +177,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     private func docContextMenu(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
             Button(role: .destructive) {
-                try? storage.delete(at: summary.url)
-                store.refresh()
+                docBeingDeleted = summary
             } label: {
                 Label("Delete", systemImage: "trash")
             }
@@ -172,6 +188,11 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 folders: folders,
                 move: { moveDocument(summary, to: $0) }
             )
+            Button(role: .destructive) {
+                docBeingDeleted = summary
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
         }
     }
 
@@ -184,11 +205,25 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         if summary.isCorrupt {
             DocumentRow(summary: summary)
                 .contextMenu { docContextMenu(summary) }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        docBeingDeleted = summary
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
         } else {
             NavigationLink(value: summary) {
                 DocumentRow(summary: summary)
             }
             .contextMenu { docContextMenu(summary) }
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) {
+                    docBeingDeleted = summary
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
         }
     }
 

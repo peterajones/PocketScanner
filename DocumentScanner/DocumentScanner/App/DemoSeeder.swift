@@ -47,6 +47,10 @@ struct DemoSeeder {
                           text: "Banana Bread\nIngredients\n3 ripe bananas\nDirections\nPreheat oven to 350")
             try writeDemo(at: recipes, name: "Recipe — Pumpkin Pie",
                           text: "Pumpkin Pie\nIngredients\nPumpkin puree\nDirections")
+
+            // A deliberately unreadable PDF at root, so the 🚫 corrupt-row path
+            // (and its immediate, no-confirm delete) is testable on device.
+            try writeCorruptDemo(at: documentsURL, name: "Damaged Scan")
         } catch {
             print("[DemoSeeder] Failed to seed: \(error)")
         }
@@ -71,6 +75,14 @@ struct DemoSeeder {
         let url = folder.appendingPathComponent("\(name).pdf")
         guard let data = pdf.dataRepresentation() else { return }
         try data.write(to: url)
+    }
+
+    /// Writes a `.pdf` whose bytes are not a valid PDF, so `PDFDocument(url:)`
+    /// returns nil and the library renders it as a corrupt (🚫) row.
+    private func writeCorruptDemo(at folder: URL, name: String) throws {
+        let url = folder.appendingPathComponent("\(name).pdf")
+        let garbage = Data("%PDF-1.4 this file is intentionally not a valid PDF".utf8)
+        try garbage.write(to: url)
     }
 
     /// A page-sized rectangle with the text drawn on it. Doesn't have to look

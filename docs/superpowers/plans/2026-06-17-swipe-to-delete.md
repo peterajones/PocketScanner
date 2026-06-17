@@ -313,7 +313,16 @@ If you have a 🚫 corrupt row, confirm its context-menu **Delete** still delete
 ## Done
 
 After Task 3: documents and folders can be deleted with a left-swipe (List) or the document
-context menu (Grid + long-press), each with the appropriate confirmation; full-swipe is disabled;
-corrupt-doc delete is unchanged. Reuses the existing `storage.delete` + `store.refresh` path.
+context menu (Grid + long-press), each with the appropriate confirmation; full-swipe is disabled.
+Reuses the existing `storage.delete` + `store.refresh` path.
 Remove the "Swipe to delete" entry from `docs/FutureEnhancements.md` on merge. Ships in the next
 release after v1.8.
+
+**On-device review changes (2026-06-17, post-Task 3):**
+- The document confirm became an `.alert` (not `.confirmationDialog`) — on device the
+  action-sheet/popover showed no Cancel and dismissed on outside-tap.
+- **Corrupt-doc delete is no longer "unchanged":** corrupt rows gained the same trailing
+  swipe-to-delete, and both their swipe and long-press Delete now route through the shared
+  confirm alert (was instant/no-confirm). One confirmed path for every document delete. See
+  the spec's reversal note for rationale.
+- `DemoSeeder` seeds a deliberately corrupt PDF ("Damaged Scan") so the 🚫 path is testable.

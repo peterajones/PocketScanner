@@ -25,6 +25,15 @@ unneeded scans. Deletes stay **permanent and confirmed** (the app has no trash/u
   (non-corrupt branch), so Grid tiles and List long-press can delete too.
 - **Corrupt documents: unchanged.** Their existing immediate, no-confirm context-menu
   Delete stays as-is (rare edge case; worst case is manual removal from iCloud).
+  - **Reversed during on-device review (2026-06-17):** corrupt rows now also get the
+    trailing swipe-to-delete, and **both** their swipe and long-press Delete route
+    through the same "Delete this document?" alert as normal docs. Rationale: a bare
+    instant delete next to confirmed normal-doc deletes was inconsistent, and a corrupt
+    file is arguably *more* worth confirming (you may want to recover it from iCloud
+    before removing). Every document delete now follows one confirmed path. The amber
+    warning icon was kept (strict-reader failure ≠ destroyed bytes; "Try to recover" is
+    still on the roadmap). Also: the document confirm became an `.alert` (not a
+    `.confirmationDialog`) so Cancel is always visible and it can't be tap-dismissed.
 - **Both library screens:** `LibraryView` (root: documents + folders) and
   `FolderContentsView` (documents inside a folder). Folders only exist at the root, so the
   **folder swipe is `LibraryView`-only**.
