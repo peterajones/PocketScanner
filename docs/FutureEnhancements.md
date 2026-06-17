@@ -16,8 +16,13 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Editing
 
+- **Highlighter thickness / bleed** — highlight marks are often too tall and dip into the line below. The mark's bounds come from the text-selection line rect, which can run taller than the glyphs themselves. Options: tighten the highlight rect toward the cap-height/baseline band of the line, or — if that can't be made reliable across varied scans/OCR — document the limitation in-app/Help so expectations are set. Decide fix vs. clarify.
 - **Preserve annotations across page edits** — annotations shipped in v1.4, but editing a page in the per-page editor (crop / rotate / filter) rebuilds the page from scratch via `DocumentMutations.replacePage`, dropping any highlights/strikethroughs on that page. A correct fix is non-trivial because a cropped / perspective-corrected page has different geometry, so marks would need re-mapping rather than re-attaching. Uncommon sequence; deferred from v1.4.
 - **Annotation rectangle-drag fallback** — annotation marks anchor to the OCR text selection, so on a poorly-recognised scan the drag-select can be imprecise. A drag-a-rectangle highlight mode would let users mark regions the OCR missed.
+
+### Library
+
+- **Swipe to delete** — add a left-swipe delete action on document (and folder) rows in the library, so clearing unneeded scans is one gesture instead of three taps (tap doc → ⋯ → Remove). To brainstorm: swipe reveal-a-Delete-button vs. full-swipe-to-delete; confirmation behaviour; folder deletes (which can contain docs — must keep the existing confirm); grid-mode equivalent (swipe doesn't apply to tiles); and reuse of the existing delete/confirm paths.
 
 ### Error handling
 
