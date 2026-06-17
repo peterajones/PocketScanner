@@ -63,9 +63,11 @@ Implements `onExtract`:
 3. On Save: `let folderStorage = DocumentStorage(documentsURL: session.url.deletingLastPathComponent())`,
    then `try folderStorage.write(newPDF, preferredName: name)`.
 4. The new file is now on disk in the source's folder. It surfaces in the library when
-   the user navigates back: iCloud mode updates automatically via `NSMetadataQuery`; the
-   local directory-scan store refreshes on appear. *(The plan confirms whether the
-   local-mode store needs an explicit refresh nudge after returning.)*
+   the user navigates back: iCloud mode updates automatically via `NSMetadataQuery`.
+   *(As-built: the local-mode `InMemoryLibraryStore` does NOT auto-detect new files, and
+   refreshing it while `LibraryView` is buried behind the pushed viewer doesn't re-render
+   it — so `LibraryView` re-scans the store when navigation pops back toward it. A
+   write-time refresh alone was insufficient; found during on-device smoke testing.)*
 5. Brief confirmation; stay in the current document's viewer (original untouched).
 On `write` throwing → surface via the existing `AlertCenter`.
 
