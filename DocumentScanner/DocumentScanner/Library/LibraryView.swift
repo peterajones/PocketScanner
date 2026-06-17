@@ -190,7 +190,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             } message: {
                 Text(folderActionError ?? "")
             }
-            .confirmationDialog(
+            .alert(
                 "Delete this document?",
                 isPresented: Binding(
                     get: { docBeingDeleted != nil },
