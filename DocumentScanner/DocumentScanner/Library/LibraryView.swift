@@ -21,6 +21,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var folderBeingRenamed: URL?
     @State private var renameFolderName = ""
     @State private var folderBeingDeleted: URL?
+    @State private var docBeingDeleted: DocumentSummary?
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
@@ -189,6 +190,22 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             } message: {
                 Text(folderActionError ?? "")
             }
+            .confirmationDialog(
+                "Delete this document?",
+                isPresented: Binding(
+                    get: { docBeingDeleted != nil },
+                    set: { if !$0 { docBeingDeleted = nil } }
+                ),
+                presenting: docBeingDeleted
+            ) { summary in
+                Button("Delete", role: .destructive) {
+                    try? storage.delete(at: summary.url)
+                    store.refresh()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: { summary in
+                Text("This will permanently remove \"\(summary.displayName).pdf\".")
+            }
             .task { refreshFolders() }
             .onChange(of: path.count) { oldCount, newCount in
                 // Re-scan when navigation pops back toward the library. The
@@ -241,13 +258,20 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             } label: {
                 Label("Delete", systemImage: "trash")
             }
-        } else if showFolders {
-            MoveToMenu(
-                currentParent: summary.url.deletingLastPathComponent(),
-                root: storage.documentsURL,
-                folders: folders,
-                move: { moveDocument(summary, to: $0) }
-            )
+        } else {
+            if showFolders {
+                MoveToMenu(
+                    currentParent: summary.url.deletingLastPathComponent(),
+                    root: storage.documentsURL,
+                    folders: folders,
+                    move: { moveDocument(summary, to: $0) }
+                )
+            }
+            Button(role: .destructive) {
+                docBeingDeleted = summary
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
         }
     }
 
@@ -261,6 +285,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 DocumentRow(summary: summary)
             }
             .contextMenu { docContextMenu(summary) }
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) {
+                    docBeingDeleted = summary
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
         }
     }
 
@@ -275,6 +306,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                         }
                         .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
                         .contextMenu { folderContextMenu(folderURL) }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                folderBeingDeleted = folderURL
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                 }
             }
