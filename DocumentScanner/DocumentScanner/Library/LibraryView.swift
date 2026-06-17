@@ -60,7 +60,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     onDeleted: {
                         store.refresh()
                         path.removeLast()
-                    }
+                    },
+                    onDocumentCreated: { store.refresh() }
                 )
             }
             .navigationDestination(for: URL.self) { folderURL in

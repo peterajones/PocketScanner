@@ -11,19 +11,26 @@ struct DocumentViewerView: View {
     /// Closure dismissing the viewer; provided by LibraryView so the deletion
     /// path can pop the navigation stack.
     let onDeleted: () -> Void
+    /// Called after this viewer creates a NEW document (page extraction) so the
+    /// library can refresh. The local-mode `InMemoryLibraryStore` doesn't detect
+    /// new files on its own the way the iCloud `NSMetadataQuery` store does, so
+    /// without this the extracted doc wouldn't appear until a manual refresh.
+    let onDocumentCreated: () -> Void
 
     init(summary: DocumentSummary,
          storage: DocumentStorage,
          scannerPresenter: DocumentScannerPresenting,
          pipeline: ScanPipeline,
          searchContext: SearchContext?,
-         onDeleted: @escaping () -> Void) {
+         onDeleted: @escaping () -> Void,
+         onDocumentCreated: @escaping () -> Void) {
         self.summary = summary
         self.storage = storage
         self.scannerPresenter = scannerPresenter
         self.pipeline = pipeline
         self.searchContext = searchContext
         self.onDeleted = onDeleted
+        self.onDocumentCreated = onDocumentCreated
         // Seed currentDocIndex from the context so the first .task(id:) fires
         // on the correct doc — avoiding an .onAppear two-phase race where
         // task(id:0) could briefly start loading docs[0] before being cancelled.
@@ -339,6 +346,7 @@ struct DocumentViewerView: View {
         let folderStorage = DocumentStorage(documentsURL: session.url.deletingLastPathComponent())
         do {
             _ = try folderStorage.write(extraction.pdf, preferredName: name)
+            onDocumentCreated()
         } catch {
             extractError = "Couldn't save \"\(name)\". Please try again."
         }
