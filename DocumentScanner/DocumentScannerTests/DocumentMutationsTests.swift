@@ -109,6 +109,61 @@ final class DocumentMutationsTests: XCTestCase {
                        "the OCR text layer must survive rotation + round-trip")
     }
 
+    func test_extractPages_returnsSelectedPagesInAscendingOrder() throws {
+        let pdf = PDFDocument()
+        for marker in ["A", "B", "C", "D", "E"] {
+            pdf.insert(try markedPage(marker), at: pdf.pageCount)
+        }
+        let extracted = DocumentMutations.extractPages(from: pdf, at: [3, 1])
+        XCTAssertEqual(pageMarkers(extracted), ["B", "D"])
+    }
+
+    func test_extractPages_leavesOriginalUnchanged() throws {
+        let pdf = try threePagePDF()       // [A, B, C]
+        _ = DocumentMutations.extractPages(from: pdf, at: [0, 2])
+        XCTAssertEqual(pageMarkers(pdf), ["A", "B", "C"])
+    }
+
+    func test_extractPages_skipsOutOfRangeIndices() throws {
+        let pdf = try threePagePDF()       // [A, B, C]
+        let extracted = DocumentMutations.extractPages(from: pdf, at: [1, 99, -1])
+        XCTAssertEqual(pageMarkers(extracted), ["B"])
+    }
+
+    func test_extractPages_emptySetYieldsEmptyDocument() throws {
+        let pdf = try threePagePDF()
+        let extracted = DocumentMutations.extractPages(from: pdf, at: [])
+        XCTAssertEqual(extracted.pageCount, 0)
+    }
+
+    func test_extractPages_preservesRotation() throws {
+        let pdf = try threePagePDF()
+        DocumentMutations.rotatePage(in: pdf, at: 1, clockwise: true) // B -> 90
+        let extracted = DocumentMutations.extractPages(from: pdf, at: [1])
+        XCTAssertEqual(extracted.page(at: 0)?.rotation, 90)
+        XCTAssertEqual(pdf.page(at: 1)?.rotation, 90, "original page keeps its rotation")
+    }
+
+    func test_extractPages_preservesSearchableText_afterDiskRoundTrip() throws {
+        // Build a bespoke page set with named markers (rather than threePagePDF())
+        // so findString has a legible multi-character string to search for after round-trip.
+        let pdf = PDFDocument()
+        for marker in ["First", "Second", "Third"] {
+            pdf.insert(try markedPage(marker), at: pdf.pageCount)
+        }
+        let extracted = DocumentMutations.extractPages(from: pdf, at: [1]) // "Second"
+
+        let tmpURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("extract-roundtrip-\(UUID().uuidString).pdf")
+        defer { try? FileManager.default.removeItem(at: tmpURL) }
+        try XCTUnwrap(extracted.dataRepresentation()).write(to: tmpURL)
+
+        let reloaded = try XCTUnwrap(PDFDocument(url: tmpURL))
+        XCTAssertEqual(reloaded.pageCount, 1)
+        XCTAssertFalse(reloaded.findString("Second", withOptions: .caseInsensitive).isEmpty,
+                       "the extracted page's OCR text layer must survive copy + round-trip")
+    }
+
     // MARK: - Helpers
 
     private func threePagePDF() throws -> PDFDocument {

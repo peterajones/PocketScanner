@@ -60,7 +60,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     onDeleted: {
                         store.refresh()
                         path.removeLast()
-                    }
+                    },
+                    onDocumentCreated: { store.refresh() }
                 )
             }
             .navigationDestination(for: URL.self) { folderURL in
@@ -189,6 +190,19 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 Text(folderActionError ?? "")
             }
             .task { refreshFolders() }
+            .onChange(of: path.count) { oldCount, newCount in
+                // Re-scan when navigation pops back toward the library. The
+                // local-mode InMemoryLibraryStore doesn't auto-detect files
+                // created deeper in the stack (e.g. page extraction in the
+                // viewer); refreshing the store while the library is buried
+                // behind a pushed view doesn't reliably re-render it, so we
+                // refresh on return — the same foreground moment that manual
+                // pull-to-refresh and the delete-then-pop path already use.
+                // (iCloud's NSMetadataQuery store updates itself.)
+                guard newCount < oldCount else { return }
+                store.refresh()
+                refreshFolders()
+            }
         }
     }
 

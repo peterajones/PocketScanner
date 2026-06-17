@@ -6,6 +6,7 @@ struct EditModeView: View {
     @Bindable var session: DocumentSession
     let onEditPage: (Int) -> Void
     let onAddPages: () -> Void
+    let onExtract: (Set<Int>) -> Void
 
     @State private var isMultiSelectMode = false
     @State private var selectedIndices: Set<Int> = []
@@ -47,6 +48,14 @@ struct EditModeView: View {
                 .font(.subheadline.weight(.medium))
                 .monospacedDigit()
             Spacer()
+            Button {
+                extractSelected()
+            } label: {
+                Image(systemName: "doc.badge.plus")
+            }
+            .disabled(selectedIndices.isEmpty)
+            .accessibilityLabel("Save as New")
+            .accessibilityIdentifier("EditMode.MultiSelect.SaveAsNew")
             Button(role: .destructive) {
                 deleteSelected()
             } label: {
@@ -140,6 +149,11 @@ struct EditModeView: View {
                     } label: {
                         Label("Rotate Right", systemImage: "rotate.right")
                     }
+                    Button {
+                        onExtract([index])
+                    } label: {
+                        Label("Save page as new", systemImage: "doc.badge.plus")
+                    }
                     Button(role: .destructive) {
                         deletePage(at: index)
                     } label: {
@@ -163,6 +177,12 @@ struct EditModeView: View {
     private func exitMultiSelect() {
         isMultiSelectMode = false
         selectedIndices = []
+    }
+
+    private func extractSelected() {
+        guard !selectedIndices.isEmpty else { return }
+        onExtract(selectedIndices)
+        exitMultiSelect()
     }
 
     private func deleteSelected() {
