@@ -9,25 +9,32 @@ actually shipped — the iMovie route was abandoned; see "Lessons" below.)
 
 ## Files
 
-- `PocketScanner-v1.8-Framed.mp4` — the final, framed preview (1290×2796, H.264). Ships
-  with the v1.8 listing revamp.
+- `PocketScanner-v1.8-AppPreview-886x1920.mp4` — **the App Store upload** (App Preview slot 1).
+  App Previews use **886×1920**, NOT the 1290×2796 screenshot size — see Output spec.
+- `PocketScanner-v1.8-Framed.mp4` — high-res framed master (1290×2796). NOT the App Preview
+  upload (wrong size for video); it's the source the 886×1920 is downscaled from, and is handy
+  for web/social/press.
 - Working inputs (not committed): the CapCut 4K export (`…-v1.7.mp4`, 2160×4692) and the
   chrome overlay PNG (`PocketScannerAppPreviewChrome1290x2796.png`).
 
 ## Output spec
 
-| Property   | Value          |
-|------------|----------------|
-| Resolution | 1290 × 2796 px |
-| Duration   | ≤ 30 s         |
-| Codec      | H.264          |
-| Frame rate | 30 fps         |
-| Audio      | none (muted autoplay) |
-| Max size   | 500 MB         |
+⚠️ **App Preview video = 886×1920 — NOT the 1290×2796 screenshot size.** Apple's app-preview
+resolution differs from the screenshot resolution; App Store Connect rejects a 1290×2796 video
+as "wrong dimensions." Screenshots stay 1290×2796; only the **video** is 886×1920 (square pixels).
+
+| Property   | App Preview **video**       | Screenshots (reference) |
+|------------|------------------------------|-------------------------|
+| Resolution | **886 × 1920 px** (SAR 1:1)  | 1290 × 2796 px          |
+| Duration   | ≤ 30 s                       | —                       |
+| Codec      | H.264                        | —                       |
+| Frame rate | 30 fps                       | —                       |
+| Audio      | none (muted autoplay)        | —                       |
+| Max size   | 500 MB                       | —                       |
 
 ## Pipeline (what actually worked)
 
-`capture → edit (CapCut) → 4K export → frame in chrome (ffmpeg) → verify → upload`
+`capture → edit (CapCut) → 4K export → frame in chrome (ffmpeg) → downscale to 886×1920 → verify → upload`
 
 ### 1. Capture
 QuickTime ▸ New Movie Recording ▸ select the cabled iPhone as camera/mic source. Records
@@ -88,13 +95,25 @@ ffmpeg -i /tmp/alpha.png -vf "crop=1290:1:0:1398,format=gray" -f rawvideo - 2>/d
 Measured viewport here: **x 69–1221 (1152 wide), y 70–2725 (2655 tall)**, centered. We
 scale the video to cover it (1222×2655) and place it at x=34, y=70 (overscan under the bezel).
 
+### 3b. Downscale to the App Preview size (886×1920)
+The chrome composite is 1290×2796; the App Preview must be **886×1920** — same ~19.5:9 aspect,
+so a clean downscale. `setsar=1` forces **square pixels**: 886/1920 isn't *exactly* 1290/2796,
+so without it ffmpeg leaves a non-1:1 SAR that App Store Connect also rejects as wrong-dimensions.
+
+```bash
+ffmpeg -i PocketScanner-v1.8-Framed.mp4 \
+  -vf "scale=886:1920:flags=lanczos,setsar=1" \
+  -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -r 30 -an \
+  PocketScanner-v1.8-AppPreview-886x1920.mp4
+```
+
 ### 4. Verify
 ```bash
 ffprobe -v error -select_streams v:0 \
-  -show_entries stream=width,height,codec_name \
+  -show_entries stream=width,height,sample_aspect_ratio,codec_name \
   -show_entries format=duration -of default=noprint_wrappers=1 "$OUT"
 ```
-Expect `width=1290`, `height=2796`, `codec_name=h264`, `duration ≤ 30`.
+Expect `width=886`, `height=1920`, `sample_aspect_ratio=1:1`, `codec_name=h264`, `duration ≤ 30`.
 (`mdls` returns null on `/tmp`; use `ffprobe`.)
 
 ### 5. Upload
@@ -104,6 +123,10 @@ locked, so this ships with the next version.
 
 ## Lessons (why the pipeline looks like this)
 
+- **App Preview video resolution ≠ screenshot resolution.** Screenshots are 1290×2796, but
+  the App Preview *video* is 886×1920 (Apple's app-preview spec). Uploading a 1290×2796 video
+  fails with "dimensions are wrong." Also force `setsar=1` on the downscale — a non-1:1 pixel
+  aspect triggers the same rejection even at the right pixel dimensions.
 - **iMovie was a dead end.** Standard iMovie projects are locked to 16:9; portrait footage
   gets letterboxed, and a 1080p export left the phone only ~497 px wide → heavy artifacting
   when scaled back up. Its "App Preview" project type is inconsistent/removed across
