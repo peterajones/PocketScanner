@@ -177,8 +177,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     private func docContextMenu(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
             Button(role: .destructive) {
-                try? storage.delete(at: summary.url)
-                store.refresh()
+                docBeingDeleted = summary
             } label: {
                 Label("Delete", systemImage: "trash")
             }
@@ -206,6 +205,13 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         if summary.isCorrupt {
             DocumentRow(summary: summary)
                 .contextMenu { docContextMenu(summary) }
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        docBeingDeleted = summary
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
         } else {
             NavigationLink(value: summary) {
                 DocumentRow(summary: summary)
