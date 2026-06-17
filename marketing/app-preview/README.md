@@ -9,13 +9,17 @@ actually shipped — the iMovie route was abandoned; see "Lessons" below.)
 
 ## Files
 
-- `PocketScanner-v1.8-AppPreview-886x1920.mp4` — **the App Store upload** (App Preview slot 1).
-  App Previews use **886×1920**, NOT the 1290×2796 screenshot size — see Output spec.
-- `PocketScanner-v1.8-Framed.mp4` — high-res framed master (1290×2796). NOT the App Preview
+Each release's media lives under its own folder (`v1.8/`, `v1.7/`, …).
+
+- `v1.8/PocketScanner-v1.8-AppPreview-886x1920.mp4` — **the App Store upload** (App Preview
+  slot 1). App Previews use **886×1920**, NOT the 1290×2796 screenshot size — see Output spec.
+- `v1.8/PocketScanner-v1.8-Framed.mp4` — high-res framed master (1290×2796). NOT the App Preview
   upload (wrong size for video); it's the source the 886×1920 is downscaled from, and is handy
   for web/social/press.
-- Working inputs (not committed): the CapCut 4K export (`…-v1.7.mp4`, 2160×4692) and the
-  chrome overlay PNG (`PocketScannerAppPreviewChrome1290x2796.png`).
+- `v1.8/Stills/*.png` — the 9 framed screenshots (1290×2796) for the 6.9" slot.
+- Working inputs (not committed): the CapCut 4K export (`v1.7/…-v1.7.mp4`, 2160×4692, gitignored)
+  and the chrome overlay PNG (`../templates/PocketScannerAppPreviewChrome1290x2796.png`).
+- `v1.7/` — prior release's media; can be deleted once v1.8 is live.
 
 ## Output spec
 

@@ -28,3 +28,7 @@ marketing/templates/App Preview Files/
 
 # 4K CapCut intermediate master — regenerable, too big for git (60MB). Framed finals are kept.
 marketing/app-preview/v1.7/PocketScanner-v1.7.mp4
+
+# Krita backups / autosaves
+*.kra~
+*-autosave.kra
