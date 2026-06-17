@@ -33,7 +33,7 @@ as "wrong dimensions." Screenshots stay 1290×2796; only the **video** is 886×1
 | Duration   | ≤ 30 s                       | —                       |
 | Codec      | H.264                        | —                       |
 | Frame rate | 30 fps                       | —                       |
-| Audio      | none (muted autoplay)        | —                       |
+| Audio      | **silent AAC track** (ASC requires an audio stream; autoplays muted) | — |
 | Max size   | 500 MB                       | —                       |
 
 ## Pipeline (what actually worked)
@@ -104,10 +104,15 @@ The chrome composite is 1290×2796; the App Preview must be **886×1920** — sa
 so a clean downscale. `setsar=1` forces **square pixels**: 886/1920 isn't *exactly* 1290/2796,
 so without it ffmpeg leaves a non-1:1 SAR that App Store Connect also rejects as wrong-dimensions.
 
+⚠️ **Include a silent audio track.** App Store Connect rejects a preview with NO audio
+stream as "unsupported or corrupted audio" — so add a silent AAC track (do NOT use `-an`).
+
 ```bash
 ffmpeg -i PocketScanner-v1.8-Framed.mp4 \
+  -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=48000 -shortest \
   -vf "scale=886:1920:flags=lanczos,setsar=1" \
-  -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -r 30 -an \
+  -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -r 30 \
+  -c:a aac -b:a 128k \
   PocketScanner-v1.8-AppPreview-886x1920.mp4
 ```
 
@@ -131,6 +136,8 @@ locked, so this ships with the next version.
   the App Preview *video* is 886×1920 (Apple's app-preview spec). Uploading a 1290×2796 video
   fails with "dimensions are wrong." Also force `setsar=1` on the downscale — a non-1:1 pixel
   aspect triggers the same rejection even at the right pixel dimensions.
+- **App Previews need an audio track.** Exporting with `-an` (no audio) makes App Store Connect
+  reject the upload as "unsupported or corrupted audio." Add a silent AAC track (`anullsrc`).
 - **iMovie was a dead end.** Standard iMovie projects are locked to 16:9; portrait footage
   gets letterboxed, and a 1080p export left the phone only ~497 px wide → heavy artifacting
   when scaled back up. Its "App Preview" project type is inconsistent/removed across
