@@ -133,16 +133,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     }
 
     private var filtered: [DocumentSummary] {
-        let matched: [DocumentSummary]
-        if searchText.isEmpty {
-            matched = docsInFolder
-        } else {
-            let needle = searchText.lowercased()
-            matched = docsInFolder.filter {
-                $0.displayName.lowercased().contains(needle)
-                || $0.ocrSnippet.lowercased().contains(needle)
-            }
-        }
+        let matched = searchText.isEmpty
+            ? docsInFolder
+            : SearchMatcher.matches(term: searchText, in: store.summaries, scope: .folder(folderURL))
         return sort.sorted(matched)
     }
 
@@ -213,7 +206,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                     }
                 }
         } else {
-            NavigationLink(value: summary) {
+            NavigationLink(value: DocumentRoute(summary: summary, term: searchText, scope: .folder(folderURL))) {
                 DocumentRow(summary: summary)
             }
             .contextMenu { docContextMenu(summary) }
@@ -233,7 +226,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             DocumentTile(summary: summary)
                 .contextMenu { docContextMenu(summary) }
         } else {
-            NavigationLink(value: summary) {
+            NavigationLink(value: DocumentRoute(summary: summary, term: searchText, scope: .folder(folderURL))) {
                 DocumentTile(summary: summary)
             }
             .buttonStyle(.plain)
