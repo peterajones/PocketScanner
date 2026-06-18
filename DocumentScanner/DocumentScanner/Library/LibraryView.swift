@@ -304,7 +304,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private var listBody: some View {
         List {
-            if showFolders && !folders.isEmpty {
+            if showFolders && !folders.isEmpty && searchText.isEmpty {
                 Section {
                     ForEach(folders, id: \.self) { folderURL in
                         NavigationLink(value: folderURL) {
@@ -345,7 +345,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     private var gridBody: some View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 16) {
-                if showFolders && !folders.isEmpty {
+                if showFolders && !folders.isEmpty && searchText.isEmpty {
                     ForEach(folders, id: \.self) { folderURL in
                         NavigationLink(value: folderURL) {
                             FolderTile(url: folderURL)
@@ -396,16 +396,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     private var filteredDocs: [DocumentSummary] {
-        let matched: [DocumentSummary]
-        if searchText.isEmpty {
-            matched = visibleDocs
-        } else {
-            let needle = searchText.lowercased()
-            matched = visibleDocs.filter {
-                $0.displayName.lowercased().contains(needle)
-                || $0.ocrSnippet.lowercased().contains(needle)
-            }
-        }
+        let matched = searchText.isEmpty
+            ? visibleDocs
+            : SearchMatcher.matches(term: searchText, in: store.summaries, scope: .library)
         return sort.sorted(matched)
     }
 
