@@ -116,20 +116,23 @@ struct DemoSeeder {
                 (line as NSString).draw(at: origin, withAttributes: attrs)
                 guard !line.isEmpty else { continue }
 
-                // Tight ink rect for this line, in image (top-left) pixels.
+                // Box = a cap-height band sitting on the baseline (no descender
+                // padding). PDFAssembler draws the invisible glyphs with their
+                // baseline at the box's bottom edge and sizes the font to the
+                // box height, so this keeps the highlight hugging the glyphs
+                // instead of running tall.
                 let baseline = origin.y + font.ascender
-                let inkTop = baseline - font.capHeight
-                let inkBottom = baseline - font.descender        // descender is negative
                 let width = (line as NSString).size(withAttributes: attrs).width
 
-                // Normalise to Vision's 0–1 space with a BOTTOM-LEFT origin.
+                // Normalise to Vision's 0–1 space with a BOTTOM-LEFT origin;
+                // the box's bottom edge is the text baseline.
                 observations.append(OCRObservation(
                     string: line,
                     boundingBox: CGRect(
                         x: origin.x / size.width,
-                        y: 1 - inkBottom / size.height,
+                        y: 1 - baseline / size.height,
                         width: width / size.width,
-                        height: (inkBottom - inkTop) / size.height)))
+                        height: font.capHeight / size.height)))
             }
         }
         return (image, observations)
