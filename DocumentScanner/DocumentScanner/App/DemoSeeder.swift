@@ -67,8 +67,8 @@ struct DemoSeeder {
     private func writeDemo(at folder: URL, name: String, text: String, pageCount: Int = 1) throws {
         let pages = (0..<pageCount).map { i -> ScannedPage in
             let pageText = pageCount > 1 ? "\(text)\n\nPage \(i + 1)" : text
-            return ScannedPage(image: placeholderImage(text: pageText),
-                               observations: observations(from: pageText))
+            let rendered = renderPage(text: pageText)
+            return ScannedPage(image: rendered.image, observations: rendered.observations)
         }
         let createdAt = Date().addingTimeInterval(-Double.random(in: 0...86400 * 14))
         let pdf = try PDFAssembler().assemble(pages: pages, createdAt: createdAt)
@@ -85,43 +85,54 @@ struct DemoSeeder {
         try garbage.write(to: url)
     }
 
-    /// A page-sized rectangle with the text drawn on it. Doesn't have to look
-    /// like a real scan — the library list shows the displayName and thumbnails
-    /// at small size, so a clean off-white card with the OCR text on top is
-    /// enough for screenshots.
-    private func placeholderImage(text: String) -> UIImage {
+    /// Renders the page image AND its matching OCR observations from one shared
+    /// per-line layout, so the invisible text layer lines up with the visible
+    /// glyphs. Earlier these were produced independently (a fixed-size 0.84×0.03
+    /// box per line), which made search/user highlights bloat and mis-align —
+    /// but only on demo docs; real Vision OCR boxes hug the ink. See
+    /// FutureEnhancements "Highlighter thickness / bleed". Each non-empty line's
+    /// box is the tight glyph rect (cap-height to descender, measured width),
+    /// normalised to Vision's bottom-left coordinate space.
+    private func renderPage(text: String) -> (image: UIImage, observations: [OCRObservation]) {
         let size = CGSize(width: 850, height: 1100)  // ~standard letter ratio
+        let font = UIFont.systemFont(ofSize: 34, weight: .regular)
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: UIColor(white: 0.15, alpha: 1)
+        ]
+        let leftInset: CGFloat = 64
+        let topInset: CGFloat = 96
+        let lineStride = font.lineHeight + 14
+        let lines = text.components(separatedBy: "\n")
+
+        var observations: [OCRObservation] = []
         let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { ctx in
+        let image = renderer.image { ctx in
             UIColor(white: 0.98, alpha: 1).setFill()
             ctx.fill(CGRect(origin: .zero, size: size))
 
-            let para = NSMutableParagraphStyle()
-            para.alignment = .left
-            let attrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 32, weight: .regular),
-                .foregroundColor: UIColor(white: 0.15, alpha: 1),
-                .paragraphStyle: para
-            ]
-            let inset: CGFloat = 64
-            let drawRect = CGRect(x: inset, y: inset,
-                                  width: size.width - inset * 2,
-                                  height: size.height - inset * 2)
-            (text as NSString).draw(in: drawRect, withAttributes: attrs)
-        }
-    }
+            for (i, line) in lines.enumerated() {
+                let origin = CGPoint(x: leftInset, y: topInset + CGFloat(i) * lineStride)
+                (line as NSString).draw(at: origin, withAttributes: attrs)
+                guard !line.isEmpty else { continue }
 
-    /// Build OCR observations that the search/index can find without running
-    /// Vision. Each non-empty line becomes one observation at a plausible y.
-    private func observations(from text: String) -> [OCRObservation] {
-        let lines = text.split(whereSeparator: \.isNewline).map(String.init)
-        let yStep: CGFloat = 0.04
-        return lines.enumerated().map { i, line in
-            let y = 0.9 - CGFloat(i) * yStep
-            return OCRObservation(string: line,
-                                  boundingBox: CGRect(x: 0.08, y: max(0.05, y),
-                                                      width: 0.84, height: 0.03))
+                // Tight ink rect for this line, in image (top-left) pixels.
+                let baseline = origin.y + font.ascender
+                let inkTop = baseline - font.capHeight
+                let inkBottom = baseline - font.descender        // descender is negative
+                let width = (line as NSString).size(withAttributes: attrs).width
+
+                // Normalise to Vision's 0–1 space with a BOTTOM-LEFT origin.
+                observations.append(OCRObservation(
+                    string: line,
+                    boundingBox: CGRect(
+                        x: origin.x / size.width,
+                        y: 1 - inkBottom / size.height,
+                        width: width / size.width,
+                        height: (inkBottom - inkTop) / size.height)))
+            }
         }
+        return (image, observations)
     }
 }
 #endif
