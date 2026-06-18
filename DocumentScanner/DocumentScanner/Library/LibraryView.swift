@@ -331,6 +331,11 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             }
         }
         .searchable(text: $searchText, prompt: "Search documents")
+        .overlay {
+            if !searchText.isEmpty && filteredDocs.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
         .refreshable {
             store.refresh()
             refreshFolders()
@@ -361,6 +366,11 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             .padding()
         }
         .searchable(text: $searchText, prompt: "Search documents")
+        .overlay {
+            if !searchText.isEmpty && filteredDocs.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
         .refreshable {
             store.refresh()
             refreshFolders()
