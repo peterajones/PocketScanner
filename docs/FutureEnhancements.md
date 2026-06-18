@@ -10,14 +10,6 @@ Versions earlier than the current shipping release are deleted from this doc as 
 
 Lower priority. Some of these may never ship. The list exists to capture what we considered.
 
-### Search
-
-- **Search scope is broken / incomplete** (reported 2026-06-18 — *needs a full end-to-end audit; not an exhaustive list*). Observed behaviour:
-  - Searching from the **Main Library** does **not** reach documents *inside folders* — only root-level docs are searched.
-  - Searching **from within a folder** returns nothing — folder-scoped search appears non-functional.
-  - These likely share a root with the cross-doc-nav item below (how each view builds — or fails to build — its `SearchContext`, and which `searchText` drives results). Audit the whole search path: root vs. folder scope, recursion into subfolders, and the nav binding.
-- **In-folder cross-doc search** — `FolderContentsView`'s own searchText doesn't feed the inherited `navigationDestination`; cross-doc nav only works off `LibraryView`'s search field. Have `FolderContentsView` build its own `SearchContext` or share `LibraryView`'s binding.
-
 ### Editing
 
 - **Highlighter thickness / bleed** — *Decided 2026-06-18: clarify, don't fix the geometry.* Evidence (search + user-mark highlights across real and demo docs): on **real** scanned printed text the coverage is already tight (Vision boxes are good + the v1.2 `scaleX` snaps width); the bloated coverage only appeared on the **seeded demo docs**, whose OCR boxes are fabricated (`DemoSeeder` uses a fixed `0.84 × 0.03`) and don't align with the drawn text. The one genuine outlier is **handwriting**, and that's a Vision-recognition-box floor a cap-height rect tighten can't meaningfully fix. So: add a short in-app/Help note setting expectations on handwriting/unusual scans rather than engineering a geometry fix (pixel-level ink bounds would be the only real fix — heavy, off-philosophy). Separate cheap win: tighten `DemoSeeder`'s synthetic OCR boxes so demo-doc highlights (and thus App Store shots) look clean.
