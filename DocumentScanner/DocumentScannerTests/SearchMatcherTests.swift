@@ -41,9 +41,13 @@ final class SearchMatcherTests: XCTestCase {
         XCTAssertEqual(result.map(\.displayName), ["Costco"])
     }
 
-    func test_emptyTerm_returnsEverythingInScope_unfiltered() {
+    func test_emptyTerm_library_returnsEverything() {
         XCTAssertEqual(SearchMatcher.matches(term: "", in: all, scope: .library).count, 3)
-        XCTAssertEqual(SearchMatcher.matches(term: "", in: all, scope: .folder(folderURL)).map(\.displayName), ["Costco"])
+    }
+
+    func test_emptyTerm_folderScope_returnsOnlyThatFoldersDocs() {
+        let result = SearchMatcher.matches(term: "", in: all, scope: .folder(folderURL))
+        XCTAssertEqual(result.map(\.displayName), ["Costco"])
     }
 
     func test_noMatch_returnsEmpty() {
