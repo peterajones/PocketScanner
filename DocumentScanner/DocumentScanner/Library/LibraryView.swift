@@ -51,13 +51,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 }
             }
             .navigationTitle("Scanned Documents")
-            .navigationDestination(for: DocumentSummary.self) { summary in
+            .navigationDestination(for: DocumentRoute.self) { route in
                 DocumentViewerView(
-                    summary: summary,
+                    summary: route.summary,
                     storage: storage,
                     scannerPresenter: scannerPresenter,
                     pipeline: pipeline,
-                    searchContext: searchContextStarting(at: summary),
+                    searchContext: searchContext(for: route),
                     onDeleted: {
                         store.refresh()
                         path.removeLast()
@@ -277,7 +277,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private func docRow(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
-            DocumentRow(summary: summary)
+            DocumentRow(summary: summary, folderName: folderLabel(for: summary))
                 .contextMenu { docContextMenu(summary) }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
@@ -287,8 +287,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     }
                 }
         } else {
-            NavigationLink(value: summary) {
-                DocumentRow(summary: summary)
+            NavigationLink(value: DocumentRoute(summary: summary, term: searchText, scope: .library)) {
+                DocumentRow(summary: summary, folderName: folderLabel(for: summary))
             }
             .contextMenu { docContextMenu(summary) }
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -304,7 +304,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private var listBody: some View {
         List {
-            if showFolders && !folders.isEmpty {
+            if showFolders && !folders.isEmpty && searchText.isEmpty {
                 Section {
                     ForEach(folders, id: \.self) { folderURL in
                         NavigationLink(value: folderURL) {
@@ -331,6 +331,11 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             }
         }
         .searchable(text: $searchText, prompt: "Search documents")
+        .overlay {
+            if !searchText.isEmpty && filteredDocs.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
         .refreshable {
             store.refresh()
             refreshFolders()
@@ -345,7 +350,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     private var gridBody: some View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 16) {
-                if showFolders && !folders.isEmpty {
+                if showFolders && !folders.isEmpty && searchText.isEmpty {
                     ForEach(folders, id: \.self) { folderURL in
                         NavigationLink(value: folderURL) {
                             FolderTile(url: folderURL)
@@ -361,6 +366,11 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             .padding()
         }
         .searchable(text: $searchText, prompt: "Search documents")
+        .overlay {
+            if !searchText.isEmpty && filteredDocs.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
         .refreshable {
             store.refresh()
             refreshFolders()
@@ -370,15 +380,24 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private func docTile(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
-            DocumentTile(summary: summary)
+            DocumentTile(summary: summary, folderName: folderLabel(for: summary))
                 .contextMenu { docContextMenu(summary) }
         } else {
-            NavigationLink(value: summary) {
-                DocumentTile(summary: summary)
+            NavigationLink(value: DocumentRoute(summary: summary, term: searchText, scope: .library)) {
+                DocumentTile(summary: summary, folderName: folderLabel(for: summary))
             }
             .buttonStyle(.plain)
             .contextMenu { docContextMenu(summary) }
         }
+    }
+
+    /// The containing folder's name for a search result that lives in a folder,
+    /// or nil when the doc is at the library root. Used to label flattened
+    /// Main Library search results ("in Receipts").
+    private func folderLabel(for summary: DocumentSummary) -> String? {
+        let parent = summary.url.deletingLastPathComponent().standardizedFileURL
+        guard parent.path != storage.documentsURL.standardizedFileURL.path else { return nil }
+        return parent.lastPathComponent
     }
 
     private var docsAtRoot: [DocumentSummary] {
@@ -396,66 +415,31 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     private var filteredDocs: [DocumentSummary] {
-        let matched: [DocumentSummary]
-        if searchText.isEmpty {
-            matched = visibleDocs
-        } else {
-            let needle = searchText.lowercased()
-            matched = visibleDocs.filter {
-                $0.displayName.lowercased().contains(needle)
-                || $0.ocrSnippet.lowercased().contains(needle)
-            }
-        }
+        let matched = searchText.isEmpty
+            ? visibleDocs
+            : SearchMatcher.matches(term: searchText, in: store.summaries, scope: .library)
         return sort.sorted(matched)
     }
 
-    /// Cross-doc search state: enumerates `filteredDocs` and runs
-    /// PDFKit `findString` against each, recording per-doc match counts.
-    /// Returns nil when the search field is empty or no doc has matches.
-    ///
-    /// `startDocIndex` is set to 0 here; the navigation destination
-    /// overrides it with the tapped doc's index.
-    private var searchContext: SearchContext? {
-        guard !searchText.isEmpty else { return nil }
-        // Span ALL docs in the store, not just the root-visible ones — this
-        // lets cross-doc nav reach docs the user has tapped into through a
-        // folder. Filter by displayName/ocrSnippet first to match what the
-        // library list shows, then narrow to docs whose content findString
-        // can actually highlight.
-        let needle = searchText.lowercased()
-        let candidates = store.summaries.filter {
-            $0.displayName.lowercased().contains(needle)
-            || $0.ocrSnippet.lowercased().contains(needle)
-        }
+    /// Builds the cross-doc search context for a tapped route: matches the term
+    /// within the route's scope (the same `SearchMatcher` the list uses), runs
+    /// `findString` for per-doc counts, and points `startDocIndex` at the tapped
+    /// doc. Nil when the term is empty, no doc has `findString` matches, or the
+    /// tapped doc isn't among them (so the viewer opens plainly rather than on
+    /// the wrong document).
+    private func searchContext(for route: DocumentRoute) -> SearchContext? {
+        guard !route.term.isEmpty else { return nil }
+        let candidates = SearchMatcher.matches(
+            term: route.term, in: store.summaries, scope: route.scope
+        )
         let entries: [SearchContext.DocEntry] = candidates.compactMap { summary in
             guard let pdf = PDFDocument(url: summary.url) else { return nil }
-            let count = pdf.findString(searchText, withOptions: .caseInsensitive).count
+            let count = pdf.findString(route.term, withOptions: .caseInsensitive).count
             return count > 0 ? .init(summary: summary, matchCount: count) : nil
         }
-        return entries.isEmpty ? nil
-            : SearchContext(term: searchText, docs: entries, startDocIndex: 0)
-    }
-
-    /// Returns the current cross-doc search context with `startDocIndex`
-    /// pointing at the tapped summary's position. Returns nil when there's
-    /// no active search, OR when the tapped summary isn't in the context's
-    /// docs list — that happens when ocrSnippet matched the term but PDFKit's
-    /// findString returned zero (rare but real). In that case the viewer
-    /// opens without search context rather than silently displaying the
-    /// wrong document.
-    ///
-    /// Note: this is also the path used for taps from `FolderContentsView`
-    /// (which inherits the parent NavigationStack's destination). Folder-
-    /// scoped searches don't currently produce a `SearchContext` of their
-    /// own — `searchText` here is LibraryView's, which is empty when the
-    /// user is searching inside a folder. Cross-doc nav within a folder
-    /// is a known follow-up (v1.3+).
-    private func searchContextStarting(at summary: DocumentSummary) -> SearchContext? {
-        guard let ctx = searchContext else { return nil }
-        guard let idx = ctx.docs.firstIndex(where: { $0.summary.id == summary.id }) else {
-            return nil
-        }
-        return SearchContext(term: ctx.term, docs: ctx.docs, startDocIndex: idx)
+        guard let idx = entries.firstIndex(where: { $0.summary.id == route.summary.id })
+        else { return nil }
+        return SearchContext(term: route.term, docs: entries, startDocIndex: idx)
     }
 
     private var sort: DocumentSort {
