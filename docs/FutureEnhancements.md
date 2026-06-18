@@ -12,11 +12,15 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Search
 
+- **Search scope is broken / incomplete** (reported 2026-06-18 — *needs a full end-to-end audit; not an exhaustive list*). Observed behaviour:
+  - Searching from the **Main Library** does **not** reach documents *inside folders* — only root-level docs are searched.
+  - Searching **from within a folder** returns nothing — folder-scoped search appears non-functional.
+  - These likely share a root with the cross-doc-nav item below (how each view builds — or fails to build — its `SearchContext`, and which `searchText` drives results). Audit the whole search path: root vs. folder scope, recursion into subfolders, and the nav binding.
 - **In-folder cross-doc search** — `FolderContentsView`'s own searchText doesn't feed the inherited `navigationDestination`; cross-doc nav only works off `LibraryView`'s search field. Have `FolderContentsView` build its own `SearchContext` or share `LibraryView`'s binding.
 
 ### Editing
 
-- **Highlighter thickness / bleed** — highlight marks are often too tall and dip into the line below. The mark's bounds come from the text-selection line rect, which can run taller than the glyphs themselves. Options: tighten the highlight rect toward the cap-height/baseline band of the line, or — if that can't be made reliable across varied scans/OCR — document the limitation in-app/Help so expectations are set. Decide fix vs. clarify.
+- **Highlighter thickness / bleed** — *Decided 2026-06-18: clarify, don't fix the geometry.* Evidence (search + user-mark highlights across real and demo docs): on **real** scanned printed text the coverage is already tight (Vision boxes are good + the v1.2 `scaleX` snaps width); the bloated coverage only appeared on the **seeded demo docs**, whose OCR boxes are fabricated (`DemoSeeder` uses a fixed `0.84 × 0.03`) and don't align with the drawn text. The one genuine outlier is **handwriting**, and that's a Vision-recognition-box floor a cap-height rect tighten can't meaningfully fix. So: add a short in-app/Help note setting expectations on handwriting/unusual scans rather than engineering a geometry fix (pixel-level ink bounds would be the only real fix — heavy, off-philosophy). Separate cheap win: tighten `DemoSeeder`'s synthetic OCR boxes so demo-doc highlights (and thus App Store shots) look clean.
 - **Preserve annotations across page edits** — annotations shipped in v1.4, but editing a page in the per-page editor (crop / rotate / filter) rebuilds the page from scratch via `DocumentMutations.replacePage`, dropping any highlights/strikethroughs on that page. A correct fix is non-trivial because a cropped / perspective-corrected page has different geometry, so marks would need re-mapping rather than re-attaching. Uncommon sequence; deferred from v1.4.
 - **Annotation rectangle-drag fallback** — annotation marks anchor to the OCR text selection, so on a poorly-recognised scan the drag-select can be imprecise. A drag-a-rectangle highlight mode would let users mark regions the OCR missed.
 
