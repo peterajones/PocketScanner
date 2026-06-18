@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DocumentRow: View {
     let summary: DocumentSummary
+    var folderName: String? = nil
 
     var body: some View {
         HStack(spacing: 12) {
@@ -26,6 +27,12 @@ struct DocumentRow: View {
                 Text(summary.formattedSubtitle)
                     .font(.footnote)
                     .foregroundStyle(summary.isCorrupt ? .orange : .secondary)
+                if let folderName {
+                    Text("in \(folderName)")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
             }
             Spacer()
         }

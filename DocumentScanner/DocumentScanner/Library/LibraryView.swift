@@ -277,7 +277,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private func docRow(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
-            DocumentRow(summary: summary)
+            DocumentRow(summary: summary, folderName: folderLabel(for: summary))
                 .contextMenu { docContextMenu(summary) }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
@@ -288,7 +288,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 }
         } else {
             NavigationLink(value: DocumentRoute(summary: summary, term: searchText, scope: .library)) {
-                DocumentRow(summary: summary)
+                DocumentRow(summary: summary, folderName: folderLabel(for: summary))
             }
             .contextMenu { docContextMenu(summary) }
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -370,15 +370,24 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private func docTile(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
-            DocumentTile(summary: summary)
+            DocumentTile(summary: summary, folderName: folderLabel(for: summary))
                 .contextMenu { docContextMenu(summary) }
         } else {
             NavigationLink(value: DocumentRoute(summary: summary, term: searchText, scope: .library)) {
-                DocumentTile(summary: summary)
+                DocumentTile(summary: summary, folderName: folderLabel(for: summary))
             }
             .buttonStyle(.plain)
             .contextMenu { docContextMenu(summary) }
         }
+    }
+
+    /// The containing folder's name for a search result that lives in a folder,
+    /// or nil when the doc is at the library root. Used to label flattened
+    /// Main Library search results ("in Receipts").
+    private func folderLabel(for summary: DocumentSummary) -> String? {
+        let parent = summary.url.deletingLastPathComponent().standardizedFileURL
+        guard parent.path != storage.documentsURL.standardizedFileURL.path else { return nil }
+        return parent.lastPathComponent
     }
 
     private var docsAtRoot: [DocumentSummary] {

@@ -4,6 +4,7 @@ import SwiftUI
 /// Pure presentation — the parent wraps it in a NavigationLink / contextMenu.
 struct DocumentTile: View {
     let summary: DocumentSummary
+    var folderName: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -30,6 +31,12 @@ struct DocumentTile: View {
                 .font(.caption)
                 .foregroundStyle(summary.isCorrupt ? .orange : .secondary)
                 .lineLimit(1)
+            if let folderName {
+                Text("in \(folderName)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+            }
         }
         .accessibilityIdentifier("Library.Tile.\(summary.displayName)")
     }
