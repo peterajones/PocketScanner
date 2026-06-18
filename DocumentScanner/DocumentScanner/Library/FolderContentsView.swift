@@ -240,6 +240,11 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             docRow(summary)
         }
         .searchable(text: $searchText, prompt: "Search this folder")
+        .overlay {
+            if !searchText.isEmpty && filtered.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
         .refreshable {
             store.refresh()
             refreshFolders()
@@ -257,6 +262,11 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             .padding()
         }
         .searchable(text: $searchText, prompt: "Search this folder")
+        .overlay {
+            if !searchText.isEmpty && filtered.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
         .refreshable {
             store.refresh()
             refreshFolders()
