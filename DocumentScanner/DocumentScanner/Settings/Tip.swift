@@ -22,12 +22,12 @@ extension Tip {
             body: "Tap the layout button in the toolbar to switch between a list and a thumbnail grid of your library."),
         Tip(id: "extract",
             title: "Split out pages",
-            body: "In a document's edit mode, select pages and tap Save as New to pull them into their own scan."),
+            body: "In a document’s edit mode, select pages and tap Save as New to pull them into their own scan."),
         Tip(id: "flat-list",
             title: "One big list",
             body: "Prefer everything in one place? Turn off Show Folders in Settings and every scan lives in a single list."),
         Tip(id: "highlights",
             title: "Highlights & handwriting",
-            body: "Highlights snap to the text Pocket Scanner detects in your scan. On printed pages that's precise; on handwriting or rough scans, text detection is looser — so a highlight may sit a bit tall or not line up exactly. Your scan itself is never altered."),
+            body: "Highlights snap to the text Pocket Scanner detects in your scan. On printed pages that’s precise; on handwriting or rough scans, text detection is looser — so a highlight may sit a bit tall or not line up exactly. Your scan itself is never altered."),
     ]
 }
