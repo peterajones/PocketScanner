@@ -1,5 +1,3 @@
-import Foundation
-
 /// A single in-app tip shown on the Tips screen. Pure content (no UI), so the
 /// copy is unit-testable and new tips are added by appending to `all`.
 struct Tip: Identifiable {
