@@ -22,6 +22,7 @@ struct PageEditorView: View {
     @State private var isWorking = false
     @State private var errorMessage: String?
     @State private var showingApplyAllConfirm = false
+    @State private var showingDiscardMarksConfirm = false
     @State private var bulkProgress: BulkProgress?
 
     private struct BulkProgress: Equatable {
@@ -62,8 +63,14 @@ struct PageEditorView: View {
                     if isWorking {
                         ProgressView()
                     } else {
-                        Button("Apply") { Task { await applyEdit() } }
-                            .disabled(quad == nil)
+                        Button("Apply") {
+                            if currentPageHasUserMarks {
+                                showingDiscardMarksConfirm = true
+                            } else {
+                                Task { await applyEdit() }
+                            }
+                        }
+                        .disabled(quad == nil)
                     }
                 }
             }
@@ -76,7 +83,16 @@ struct PageEditorView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This will re-process all \(session.pdf.pageCount) pages and may take a moment.")
+                Text(applyAllMessage)
+            }
+            .alert("Discard this page's highlights?",
+                   isPresented: $showingDiscardMarksConfirm) {
+                Button("Edit Anyway", role: .destructive) {
+                    Task { await applyEdit() }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Editing Page \(pageIndex + 1) removes the highlights and marks you added to it. The rest of your document is unaffected.")
             }
         }
     }
@@ -177,6 +193,32 @@ struct PageEditorView: View {
     private func displayedImage(_ image: UIImage) -> UIImage {
         let rotated = rotatedImage(image)
         return filterEngine.apply(filter, to: rotated) ?? rotated
+    }
+
+    /// True when the page being edited has user highlights/strikethroughs that
+    /// the rebuild-on-apply would discard. Uses the same predicate the viewer
+    /// uses to identify user marks (excludes in-session search highlights).
+    private var currentPageHasUserMarks: Bool {
+        guard let page = session.pdf.page(at: pageIndex) else { return false }
+        return page.annotations.contains(where: AnnotationFactory.isUserDeletable)
+    }
+
+    /// True when ANY page has user marks — used to warn before Apply-to-all,
+    /// which rebuilds every page.
+    private var anyPageHasUserMarks: Bool {
+        (0..<session.pdf.pageCount).contains { index in
+            session.pdf.page(at: index)?.annotations.contains(where: AnnotationFactory.isUserDeletable) ?? false
+        }
+    }
+
+    /// Apply-to-all confirmation message — adds a mark-loss sentence only when
+    /// some page actually has marks to lose.
+    private var applyAllMessage: String {
+        var text = "This will re-process all \(session.pdf.pageCount) pages and may take a moment."
+        if anyPageHasUserMarks {
+            text += " Highlights and marks on pages that have them will be removed."
+        }
+        return text
     }
 
     private func applyEdit() async {
