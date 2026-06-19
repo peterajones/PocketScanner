@@ -8,13 +8,13 @@ struct TipsView: View {
             ForEach(Tip.all) { tip in
                 Section {
                     Text(tip.body)
-                        .font(.callout)
                         .foregroundStyle(.secondary)
                 } header: {
                     Text(tip.title)
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Tips")
         .navigationBarTitleDisplayMode(.inline)
     }
