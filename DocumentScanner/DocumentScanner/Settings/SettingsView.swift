@@ -36,6 +36,11 @@ struct SettingsView: View {
             }
             #endif
             Section("About") {
+                NavigationLink {
+                    TipsView()
+                } label: {
+                    Label("Tips", systemImage: "lightbulb")
+                }
                 AboutRow()
                 SendFeedbackRow()
             }
