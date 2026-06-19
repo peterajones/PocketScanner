@@ -85,14 +85,14 @@ struct PageEditorView: View {
             } message: {
                 Text(applyAllMessage)
             }
-            .alert("Discard this page's highlights?",
+            .alert("Discard this page's markup?",
                    isPresented: $showingDiscardMarksConfirm) {
                 Button("Edit Anyway", role: .destructive) {
                     Task { await applyEdit() }
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Editing Page \(pageIndex + 1) removes the highlights and marks you added to it. The rest of your document is unaffected.")
+                Text("Editing Page \(pageIndex + 1) removes the markup you added to it. The rest of your document is unaffected.")
             }
         }
     }
@@ -216,7 +216,7 @@ struct PageEditorView: View {
     private var applyAllMessage: String {
         var text = "This will re-process all \(session.pdf.pageCount) pages and may take a moment."
         if anyPageHasUserMarks {
-            text += " Highlights and marks on pages that have them will be removed."
+            text += " Markup on pages that have it will be removed."
         }
         return text
     }
