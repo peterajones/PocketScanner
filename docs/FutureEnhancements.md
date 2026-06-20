@@ -26,7 +26,7 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Business / pricing
 
-- **Launch sale** — drop to $2.99 for the first week post-launch, then return to $4.99. App Store users see "was $4.99, now $2.99" as a deal.
+- ~~**Launch sale**~~ — **Run 2026-06-20** (well after launch, so reframed as a plain limited-time sale). A 1-week **Temporary Price Change** to **$2.99** (from $4.99), **Jun 21–28**, broad territories (CA / US / UK + all EU) — auto-reverts on the end date. Paired with sale **Promotional Text** (blurb A) set on **both** the live and the in-review version (promo text is per-version, so it must be on each, and reverted manually when the sale ends — the price reverts itself). Repeatable anytime: Pricing → *Temporary Price Change* for the price, Promotional Text (no review) for the message.
 - **Tip jar IAP** — one-time "Buy the developer a coffee" tiers ($1.99 / $4.99 / $9.99) in Settings. Some users like to support indie devs they like.
 
 ### Internationalization
