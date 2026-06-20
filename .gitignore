@@ -19,6 +19,9 @@ Package.resolved
 # Brainstorming scratchpad
 .superpowers/
 
+# Claude Code local state (scheduled-task locks, etc.)
+.claude/
+
 #Markdownlint rules so I don't go crazy with the formatting of my markdown files.
 .markdownlint.cjs
 
