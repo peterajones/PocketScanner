@@ -10,6 +10,11 @@ Versions earlier than the current shipping release are deleted from this doc as 
 
 Lower priority. Some of these may never ship. The list exists to capture what we considered.
 
+### Documents
+
+- **Copy text from a scan** — the app has no `UIPasteboard` usage anywhere; you can *search* a scan's recognized text but can't *copy it out*. Add a **Copy Text** action (whole page and/or whole document) that puts the OCR text (`pdf.string` / per-page) on the clipboard — turns any scan into reusable text (a receipt total, an address, a recipe). Small effort, high everyday value, very on-brand for an OCR-first scanner. (The markup view's custom edit menu may suppress PDFView's native text-Copy, so a dedicated action is clearer regardless.)
+- **Merge two documents** — combine two existing scans into one PDF. The engine already supports it (`DocumentMutations.append`); this just needs a "Merge into…" / "Combine" UI (e.g. a library multi-select, or a context-menu action that picks a target document). Useful when something was scanned across two sessions.
+
 ### Editing
 
 - ~~**Preserve annotations across page edits**~~ — **Decided 2026-06-19: warn, don't preserve.** Editing a page (crop / rotate / filter) still rebuilds it via `DocumentMutations.replacePage`, dropping that page's highlights/strikethroughs — geometry-remapping was rejected (rare flow; hard/non-affine for crop & perspective; semantically dubious when the marked region is cropped away). Instead the editor now **confirms before discarding marks** (single Apply, plus a note in the Apply-to-all dialog) so the loss is never silent. Shipped in v1.12. (The lossless strip quick-rotate already preserves marks.)
