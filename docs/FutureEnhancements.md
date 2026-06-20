@@ -19,28 +19,6 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 - ~~**Corrupt PDF "Try to recover"**~~ — **Dropped 2026-06-19.** All real document saves are atomic + file-coordinated (`DocumentStorage` writes with `data.write(to:options: .atomic)` inside an `NSFileCoordinator`), so an interrupted or failed save never leaves a half-written file — the user keeps the complete file or the previous one, never a corrupt one. The only remaining ways an app-created PDF could be unreadable are genuine hardware/filesystem corruption (not reliably recoverable, and bigger problems exist) or a manually sideloaded corrupt PDF (out of scope). The existing 🚫 row + confirmed Delete is a sufficient safety net. (Also: PDFKit has no lenient/repair reader, so the original "lenient reader" premise wasn't implementable.) Only adjacent value, if ever: a clear "storage full" save-error message — minor.
 
-### App Store presence
-
-An ongoing effort (not a one-off) to make the listing look professional. Today's
-preview images are screenshots that read as amateur; the better-looking apps lead
-with an **App Preview** (the autoplay video in the first slot) followed by framed
-static shots.
-
-- **Device-frame template** — *first deliverable*. A single layered source file with
-  the iPhone 17 chrome as the background layer and a blank (transparent) viewport
-  cut-out, into which the App Preview video frame and the static screenshot layers
-  can be dropped. End state: one master file where each marketing shot is a layer
-  composited inside consistent device chrome.
-  - Open decisions: which tool / file format for the layered master (Figma, Sketch,
-    Photoshop PSD, Affinity); exact App Store screenshot pixel dimensions for the
-    required display sizes; where the canonical chrome asset comes from (Apple's
-    marketing resources vs. a third-party device-frame kit).
-- **App Preview video** — a short (≤30s) screen-recorded walkthrough for slot 1:
-  scan → pick a filter → annotate → rotate → search. Produced inside the template's
-  viewport so it sits in the same device frame as the static shots.
-- **Refreshed static screenshots** — re-shoot the static slots through the template
-  so the whole gallery looks consistent and intentional.
-
 ### Business / pricing
 
 - **Launch sale** — drop to $2.99 for the first week post-launch, then return to $4.99. App Store users see "was $4.99, now $2.99" as a deal.
