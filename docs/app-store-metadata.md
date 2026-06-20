@@ -21,10 +21,11 @@ Test availability by searching the App Store from your phone before settling.
 
 ## Subtitle (30 chars max)
 
-**Recommendation:** `Scan to PDF. No subscription.` (29 chars)
+**Shipped:** `No subscriptions or ads ever!` (29 chars)
 
-Alternates:
+Alternates considered:
 
+- `Scan to PDF. No subscription.` (29)
 - `Scan documents. No ads.` (23)
 - `Private document scanner` (24)
 - `One-time price. No accounts.` (28)
@@ -55,12 +56,16 @@ That's it. No subscription. No ads. No account to sign up for. No upsells. Pay o
 WHAT IT DOES
 
 • Capture pages with Apple's document scanner — automatic edge detection, perspective correction, multi-page in one shot
-• On-device OCR — every scan is a fully searchable PDF, no internet required
-• iCloud Drive sync — your scans appear on every device signed into your iCloud account, and stay in your own storage where you can see and manage them
-• Per-page editor — adjust the crop, rotate, apply a clean B&W or photo filter
-• Search across all your scans by name or by text inside the document; matches highlight on the page
-• Optional Face ID lock for the library
-• App-switcher privacy blur so document thumbnails don't appear in the iOS task switcher
+• Pick a look as you scan — Color, Greyscale, Black & White, or Photo
+• On-device OCR — every scan becomes a fully searchable PDF, no internet required
+• Search your whole library, including inside folders, by filename or by text in the document — matches highlight right on the page
+• Stay organized — folders you can move documents between, sorting by date / name / page count, and a list or thumbnail-grid view
+• Per-page editor — crop, rotate, and apply a clean filter; or rotate a page straight from the page strip
+• Split out pages — pull selected pages into their own new document
+• Mark up scans — highlight or strike through text directly on the page
+• Swipe to delete documents and folders
+• iCloud Drive sync — your scans appear on every device on your iCloud account, in your own storage where you can see and manage them
+• Privacy built in — optional Face ID lock for the library, plus an app-switcher blur so thumbnails don't appear in the task switcher
 
 WHAT IT DOESN'T DO
 
@@ -85,7 +90,7 @@ ABOUT
 Built solo by an indie developer who got tired of every scanner app demanding a subscription. If you like the app, leave a review — it's the single most valuable thing you can do to help.
 ```
 
-(~1900 chars — well under the 4000 limit)
+(~2,300 chars — comfortably under the 4,000 limit)
 
 ---
 
@@ -134,43 +139,23 @@ Run through the questionnaire honestly. Expected outcome: **4+** (no objectionab
 
 ---
 
-## Screenshots
+## Screenshots & App Preview
 
-Apple requires screenshots for the largest iPhone size you support; the next-largest is recommended. Take all of them in the simulator.
+The gallery is now **framed in iPhone 17 device chrome**, led by an **App Preview video** in slot 1 followed by framed static shots — not the bare simulator screenshots the original v1.0 plan described.
 
-Required device sizes (as of iOS 26):
+**The production workflow is the single source of truth in `marketing/app-preview/README.md`** (capture → CapCut edit → ffmpeg chrome composite → downscale → verify → upload), including the two gotchas that bit us:
 
-- **6.9" Display** (iPhone 17 Pro Max) — 1320 × 2868
-- **6.7" Display** (iPhone 17 / iPhone Air) — 1290 × 2796 — also covers iPhone 14/15 Pro Max
+- The App Preview **video** is **886 × 1920** — NOT the screenshot pixel size — and must carry a **silent AAC audio track**, or App Store Connect rejects it.
+- Static shots are framed via the Krita master `marketing/templates/PocketScannerAppPreview.kra`; per-release stills live under `marketing/app-preview/v1.x/Stills/`. See the README for exact dimensions and the device-size slot.
 
-In Xcode: Cmd+R to launch the simulator at the right device size, then in the **Simulator** app menu: **File → Save Screen…** (or Cmd+S) saves a properly-sized PNG.
+Current framed gallery (all at the canonical **9:41** status bar):
 
-### Suggested screenshot sequence (5 frames)
+- **App Preview video** (slot 1) — short walkthrough.
+- Stills: Main Library, Grid view, Folder added, Move to folder, Docs moved to folder, Search term, Search results, Settings, Tips.
 
-1. **The library** showing 5-6 sample scans with realistic names (Lease Agreement, Costco Receipt, Vet Invoice). Caption overlay: *"Your scans, your iCloud."*
+### Demo content for the shots
 
-2. **Capture moment** — the VisionKit scanner with a document outlined. Caption: *"Auto edge detection. Multi-page in one go."*
-
-3. **A scanned PDF open in the viewer** with selected text showing the searchable layer working. Caption: *"Every scan is searchable, OCR'd on your phone."*
-
-4. **The per-page editor** with the crop quad visible and the filter picker showing B&W selected. Caption: *"Crop, rotate, filter — per page."*
-
-5. **Settings screen** with App Lock toggle. Caption: *"No accounts. No ads. No subscription."*
-
-Captions can be overlaid in any image editor (Figma, Sketch, Photoshop, or even Keynote). Keep them readable at thumbnail size — large, bold, high-contrast text near the top or bottom.
-
-### Sample content for the screenshots
-
-The library row names should look real but generic (no personal info). Use names like:
-
-- Lease Agreement
-- Costco Receipt
-- Vet Invoice — Maple
-- Recipe — Banana Bread
-- Tax Return 2025
-- Passport Page
-
-Fill the simulator's iCloud Drive with sample PDFs ahead of time so the screenshots show a populated library, not the empty state.
+Generated on launch by the **DEBUG-only** `-SeedDemoData` launch argument (`DemoSeeder`, compiled out of Release builds). It seeds folders **Receipts / Recipes / Tax 2025** plus realistic, generic documents — Lease Agreement, Travel Insurance Policy, Vacation Itinerary, the Costco / Whole Foods / Home Depot receipts, the Banana Bread / Pumpkin Pie recipes — with no personal info. See `docs/dev-build.md` and `DemoSeeder.swift` for the exact set.
 
 ---
 
