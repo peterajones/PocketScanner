@@ -161,15 +161,16 @@ Generated on launch by the **DEBUG-only** `-SeedDemoData` launch argument (`Demo
 
 ## Build configuration before archive
 
-In Xcode:
+A recurring per-release checklist. In Xcode (target build settings, or the General tab):
 
-1. **Bundle identifier:** `ca.peter-jones.DocumentScanner` ✓ (already set)
-2. **Version:** `1.0` (in the General tab)
-3. **Build number:** `1` (increment on every subsequent upload)
-4. **Marketing version:** `1.0`
-5. **Deployment target:** iOS 17.6 ✓
-6. **Scheme:** switch to **Release** for archive (`Product → Scheme → Edit Scheme → Archive` should already be Release by default)
-7. **Encryption:** Add `ITSAppUsesNonExemptEncryption` = `NO` to Info.plist. We use only Apple's standard cryptography (HTTPS, iCloud), which is exempt. Skipping this triggers an annoying export-compliance prompt on every upload.
+1. **Bundle identifier:** `ca.peter-jones.DocumentScanner` (production). The dev build uses `…DocumentScanner.dev` — a separate install with no iCloud entitlement; don't archive that one.
+2. **Marketing version** (`MARKETING_VERSION`, shown as "Version" in General): bump for the release — e.g. `1.12`. This is the user-facing version on the Store.
+3. **Build number** (`CURRENT_PROJECT_VERSION`): increment on **every** upload — must be unique and higher than the last build App Store Connect has seen (e.g. `1.12 (17)`). Commit the bump on its own as `chore: bump to vX.Y (N)`.
+4. **Deployment target:** unchanged since launch (iOS 17.6).
+5. **Configuration:** archive the **Release** configuration (`Product → Scheme → Edit Scheme → Archive` is Release by default). The dev `-SeedDemoData` seeding and the DEBUG-only Developer settings section are compiled out of Release, so the archive is clean. (If you flipped the *Run* config to Release for screenshots, flip it back to Debug afterward.)
+6. **Encryption:** `ITSAppUsesNonExemptEncryption` = `NO` in Info.plist — we use only Apple's standard cryptography (HTTPS, iCloud), which is exempt. Skipping this triggers an export-compliance prompt on every upload.
+
+Then **Product → Archive → Validate → Upload**. Note: App Store Connect allows only **one version in the review pipeline at a time** — you can't create the next version until the current one is approved and released, though you *can* upload the build anytime.
 
 ---
 
