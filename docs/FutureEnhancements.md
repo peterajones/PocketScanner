@@ -18,7 +18,11 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 ### Editing
 
 - ~~**Preserve annotations across page edits**~~ — **Decided 2026-06-19: warn, don't preserve.** Editing a page (crop / rotate / filter) still rebuilds it via `DocumentMutations.replacePage`, dropping that page's highlights/strikethroughs — geometry-remapping was rejected (rare flow; hard/non-affine for crop & perspective; semantically dubious when the marked region is cropped away). Instead the editor now **confirms before discarding marks** (single Apply, plus a note in the Apply-to-all dialog) so the loss is never silent. Shipped in v1.12. (The lossless strip quick-rotate already preserves marks.)
-- **Annotation rectangle-drag fallback** — annotation marks anchor to the OCR text selection, so on a poorly-recognised scan the drag-select can be imprecise. A drag-a-rectangle highlight mode would let users mark regions the OCR missed.
+- ~~**Annotation rectangle-drag fallback**~~ — **Superseded 2026-06-22 by Signing.** Free-form (non-text-anchored) placement now exists via the signature stamp (`ImageStampAnnotation` placed at arbitrary page coords). If a generic drag-a-rectangle *highlight* is still wanted later, it would reuse the same placement plumbing.
+
+### Signing
+
+- **Sign a document (v2.0)** — scan your signature on paper → auto-clean to a transparent cut-out (`SignatureProcessor`: B&W → key white→alpha → crop) → save one reusable signature (`SignatureStore`, Settings ▸ Signature) → **Sign** in the viewer drops it as a drag/resize stamp on the page you're viewing; persists as an editable annotation you can **Move** or **Remove**. Built subagent-driven; a front-loaded spike proved image stamp annotations persist *and render* across save→reload (so no flatten needed). **2.x follow-ups** (all deferred from the lean 2.0): multiple saved signatures; typed / on-screen-drawn signatures; initials / date / text stamps; iCloud-sync the saved signature across devices; auto-detect the signature line; sign multiple pages at once.
 
 ### Error handling
 
