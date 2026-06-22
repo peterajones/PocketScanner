@@ -73,7 +73,8 @@ struct SignaturePlacementView: View {
         guard center == .zero else { return }
         let fit = aspectFit(pageImage.size, in: container)
         guard let r = initialPageRect else {
-            center = CGPoint(x: container.width / 2, y: container.height / 2)
+            center = CGPoint(x: fit.origin.x + fit.size.width / 2,
+                             y: fit.origin.y + fit.size.height / 2)
             return
         }
         let nx = (r.minX - pageBounds.minX) / pageBounds.width

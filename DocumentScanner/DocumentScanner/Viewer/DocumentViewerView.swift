@@ -80,6 +80,9 @@ struct DocumentViewerView: View {
         let signature: UIImage
         let page: PDFPage
         let seedRect: CGRect?
+        /// When moving an existing signature, the annotation to remove — but only
+        /// once the user commits (taps Done), so a Cancel keeps the original.
+        var replacing: PDFAnnotation? = nil
     }
     private struct SignatureEdit: Identifiable {
         let id = UUID()
@@ -348,6 +351,9 @@ struct DocumentViewerView: View {
                 pageBounds: req.page.bounds(for: .mediaBox),
                 initialPageRect: req.seedRect,
                 onPlace: { rect in
+                    // Remove the old annotation only now, on commit — so a Cancel
+                    // above leaves the original signature untouched.
+                    if let old = req.replacing { req.page.removeAnnotation(old) }
                     placeSignature(req.signature, at: rect, on: req.page, session: session)
                     placement = nil
                 },
@@ -359,12 +365,14 @@ struct DocumentViewerView: View {
             set: { if !$0 { pendingSignatureEdit = nil } }
         ), presenting: pendingSignatureEdit) { item in
             Button("Move") {
-                let rect = item.annotation.bounds
-                item.page.removeAnnotation(item.annotation)
-                _ = try? session.save(); annotationRevision &+= 1
-                if let sig = signatureStore.load() {
-                    placement = PlacementRequest(signature: sig, page: item.page, seedRect: rect)
-                }
+                // Don't mutate the document yet — open placement seeded at the
+                // current spot, carrying the old annotation to remove on commit
+                // (so Cancel keeps the original). If the saved signature was
+                // cleared meanwhile, abort the move rather than lose what's placed.
+                guard let sig = signatureStore.load() else { pendingSignatureEdit = nil; return }
+                placement = PlacementRequest(signature: sig, page: item.page,
+                                             seedRect: item.annotation.bounds,
+                                             replacing: item.annotation)
                 pendingSignatureEdit = nil
             }
             Button("Remove", role: .destructive) {
@@ -537,7 +545,7 @@ private struct PDFKitView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
     final class Coordinator {
-        let parent: PDFKitView
+        var parent: PDFKitView
         init(_ parent: PDFKitView) { self.parent = parent }
         @objc func pageChanged(_ note: Notification) {
             guard let view = note.object as? PDFView,
@@ -559,7 +567,12 @@ private struct PDFKitView: UIViewRepresentable {
         return v
     }
 
+    static func dismantleUIView(_ view: PDFView, coordinator: Coordinator) {
+        NotificationCenter.default.removeObserver(coordinator, name: .PDFViewPageChanged, object: view)
+    }
+
     func updateUIView(_ view: PDFView, context: Context) {
+        context.coordinator.parent = self    // keep the coordinator's binding current
         guard let view = view as? MarkupPDFView else { return }
         view.onMark = onApplyTool
         view.onTapAnnotation = onRequestDelete
