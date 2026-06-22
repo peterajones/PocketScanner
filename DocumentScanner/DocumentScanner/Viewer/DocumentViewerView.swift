@@ -73,6 +73,12 @@ struct DocumentViewerView: View {
     @State private var placement: PlacementRequest?
     @State private var pendingSignatureEdit: SignatureEdit?
     @State private var currentVisiblePageIndex = 0
+    /// Bumped only on signature add/remove/move. A signature is a custom-draw
+    /// stamp painted into PDFView's cached page tile, so (unlike standard
+    /// highlights, which live in an overlay layer) removing/moving it doesn't
+    /// invalidate the tile — the stale paint lingers. PDFKitView watches this to
+    /// force a tile-clearing reload only when a signature actually changed.
+    @State private var signatureRevision = 0
     private let signatureStore = SignatureStore()
 
     private struct PlacementRequest: Identifiable {
@@ -169,6 +175,7 @@ struct DocumentViewerView: View {
                 highlightedSelections: searchHighlight?.matches ?? [],
                 currentSelection: searchHighlight?.current,
                 annotationRevision: annotationRevision,
+                signatureRevision: signatureRevision,
                 onApplyTool: { tool, selection in
                     applyTool(tool, to: selection, session: session)
                 },
@@ -377,7 +384,7 @@ struct DocumentViewerView: View {
             }
             Button("Remove", role: .destructive) {
                 item.page.removeAnnotation(item.annotation)
-                _ = try? session.save(); annotationRevision &+= 1
+                _ = try? session.save(); annotationRevision &+= 1; signatureRevision &+= 1
                 pendingSignatureEdit = nil
             }
             Button("Cancel", role: .cancel) { pendingSignatureEdit = nil }
@@ -460,6 +467,7 @@ struct DocumentViewerView: View {
         page.addAnnotation(stamp)
         _ = try? session.save()
         annotationRevision &+= 1
+        signatureRevision &+= 1
     }
 }
 
@@ -533,6 +541,9 @@ private struct PDFKitView: UIViewRepresentable {
     let currentSelection: PDFSelection?
     /// Bumped by the parent after add/delete to force a redraw of annotations.
     let annotationRevision: Int
+    /// Bumped only when a signature stamp changes — triggers a harder, tile-cache
+    /// clearing reload (a custom-draw stamp paints into the cached page tile).
+    let signatureRevision: Int
     let onApplyTool: (AnnotationTool, PDFSelection) -> Void
     let onRequestDelete: (PDFAnnotation, PDFPage) -> Void
     @Binding var currentPageIndex: Int
@@ -546,6 +557,7 @@ private struct PDFKitView: UIViewRepresentable {
 
     final class Coordinator {
         var parent: PDFKitView
+        var lastSignatureRevision = 0
         init(_ parent: PDFKitView) { self.parent = parent }
         @objc func pageChanged(_ note: Notification) {
             guard let view = note.object as? PDFView,
@@ -593,6 +605,20 @@ private struct PDFKitView: UIViewRepresentable {
         // forces a refresh; we keep it unconditional rather than gated on
         // `view.document !== document` so highlight edits flow through.
         view.document = document
+
+        // A removed/moved signature is a custom-draw stamp baked into PDFView's
+        // cached page tile, which the reassignment above does NOT invalidate
+        // (standard highlights live in an overlay layer and refresh fine). When
+        // a signature actually changed, force a tile-clearing reload by nil'ing
+        // the document first, then restore the viewed page so scroll doesn't jump
+        // to the top. Gated so ordinary highlight edits don't pay this cost.
+        if signatureRevision != context.coordinator.lastSignatureRevision {
+            context.coordinator.lastSignatureRevision = signatureRevision
+            let page = view.currentPage
+            view.document = nil
+            view.document = document
+            if let page { view.go(to: page) }
+        }
 
         if let currentSelection {
             view.go(to: currentSelection)

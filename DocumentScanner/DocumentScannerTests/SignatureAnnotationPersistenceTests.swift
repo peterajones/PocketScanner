@@ -11,6 +11,35 @@ final class SignatureAnnotationPersistenceTests: XCTestCase {
         }
     }
 
+    private func signatureCount(_ doc: PDFDocument) -> Int {
+        doc.page(at: 0)?.annotations.filter { $0.userName == "DocumentScanner.signature" }.count ?? -1
+    }
+
+    /// EVIDENCE: simulate the Move commit (remove old annotation, add new one) at
+    /// the model level. If this yields exactly one signature on the page AND
+    /// after a disk round-trip, then any "2 signatures" seen on device is a
+    /// VISUAL tile-cache artifact (PDFView not re-rendering the removed custom
+    /// stamp), not a data bug.
+    func test_moveCommit_removeOldAddNew_leavesExactlyOneSignature() throws {
+        let pdf = PDFDocument(); let page = PDFPage(); pdf.insert(page, at: 0)
+        let a = ImageStampAnnotation(image: solidImage(.black, CGSize(width: 80, height: 30)),
+                                     bounds: CGRect(x: 20, y: 20, width: 80, height: 30),
+                                     userName: "DocumentScanner.signature")
+        page.addAnnotation(a)
+        XCTAssertEqual(signatureCount(pdf), 1)
+
+        page.removeAnnotation(a)                      // Move: remove old on commit
+        let b = ImageStampAnnotation(image: solidImage(.black, CGSize(width: 80, height: 30)),
+                                     bounds: CGRect(x: 200, y: 400, width: 80, height: 30),
+                                     userName: "DocumentScanner.signature")
+        page.addAnnotation(b)                          // …add the repositioned one
+        XCTAssertEqual(signatureCount(pdf), 1, "in-memory: exactly one signature after a move")
+
+        let data = try XCTUnwrap(pdf.dataRepresentation())
+        let reloaded = try XCTUnwrap(PDFDocument(data: data))
+        XCTAssertEqual(signatureCount(reloaded), 1, "on disk: exactly one signature after a move")
+    }
+
     /// A one-page PDF with an image stamp annotation, written to data and
     /// reloaded, must still expose an annotation tagged as our signature on the
     /// page. This is the GO/NO-GO for the editable-stamp model.

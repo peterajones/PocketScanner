@@ -68,24 +68,20 @@ struct SignaturePlacementView: View {
         return CGRect(x: px, y: py, width: pw, height: ph)
     }
 
-    /// Seed center/scale: at the existing rect when moving, else page center.
+    /// Seed center/scale. Always start centered in the fitted page (so the
+    /// signature can't open under the nav bar / off-screen); when moving an
+    /// existing signature, preserve its *size* (derive scale from the original
+    /// rect) but not its position.
     private func seedPosition(in container: CGSize) {
         guard center == .zero else { return }
         let fit = aspectFit(pageImage.size, in: container)
-        guard let r = initialPageRect else {
-            center = CGPoint(x: fit.origin.x + fit.size.width / 2,
-                             y: fit.origin.y + fit.size.height / 2)
-            return
+        center = CGPoint(x: fit.origin.x + fit.size.width / 2,
+                         y: fit.origin.y + fit.size.height / 2)
+        if let r = initialPageRect {
+            let vw = (r.width / pageBounds.width) * fit.size.width
+            let baseW = signatureSize(in: fit.size).width
+            scale = baseW > 0 ? vw / baseW : 1
         }
-        let nx = (r.minX - pageBounds.minX) / pageBounds.width
-        let nw = r.width / pageBounds.width
-        let nh = r.height / pageBounds.height
-        let ny = 1 - (r.minY - pageBounds.minY) / pageBounds.height - nh
-        let vw = nw * fit.size.width, vh = nh * fit.size.height
-        let baseW = signatureSize(in: fit.size).width
-        scale = baseW > 0 ? vw / baseW : 1
-        center = CGPoint(x: fit.origin.x + nx * fit.size.width + vw / 2,
-                         y: fit.origin.y + ny * fit.size.height + vh / 2)
     }
 
     private func signatureSize(in fitted: CGSize) -> CGSize {
