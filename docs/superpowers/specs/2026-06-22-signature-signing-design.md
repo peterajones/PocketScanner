@@ -47,7 +47,8 @@ Given the saved PNG and the current page, shows a **draggable, pinch-resizable**
 - **`DocumentViewerView`** — a **"Sign"** toolbar action:
   - no saved signature → route into `SignatureCaptureView` first, then continue to placement;
   - on **Done**, create an image **stamp `PDFAnnotation`** at the chosen page rect, tagged with a new `DocumentSession.signatureAnnotationName`, and save via the existing `DocumentSession.save()`.
-  - **delete**: extend the existing tap-to-delete path — `AnnotationFactory.isUserDeletable` (or a sibling) recognizes the stamp subtype/tag → "Remove this signature?" → delete.
+  - **move / delete**: extend the existing tap-to-annotation path — `AnnotationFactory.isUserDeletable` recognizes the signature tag → a **Move / Remove** dialog. **Move** re-opens placement seeded at the current rect; **Remove** deletes. Both are v1 (user confirmed move + remove wanted at launch).
+- **Persistence RESOLVED (2026-06-22 spike):** image stamp annotations both persist *and render* across save→reload (verified: reloaded page renders the signature, center luminance 0.0). Editable-stamp model is viable as-is — no flatten / no appearance-stream injection.
 
 ## Data flow
 
@@ -63,7 +64,7 @@ SIGN A DOCUMENT (viewer "Sign")
     Cancel → discard
 
 LATER
-  tap signature → "Remove this signature?" → delete annotation → save
+  tap signature → Move (re-place, seeded at current spot) / Remove (delete) → save
 ```
 
 ## Error handling
