@@ -69,6 +69,23 @@ struct DocumentViewerView: View {
     @State private var pendingExtraction: PendingExtraction?
     @State private var extractName: String = ""
     @State private var extractError: String?
+    @State private var showingSignCapture = false
+    @State private var placement: PlacementRequest?
+    @State private var pendingSignatureEdit: SignatureEdit?
+    @State private var currentVisiblePageIndex = 0
+    private let signatureStore = SignatureStore()
+
+    private struct PlacementRequest: Identifiable {
+        let id = UUID()
+        let signature: UIImage
+        let page: PDFPage
+        let seedRect: CGRect?
+    }
+    private struct SignatureEdit: Identifiable {
+        let id = UUID()
+        let annotation: PDFAnnotation
+        let page: PDFPage
+    }
 
     /// The summary the viewer is currently displaying. Falls back to the
     /// `summary` parameter when there's no search context (single-doc nav).
@@ -153,8 +170,13 @@ struct DocumentViewerView: View {
                     applyTool(tool, to: selection, session: session)
                 },
                 onRequestDelete: { annotation, page in
-                    pendingDeletion = PendingDeletion(annotation: annotation, page: page)
-                }
+                    if annotation.userName == DocumentSession.signatureAnnotationName {
+                        pendingSignatureEdit = SignatureEdit(annotation: annotation, page: page)
+                    } else {
+                        pendingDeletion = PendingDeletion(annotation: annotation, page: page)
+                    }
+                },
+                currentPageIndex: $currentVisiblePageIndex
             )
             .ignoresSafeArea(edges: editMode ? [] : .bottom)
             .confirmationDialog(
@@ -213,6 +235,12 @@ struct DocumentViewerView: View {
             ToolbarItemGroup(placement: .bottomBar) {
                 Button(editMode ? "Done" : "Edit") { editMode.toggle() }
                     .accessibilityIdentifier("Viewer.EditToggle")
+                Button("Sign") {
+                    guard let sig = signatureStore.load() else { showingSignCapture = true; return }
+                    if let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    }
+                }
                 Spacer()
                 if let h = searchHighlight, h.matchCount > 0 {
                     Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
@@ -301,6 +329,51 @@ struct DocumentViewerView: View {
                 onDismiss: { editingPageIndex = nil }
             )
         }
+        .sheet(isPresented: $showingSignCapture) {
+            SignatureCaptureView(
+                presenter: scannerPresenter, store: signatureStore,
+                onSaved: {
+                    showingSignCapture = false
+                    if let sig = signatureStore.load(), let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    }
+                },
+                onCancel: { showingSignCapture = false }
+            )
+        }
+        .sheet(item: $placement) { req in
+            SignaturePlacementView(
+                pageImage: pageRenderForSigning(req.page),
+                signature: req.signature,
+                pageBounds: req.page.bounds(for: .mediaBox),
+                initialPageRect: req.seedRect,
+                onPlace: { rect in
+                    placeSignature(req.signature, at: rect, on: req.page, session: session)
+                    placement = nil
+                },
+                onCancel: { placement = nil }
+            )
+        }
+        .confirmationDialog("Signature", isPresented: Binding(
+            get: { pendingSignatureEdit != nil },
+            set: { if !$0 { pendingSignatureEdit = nil } }
+        ), presenting: pendingSignatureEdit) { item in
+            Button("Move") {
+                let rect = item.annotation.bounds
+                item.page.removeAnnotation(item.annotation)
+                _ = try? session.save(); annotationRevision &+= 1
+                if let sig = signatureStore.load() {
+                    placement = PlacementRequest(signature: sig, page: item.page, seedRect: rect)
+                }
+                pendingSignatureEdit = nil
+            }
+            Button("Remove", role: .destructive) {
+                item.page.removeAnnotation(item.annotation)
+                _ = try? session.save(); annotationRevision &+= 1
+                pendingSignatureEdit = nil
+            }
+            Button("Cancel", role: .cancel) { pendingSignatureEdit = nil }
+        }
         }
     }
 
@@ -362,6 +435,23 @@ struct DocumentViewerView: View {
         }
         do { try session.save() }
         catch { session.displayName = summary.displayName } // revert on failure
+    }
+
+    private func currentPageForSigning(session: DocumentSession) -> PDFPage? {
+        let idx = min(max(currentVisiblePageIndex, 0), session.pdf.pageCount - 1)
+        return session.pdf.page(at: idx)
+    }
+
+    private func pageRenderForSigning(_ page: PDFPage) -> UIImage {
+        PageImageRenderer().image(from: page) ?? UIImage()
+    }
+
+    private func placeSignature(_ image: UIImage, at rect: CGRect, on page: PDFPage, session: DocumentSession) {
+        let stamp = ImageStampAnnotation(image: image, bounds: rect,
+                                         userName: DocumentSession.signatureAnnotationName)
+        page.addAnnotation(stamp)
+        _ = try? session.save()
+        annotationRevision &+= 1
     }
 }
 
@@ -437,11 +527,25 @@ private struct PDFKitView: UIViewRepresentable {
     let annotationRevision: Int
     let onApplyTool: (AnnotationTool, PDFSelection) -> Void
     let onRequestDelete: (PDFAnnotation, PDFPage) -> Void
+    @Binding var currentPageIndex: Int
 
     /// Tag we attach to highlight annotations so we can remove the ones we
     /// added on the next update without disturbing any annotations that
     /// happened to be in the PDF already.
     private static let annotationUserName = DocumentSession.searchHighlightAnnotationName
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator {
+        let parent: PDFKitView
+        init(_ parent: PDFKitView) { self.parent = parent }
+        @objc func pageChanged(_ note: Notification) {
+            guard let view = note.object as? PDFView,
+                  let doc = view.document, let page = view.currentPage else { return }
+            let idx = doc.index(for: page)
+            if idx != parent.currentPageIndex { parent.currentPageIndex = idx }
+        }
+    }
 
     func makeUIView(context: Context) -> PDFView {
         let v = MarkupPDFView()
@@ -449,6 +553,9 @@ private struct PDFKitView: UIViewRepresentable {
         v.displayMode = .singlePageContinuous
         v.usePageViewController(false)
         v.installTapIfNeeded()
+        NotificationCenter.default.addObserver(
+            context.coordinator, selector: #selector(Coordinator.pageChanged(_:)),
+            name: .PDFViewPageChanged, object: v)
         return v
     }
 

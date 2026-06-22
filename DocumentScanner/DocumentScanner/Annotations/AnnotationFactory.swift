@@ -47,7 +47,9 @@ enum AnnotationFactory {
     /// True for marks the user created and may delete. Keyed on SUBTYPE (not the
     /// user tag) so marks loaded from disk — whose userName may not round-trip —
     /// are still recognised. In-session search highlights are excluded by tag.
+    /// Signature stamps are recognised by their explicit userName tag.
     static func isUserDeletable(_ annotation: PDFAnnotation) -> Bool {
+        if annotation.userName == DocumentSession.signatureAnnotationName { return true }
         let isMarkSubtype = annotation.type == "Highlight" || annotation.type == "StrikeOut"
         return isMarkSubtype && annotation.userName != DocumentSession.searchHighlightAnnotationName
     }
