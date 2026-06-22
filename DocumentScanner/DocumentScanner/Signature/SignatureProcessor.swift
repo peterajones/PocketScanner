@@ -51,11 +51,16 @@ struct SignatureProcessor {
             }
         }
         guard maxX >= minX, maxY >= minY else { return nil }
-        let pad = 4
-        let rx = max(0, minX - pad)
-        let ry = max(0, (h - 1 - maxY) - pad)
-        let rw = min(w - rx, (maxX - minX) + 1 + pad * 2)
-        let rh = min(h - ry, (maxY - minY) + 1 + pad * 2)
-        return CGRect(x: rx, y: ry, width: rw, height: rh)
+        // Pad evenly, then clamp the whole rect to the image extent in one step
+        // (a per-edge min() clamp would silently halve the padding when ink sits
+        // against an edge). CIImage origin is bottom-left, so flip the raster's
+        // top-left y-range when forming the rect.
+        let pad: CGFloat = 4
+        let rect = CGRect(x: CGFloat(minX) - pad,
+                          y: CGFloat(h - 1 - maxY) - pad,
+                          width: CGFloat(maxX - minX) + 1 + pad * 2,
+                          height: CGFloat(maxY - minY) + 1 + pad * 2)
+        let clamped = rect.intersection(CGRect(x: 0, y: 0, width: w, height: h))
+        return clamped.isEmpty ? nil : clamped
     }
 }

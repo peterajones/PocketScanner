@@ -36,8 +36,11 @@ final class SignatureProcessorTests: XCTestCase {
     func test_process_cropsToInkBounds() throws {
         let src = inkOnPaper(size: CGSize(width: 200, height: 200))
         let out = try XCTUnwrap(SignatureProcessor().process(src))
+        // Ink bar is 120×20 inside 200×200; cropped output hugs it (+ padding),
+        // so the height in particular must be tight — a loose bound would miss a
+        // wrong-axis crop.
         XCTAssertLessThan(out.size.width, 160)
-        XCTAssertLessThan(out.size.height, 80)
+        XCTAssertLessThan(out.size.height, 40)
     }
 
     func test_process_blankPage_returnsNil() {
