@@ -9,24 +9,36 @@ struct SignaturePicker: View {
 
     var body: some View {
         NavigationStack {
-            List(signatures) { sig in
-                Button { onPick(sig) } label: {
-                    Image(uiImage: sig.image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: 90)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
+            Group {
+                if signatures.isEmpty {
+                    ContentUnavailableView("No signatures",
+                        systemImage: "signature",
+                        description: Text("Add a signature in Settings first."))
+                } else {
+                    pickerList
                 }
-                .buttonStyle(.plain)
             }
             .navigationTitle("Choose a Signature")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { onCancel() } }
             }
+        }
+    }
+
+    private var pickerList: some View {
+        List(signatures) { sig in
+            Button { onPick(sig) } label: {
+                Image(uiImage: sig.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: 90)
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
+            }
+            .buttonStyle(.plain)
         }
     }
 }

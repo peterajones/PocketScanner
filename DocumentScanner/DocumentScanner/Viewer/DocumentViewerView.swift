@@ -249,10 +249,14 @@ struct DocumentViewerView: View {
                     .accessibilityIdentifier("Viewer.EditToggle")
                 Button("Sign") {
                     let sigs = signatureStore.all()
-                    if sigs.isEmpty { showingSignCapture = true }
-                    else if sigs.count == 1, let page = currentPageForSigning(session: session) {
-                        placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
-                                                     page: page, seedRect: nil)
+                    if sigs.isEmpty {
+                        showingSignCapture = true
+                    } else if sigs.count == 1 {
+                        // place the only signature directly (no-op if no page to sign)
+                        if let page = currentPageForSigning(session: session) {
+                            placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
+                                                         page: page, seedRect: nil)
+                        }
                     } else {
                         showingSignaturePicker = true
                     }
