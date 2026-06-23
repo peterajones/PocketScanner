@@ -5,7 +5,7 @@ struct SettingsView: View {
     @Bindable var lockSettings: AppLockSettings
     let scannerPresenter: DocumentScannerPresenting
     @State private var authError: String?
-    @State private var signatureThumbnail: UIImage?
+    @State private var signatures: [Signature] = []
     @State private var showingSignatureCapture = false
     private let signatureStore = SignatureStore()
     @AppStorage("showFolders") private var showFolders = true
@@ -41,28 +41,28 @@ struct SettingsView: View {
             }
             #endif
             Section {
-                if let signatureThumbnail {
-                    Image(uiImage: signatureThumbnail)
+                ForEach(signatures) { sig in
+                    Image(uiImage: sig.image)
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: 100)   // single frame: scales the signature up, centered
+                        .frame(maxWidth: .infinity, maxHeight: 100)
                         .padding(.vertical, 10)
-                        .background(Color.white)   // black ink on transparent — keep it visible in dark mode too
+                        .background(Color.white)   // black ink on transparent — visible in dark mode
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
                         .padding(.vertical, 4)
-                    Button("Replace Signature") { showingSignatureCapture = true }
-                    Button("Remove Signature", role: .destructive) {
-                        if let first = signatureStore.all().first { signatureStore.remove(id: first.id) }
-                        self.signatureThumbnail = signatureStore.all().first?.image
-                    }
-                } else {
-                    Button("Add Signature") { showingSignatureCapture = true }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                signatureStore.remove(id: sig.id)
+                                signatures = signatureStore.all()
+                            } label: { Label("Delete", systemImage: "trash") }
+                        }
                 }
+                Button("Add Signature") { showingSignatureCapture = true }
             } header: {
                 Text("Signature")
             } footer: {
-                Text("Scan your signature once on paper, then reuse it to sign any document.")
+                Text("Scan your signature on paper, then reuse it to sign any document. Add more than one — you'll pick which to place.")
             }
             Section("About") {
                 NavigationLink {
@@ -76,12 +76,12 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { signatureThumbnail = signatureStore.all().first?.image }
+        .onAppear { signatures = signatureStore.all() }
         .sheet(isPresented: $showingSignatureCapture) {
             SignatureCaptureView(
                 presenter: scannerPresenter,
                 store: signatureStore,
-                onSaved: { showingSignatureCapture = false; signatureThumbnail = signatureStore.all().first?.image },
+                onSaved: { showingSignatureCapture = false; signatures = signatureStore.all() },
                 onCancel: { showingSignatureCapture = false }
             )
         }
