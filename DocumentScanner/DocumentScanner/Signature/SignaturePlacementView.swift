@@ -41,6 +41,7 @@ struct SignaturePlacementView: View {
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
                 .onAppear { seedPosition(in: geo.size) }
+                .onChange(of: geo.size) { _, newSize in seedPosition(in: newSize) }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel") { onCancel() } }
                     ToolbarItem(placement: .confirmationAction) {
@@ -73,7 +74,10 @@ struct SignaturePlacementView: View {
     /// existing signature, preserve its *size* (derive scale from the original
     /// rect) but not its position.
     private func seedPosition(in container: CGSize) {
-        guard center == .zero else { return }
+        // Only seed once, and only when the geometry is real — an early
+        // .onAppear can fire with a .zero size, which would otherwise lock the
+        // signature at the top-left corner.
+        guard center == .zero, container.width > 0, container.height > 0 else { return }
         let fit = aspectFit(pageImage.size, in: container)
         center = CGPoint(x: fit.origin.x + fit.size.width / 2,
                          y: fit.origin.y + fit.size.height / 2)
