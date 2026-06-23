@@ -1,11 +1,11 @@
 import PDFKit
 import UIKit
 
-/// A stamp annotation that draws a (signature) image. Draws at runtime via the
-/// override; to survive a save→reload round-trip it must also carry a PDF
-/// appearance stream, which `draw(with:in:)` alone does not create — Task 1's
-/// spike verifies whether PDFKit persists this. Tagged so the viewer's
-/// tap-to-delete recognizes it.
+/// A stamp annotation that draws a (signature) image. The image is drawn in the
+/// override and PDFKit bakes the result into the saved PDF's appearance stream,
+/// so it persists and renders across a save→reload (verified by
+/// `SignatureAnnotationPersistenceTests`). Tagged so the viewer's tap handler
+/// recognizes it for move/remove.
 final class ImageStampAnnotation: PDFAnnotation {
     private let image: UIImage
 
@@ -18,7 +18,9 @@ final class ImageStampAnnotation: PDFAnnotation {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override func draw(with box: PDFDisplayBox, in context: CGContext) {
-        super.draw(with: box, in: context)
+        // NOTE: do NOT call super.draw() — for a `.stamp` with no appearance
+        // stream PDFKit paints a default placeholder (a bordered box with an X
+        // through it). We draw only our own image.
         guard let cg = image.cgImage else { return }
         context.saveGState()
         context.draw(cg, in: bounds)
