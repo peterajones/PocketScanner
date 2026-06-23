@@ -73,6 +73,8 @@ struct DocumentViewerView: View {
     @State private var showingSignaturePicker = false
     @State private var placement: PlacementRequest?
     @State private var pendingSignatureEdit: SignatureEdit?
+    @State private var showingMovePicker = false
+    @State private var moveTarget: SignatureEdit?
     @State private var currentVisiblePageIndex = 0
     /// Bumped only on signature add/remove/move. A signature is a custom-draw
     /// stamp painted into PDFView's cached page tile, so (unlike standard
@@ -375,6 +377,21 @@ struct DocumentViewerView: View {
                 onCancel: { showingSignaturePicker = false }
             )
         }
+        .sheet(isPresented: $showingMovePicker) {
+            SignaturePicker(
+                signatures: signatureStore.all(),
+                onPick: { sig in
+                    showingMovePicker = false
+                    if let target = moveTarget {
+                        placement = PlacementRequest(signature: sig.image, signatureID: sig.id,
+                                                     page: target.page, seedRect: target.annotation.bounds,
+                                                     replacing: target.annotation)
+                    }
+                    moveTarget = nil
+                },
+                onCancel: { showingMovePicker = false; moveTarget = nil }
+            )
+        }
         .sheet(item: $placement) { req in
             SignaturePlacementView(
                 pageImage: pageRenderForSigning(req.page),
@@ -396,15 +413,20 @@ struct DocumentViewerView: View {
             set: { if !$0 { pendingSignatureEdit = nil } }
         ), presenting: pendingSignatureEdit) { item in
             Button("Move") {
-                // Don't mutate the document yet — open placement seeded at the
-                // current spot, carrying the old annotation to remove on commit
-                // (so Cancel keeps the original). If the saved signature was
-                // cleared meanwhile, abort the move rather than lose what's placed.
-                guard let sig = signatureStore.all().first?.image else { pendingSignatureEdit = nil; return }
-                placement = PlacementRequest(signature: sig, page: item.page,
-                                             seedRect: item.annotation.bounds,
-                                             replacing: item.annotation)
-                pendingSignatureEdit = nil
+                // Re-place the SAME signature: read its id off the annotation and
+                // reload that image. If it was deleted (or has no id), fall back to
+                // the picker so the move still works.
+                let id = item.annotation.contents
+                if let sig = id.flatMap({ signatureStore.signature(withID: $0) }) {
+                    placement = PlacementRequest(signature: sig.image, signatureID: sig.id,
+                                                 page: item.page, seedRect: item.annotation.bounds,
+                                                 replacing: item.annotation)
+                    pendingSignatureEdit = nil
+                } else {
+                    moveTarget = item                 // remember what we're moving
+                    pendingSignatureEdit = nil
+                    showingMovePicker = true
+                }
             }
             Button("Remove", role: .destructive) {
                 item.page.removeAnnotation(item.annotation)
