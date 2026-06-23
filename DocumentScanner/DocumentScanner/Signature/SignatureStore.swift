@@ -35,8 +35,6 @@ struct SignatureStore {
         }
     }
 
-    var isEmpty: Bool { all().isEmpty }
-
     @discardableResult
     func add(_ image: UIImage) throws -> Signature {
         migrateLegacyIfNeeded()
