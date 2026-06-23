@@ -43,6 +43,21 @@ final class SignatureProcessorTests: XCTestCase {
         XCTAssertLessThan(out.size.height, 40)
     }
 
+    func test_process_dropsSeparatedArtifactLine() throws {
+        // A signature mass near the top + a thin full-width line near the bottom,
+        // separated by whitespace — mimics the camera band artifact from scanning
+        // a screen. The crop should keep the signature band and drop the line.
+        let src = UIGraphicsImageRenderer(size: CGSize(width: 200, height: 300)).image { ctx in
+            UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 200, height: 300))
+            UIColor.black.setFill()
+            ctx.fill(CGRect(x: 40, y: 40, width: 120, height: 60))   // signature mass
+            ctx.fill(CGRect(x: 10, y: 270, width: 180, height: 3))   // artifact line
+        }
+        let out = try XCTUnwrap(SignatureProcessor().process(src))
+        // Without the line the crop hugs the ~60px band, not the ~230px span.
+        XCTAssertLessThan(out.size.height, 120, "separated artifact line should be cropped out")
+    }
+
     func test_process_blankPage_returnsNil() {
         let blank = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 100)).image { ctx in
             UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 100, height: 100))

@@ -41,16 +41,42 @@ struct SignatureProcessor {
               let cg = context.createCGImage(image, from: extent) else { return nil }
         ctx.draw(cg, in: CGRect(x: 0, y: 0, width: w, height: h))
 
-        var minX = w, minY = h, maxX = -1, maxY = -1
+        // Per-row ink counts.
+        var rowInk = [Int](repeating: 0, count: h)
         for y in 0..<h {
-            for x in 0..<w {
-                if px[(y * w + x) * 4 + 3] > 40 {
-                    if x < minX { minX = x }; if x > maxX { maxX = x }
-                    if y < minY { minY = y }; if y > maxY { maxY = y }
-                }
+            var c = 0
+            for x in 0..<w where px[(y * w + x) * 4 + 3] > 40 { c += 1 }
+            rowInk[y] = c
+        }
+        // Group inky rows into vertical bands, merging across small gaps (so a
+        // signature's own internal whitespace doesn't split it), and keep the
+        // band with the most ink. This drops a thin line separated from the
+        // signature by a wide gap — e.g. a camera/refresh band artifact when
+        // scanning a screen — without clipping the signature's own strokes.
+        let maxGap = max(8, Int(Double(h) * 0.10))
+        var bestStart = -1, bestEnd = -1, bestInk = -1
+        var y = 0
+        while y < h {
+            guard rowInk[y] > 0 else { y += 1; continue }
+            var end = y, gap = 0, total = 0, j = y
+            while j < h {
+                if rowInk[j] > 0 { end = j; total += rowInk[j]; gap = 0 }
+                else { gap += 1; if gap > maxGap { break } }
+                j += 1
+            }
+            if total > bestInk { bestInk = total; bestStart = y; bestEnd = end }
+            y = j
+        }
+        guard bestStart >= 0 else { return nil }
+        // Column extent within the chosen band.
+        var minX = w, maxX = -1
+        for yy in bestStart...bestEnd {
+            for x in 0..<w where px[(yy * w + x) * 4 + 3] > 40 {
+                if x < minX { minX = x }; if x > maxX { maxX = x }
             }
         }
-        guard maxX >= minX, maxY >= minY else { return nil }
+        guard maxX >= minX else { return nil }
+        let minY = bestStart, maxY = bestEnd
         // Pad evenly, then clamp the whole rect to the image extent in one step
         // (a per-edge min() clamp would silently halve the padding when ink sits
         // against an edge). CIImage origin is bottom-left, so flip the raster's
