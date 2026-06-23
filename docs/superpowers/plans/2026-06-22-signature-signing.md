@@ -653,7 +653,7 @@ git commit -m "feat: Settings Signature section — capture, replace, remove"
 
 ---
 
-## Task 6: Viewer — Sign action, placement, commit, delete
+## Task 6: Viewer — Sign action, placement, commit, move/delete
 
 **Files:**
 - Modify: `DocumentScanner/DocumentScanner/Viewer/DocumentSession.swift`
@@ -698,6 +698,7 @@ struct SignaturePlacementView: View {
     let pageImage: UIImage
     let signature: UIImage
     let pageBounds: CGRect          // page.bounds(for: .mediaBox)
+    var initialPageRect: CGRect? = nil   // seed position/scale when MOVING an existing signature
     let onPlace: (CGRect) -> Void
     let onCancel: () -> Void
 
@@ -729,7 +730,7 @@ struct SignaturePlacementView: View {
                         )
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
-                .onAppear { if center == .zero { center = CGPoint(x: geo.size.width/2, y: geo.size.height/2) } }
+                .onAppear { seedPosition(in: geo.size) }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel") { onCancel() } }
                     ToolbarItem(placement: .confirmationAction) {
@@ -760,6 +761,25 @@ struct SignaturePlacementView: View {
         let ph = nh * pageBounds.height
         let py = pageBounds.minY + (1 - ny - nh) * pageBounds.height
         return CGRect(x: px, y: py, width: pw, height: ph)
+    }
+
+    /// Seed center/scale: at the existing rect when moving, else page center.
+    private func seedPosition(in container: CGSize) {
+        guard center == .zero else { return }
+        let fit = aspectFit(pageImage.size, in: container)
+        guard let r = initialPageRect else {
+            center = CGPoint(x: container.width / 2, y: container.height / 2)
+            return
+        }
+        let nx = (r.minX - pageBounds.minX) / pageBounds.width
+        let nw = r.width / pageBounds.width
+        let nh = r.height / pageBounds.height
+        let ny = 1 - (r.minY - pageBounds.minY) / pageBounds.height - nh   // flip to top-left
+        let vw = nw * fit.size.width, vh = nh * fit.size.height
+        let baseW = signatureSize(in: fit.size).width
+        scale = baseW > 0 ? vw / baseW : 1
+        center = CGPoint(x: fit.origin.x + nx * fit.size.width + vw / 2,
+                         y: fit.origin.y + ny * fit.size.height + vh / 2)
     }
 
     private func signatureSize(in fitted: CGSize) -> CGSize {
@@ -819,17 +839,46 @@ Add state and a bottom-bar **Sign** button (near the existing Edit button at lin
 
 ```swift
     @State private var showingSignCapture = false
-    @State private var placingSignature: UIImage?     // non-nil → show placement
+    @State private var placement: PlacementRequest?       // non-nil → show placement
+    @State private var pendingSignatureEdit: SignatureEdit?  // tapped a placed signature
     @State private var currentVisiblePageIndex = 0
     private let signatureStore = SignatureStore()
+
+    /// A placement session — used for both a fresh Sign and a Move (seedRect set).
+    private struct PlacementRequest: Identifiable {
+        let id = UUID()
+        let signature: UIImage
+        let page: PDFPage
+        let seedRect: CGRect?   // current rect when moving; nil when signing fresh
+    }
+    /// A tapped existing signature, offered Move / Remove.
+    private struct SignatureEdit: Identifiable {
+        let id = UUID()
+        let annotation: PDFAnnotation
+        let page: PDFPage
+    }
 ```
 
 Bottom-bar button (in the `ToolbarItemGroup(placement: .bottomBar)`):
 
 ```swift
                 Button("Sign") {
-                    if let sig = signatureStore.load() { placingSignature = sig }
-                    else { showingSignCapture = true }
+                    guard let sig = signatureStore.load() else { showingSignCapture = true; return }
+                    if let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    }
+                }
+```
+
+Route a signature tap to Move/Remove instead of the plain "Remove this mark?" dialog — in the `onRequestDelete` closure passed to `PDFKitView` (line ~156), branch by tag:
+
+```swift
+                onRequestDelete: { annotation, page in
+                    if annotation.userName == DocumentSession.signatureAnnotationName {
+                        pendingSignatureEdit = SignatureEdit(annotation: annotation, page: page)
+                    } else {
+                        pendingDeletion = PendingDeletion(annotation: annotation, page: page)
+                    }
                 }
 ```
 
@@ -839,29 +888,53 @@ Presentations (on the same view that hosts the PDF; uses the current page = page
         .sheet(isPresented: $showingSignCapture) {
             SignatureCaptureView(
                 presenter: scannerPresenter, store: signatureStore,
-                onSaved: { showingSignCapture = false; placingSignature = signatureStore.load() },
+                onSaved: {
+                    showingSignCapture = false
+                    if let sig = signatureStore.load(), let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    }
+                },
                 onCancel: { showingSignCapture = false }
             )
         }
-        .sheet(item: Binding(get: { placingSignature.map { SigImage(image: $0) } },
-                             set: { if $0 == nil { placingSignature = nil } })) { wrapper in
-            if let page = currentPageForSigning(session: session) {
-                SignaturePlacementView(
-                    pageImage: pageRenderForSigning(page),
-                    signature: wrapper.image,
-                    pageBounds: page.bounds(for: .mediaBox),
-                    onPlace: { rect in placeSignature(wrapper.image, at: rect, on: page, session: session); placingSignature = nil },
-                    onCancel: { placingSignature = nil }
-                )
+        .sheet(item: $placement) { req in
+            SignaturePlacementView(
+                pageImage: pageRenderForSigning(req.page),
+                signature: req.signature,
+                pageBounds: req.page.bounds(for: .mediaBox),
+                initialPageRect: req.seedRect,
+                onPlace: { rect in
+                    placeSignature(req.signature, at: rect, on: req.page, session: session)
+                    placement = nil
+                },
+                onCancel: { placement = nil }
+            )
+        }
+        .confirmationDialog("Signature", isPresented: Binding(
+            get: { pendingSignatureEdit != nil },
+            set: { if !$0 { pendingSignatureEdit = nil } }
+        ), presenting: pendingSignatureEdit) { item in
+            Button("Move") {
+                let rect = item.annotation.bounds                 // capture before removing
+                item.page.removeAnnotation(item.annotation)
+                _ = try? session.save(); annotationRevision &+= 1
+                if let sig = signatureStore.load() {
+                    placement = PlacementRequest(signature: sig, page: item.page, seedRect: rect)
+                }
+                pendingSignatureEdit = nil
             }
+            Button("Remove", role: .destructive) {
+                item.page.removeAnnotation(item.annotation)
+                _ = try? session.save(); annotationRevision &+= 1
+                pendingSignatureEdit = nil
+            }
+            Button("Cancel", role: .cancel) { pendingSignatureEdit = nil }
         }
 ```
 
-Helpers (add to the view; `SigImage` is a tiny Identifiable wrapper; `currentPageForSigning` returns the page the viewer is showing — reuse the viewer's existing current-page tracking, or `session.pdf.page(at: 0)` if it shows the whole doc; `pageRenderForSigning` reuses `PageImageRenderer().image(from:)`):
+Helpers (`currentPageForSigning` returns the viewed page via the tracked index; `pageRenderForSigning` reuses `PageImageRenderer().image(from:)`):
 
 ```swift
-    private struct SigImage: Identifiable { let id = UUID(); let image: UIImage }
-
     /// The page the user is currently viewing (tracked from PDFKitView). Clamped
     /// so a stale index can't trap.
     private func currentPageForSigning(session: DocumentSession) -> PDFPage? {
@@ -888,7 +961,7 @@ Helpers (add to the view; `SigImage` is a tiny Identifiable wrapper; `currentPag
 cd DocumentScanner && xcodebuild build -scheme DocumentScanner \
   -destination 'platform=iOS Simulator,name=iPhone 17' 2>&1 | tail -5
 ```
-Expected: `** BUILD SUCCEEDED **`. The existing tap-to-delete already routes any `isUserDeletable` annotation to the "Delete" confirm — verify the signature is now tappable→deletable (its title is generic "Delete"; that's fine for v1).
+Expected: `** BUILD SUCCEEDED **`. Verify a tapped signature now opens the **Move / Remove** dialog (not the plain "Remove this mark?"), and that highlights/strikethroughs still get their own delete confirm.
 
 - [ ] **Step 7: Commit**
 
@@ -897,7 +970,7 @@ git add DocumentScanner/DocumentScanner/Viewer/DocumentSession.swift \
         DocumentScanner/DocumentScanner/Annotations/AnnotationFactory.swift \
         DocumentScanner/DocumentScanner/Signature/SignaturePlacementView.swift \
         DocumentScanner/DocumentScanner/Viewer/DocumentViewerView.swift
-git commit -m "feat: sign a document — Sign action, placement, commit, delete"
+git commit -m "feat: sign a document — Sign action, placement, commit, move/remove"
 ```
 
 ---
@@ -937,8 +1010,9 @@ After Task 7: a user can scan their signature once (Settings ▸ Signature), the
 1. Settings ▸ Signature ▸ **Add Signature** → scan a signature on paper → checkerboard preview shows a clean transparent cut-out → **Save**; the thumbnail appears.
 2. Bad input (blank/blurry) → preview shows the "Couldn't read that" state → **Rescan**.
 3. Open a doc ▸ **Sign** → the signature appears → drag + pinch into place → **Done** → it's on the page.
-4. Close + reopen the doc → the signature is **still there** (persistence) → tap it → **Delete** → gone.
+4. Close + reopen the doc → the signature is **still there** (persistence) → tap it → **Move** (re-opens placement at its current spot, reposition, Done) and **Remove** (gone) both work.
 5. With no saved signature, **Sign** routes to capture first, then placement.
 6. Replace + Remove signature in Settings behave correctly.
+7. Multi-page doc: scroll to page 2, Sign → signature lands on page 2 (current-page plumbing).
 
 Ships in **v2.0 (18)** (bump `MARKETING_VERSION` 1.12→2.0, `CURRENT_PROJECT_VERSION`→18 as the usual `chore:` at archive time). The deferred items are the 2.x roadmap.

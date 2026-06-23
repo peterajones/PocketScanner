@@ -35,6 +35,10 @@ final class DocumentSession {
     /// for the same reason as above.
     nonisolated static let userAnnotationName = "DocumentScanner.userAnnotation"
 
+    /// Annotation `userName` marking a placed signature stamp. Persists across
+    /// save like user marks (not search-tagged, so save() keeps it).
+    nonisolated static let signatureAnnotationName = "DocumentScanner.signature"
+
     enum InitError: Error { case unreadablePDF }
 
     init(summary: DocumentSummary, storage: DocumentStorage) throws {

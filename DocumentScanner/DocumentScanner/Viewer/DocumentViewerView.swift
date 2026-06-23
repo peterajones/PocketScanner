@@ -69,6 +69,32 @@ struct DocumentViewerView: View {
     @State private var pendingExtraction: PendingExtraction?
     @State private var extractName: String = ""
     @State private var extractError: String?
+    @State private var showingSignCapture = false
+    @State private var placement: PlacementRequest?
+    @State private var pendingSignatureEdit: SignatureEdit?
+    @State private var currentVisiblePageIndex = 0
+    /// Bumped only on signature add/remove/move. A signature is a custom-draw
+    /// stamp painted into PDFView's cached page tile, so (unlike standard
+    /// highlights, which live in an overlay layer) removing/moving it doesn't
+    /// invalidate the tile — the stale paint lingers. PDFKitView watches this to
+    /// force a tile-clearing reload only when a signature actually changed.
+    @State private var signatureRevision = 0
+    private let signatureStore = SignatureStore()
+
+    private struct PlacementRequest: Identifiable {
+        let id = UUID()
+        let signature: UIImage
+        let page: PDFPage
+        let seedRect: CGRect?
+        /// When moving an existing signature, the annotation to remove — but only
+        /// once the user commits (taps Done), so a Cancel keeps the original.
+        var replacing: PDFAnnotation? = nil
+    }
+    private struct SignatureEdit: Identifiable {
+        let id = UUID()
+        let annotation: PDFAnnotation
+        let page: PDFPage
+    }
 
     /// The summary the viewer is currently displaying. Falls back to the
     /// `summary` parameter when there's no search context (single-doc nav).
@@ -149,12 +175,18 @@ struct DocumentViewerView: View {
                 highlightedSelections: searchHighlight?.matches ?? [],
                 currentSelection: searchHighlight?.current,
                 annotationRevision: annotationRevision,
+                signatureRevision: signatureRevision,
                 onApplyTool: { tool, selection in
                     applyTool(tool, to: selection, session: session)
                 },
                 onRequestDelete: { annotation, page in
-                    pendingDeletion = PendingDeletion(annotation: annotation, page: page)
-                }
+                    if annotation.userName == DocumentSession.signatureAnnotationName {
+                        pendingSignatureEdit = SignatureEdit(annotation: annotation, page: page)
+                    } else {
+                        pendingDeletion = PendingDeletion(annotation: annotation, page: page)
+                    }
+                },
+                currentPageIndex: $currentVisiblePageIndex
             )
             .ignoresSafeArea(edges: editMode ? [] : .bottom)
             .confirmationDialog(
@@ -213,6 +245,12 @@ struct DocumentViewerView: View {
             ToolbarItemGroup(placement: .bottomBar) {
                 Button(editMode ? "Done" : "Edit") { editMode.toggle() }
                     .accessibilityIdentifier("Viewer.EditToggle")
+                Button("Sign") {
+                    guard let sig = signatureStore.load() else { showingSignCapture = true; return }
+                    if let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    }
+                }
                 Spacer()
                 if let h = searchHighlight, h.matchCount > 0 {
                     Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
@@ -301,6 +339,56 @@ struct DocumentViewerView: View {
                 onDismiss: { editingPageIndex = nil }
             )
         }
+        .sheet(isPresented: $showingSignCapture) {
+            SignatureCaptureView(
+                presenter: scannerPresenter, store: signatureStore,
+                onSaved: {
+                    showingSignCapture = false
+                    if let sig = signatureStore.load(), let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    }
+                },
+                onCancel: { showingSignCapture = false }
+            )
+        }
+        .sheet(item: $placement) { req in
+            SignaturePlacementView(
+                pageImage: pageRenderForSigning(req.page),
+                signature: req.signature,
+                pageBounds: req.page.bounds(for: .mediaBox),
+                initialPageRect: req.seedRect,
+                onPlace: { rect in
+                    // Remove the old annotation only now, on commit — so a Cancel
+                    // above leaves the original signature untouched.
+                    if let old = req.replacing { req.page.removeAnnotation(old) }
+                    placeSignature(req.signature, at: rect, on: req.page, session: session)
+                    placement = nil
+                },
+                onCancel: { placement = nil }
+            )
+        }
+        .alert("Signature", isPresented: Binding(
+            get: { pendingSignatureEdit != nil },
+            set: { if !$0 { pendingSignatureEdit = nil } }
+        ), presenting: pendingSignatureEdit) { item in
+            Button("Move") {
+                // Don't mutate the document yet — open placement seeded at the
+                // current spot, carrying the old annotation to remove on commit
+                // (so Cancel keeps the original). If the saved signature was
+                // cleared meanwhile, abort the move rather than lose what's placed.
+                guard let sig = signatureStore.load() else { pendingSignatureEdit = nil; return }
+                placement = PlacementRequest(signature: sig, page: item.page,
+                                             seedRect: item.annotation.bounds,
+                                             replacing: item.annotation)
+                pendingSignatureEdit = nil
+            }
+            Button("Remove", role: .destructive) {
+                item.page.removeAnnotation(item.annotation)
+                _ = try? session.save(); annotationRevision &+= 1; signatureRevision &+= 1
+                pendingSignatureEdit = nil
+            }
+            Button("Cancel", role: .cancel) { pendingSignatureEdit = nil }
+        }
         }
     }
 
@@ -362,6 +450,24 @@ struct DocumentViewerView: View {
         }
         do { try session.save() }
         catch { session.displayName = summary.displayName } // revert on failure
+    }
+
+    private func currentPageForSigning(session: DocumentSession) -> PDFPage? {
+        let idx = min(max(currentVisiblePageIndex, 0), session.pdf.pageCount - 1)
+        return session.pdf.page(at: idx)
+    }
+
+    private func pageRenderForSigning(_ page: PDFPage) -> UIImage {
+        PageImageRenderer().image(from: page) ?? UIImage()
+    }
+
+    private func placeSignature(_ image: UIImage, at rect: CGRect, on page: PDFPage, session: DocumentSession) {
+        let stamp = ImageStampAnnotation(image: image, bounds: rect,
+                                         userName: DocumentSession.signatureAnnotationName)
+        page.addAnnotation(stamp)
+        _ = try? session.save()
+        annotationRevision &+= 1
+        signatureRevision &+= 1
     }
 }
 
@@ -435,13 +541,31 @@ private struct PDFKitView: UIViewRepresentable {
     let currentSelection: PDFSelection?
     /// Bumped by the parent after add/delete to force a redraw of annotations.
     let annotationRevision: Int
+    /// Bumped only when a signature stamp changes — triggers a harder, tile-cache
+    /// clearing reload (a custom-draw stamp paints into the cached page tile).
+    let signatureRevision: Int
     let onApplyTool: (AnnotationTool, PDFSelection) -> Void
     let onRequestDelete: (PDFAnnotation, PDFPage) -> Void
+    @Binding var currentPageIndex: Int
 
     /// Tag we attach to highlight annotations so we can remove the ones we
     /// added on the next update without disturbing any annotations that
     /// happened to be in the PDF already.
     private static let annotationUserName = DocumentSession.searchHighlightAnnotationName
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator {
+        var parent: PDFKitView
+        var lastSignatureRevision = 0
+        init(_ parent: PDFKitView) { self.parent = parent }
+        @objc func pageChanged(_ note: Notification) {
+            guard let view = note.object as? PDFView,
+                  let doc = view.document, let page = view.currentPage else { return }
+            let idx = doc.index(for: page)
+            if idx != parent.currentPageIndex { parent.currentPageIndex = idx }
+        }
+    }
 
     func makeUIView(context: Context) -> PDFView {
         let v = MarkupPDFView()
@@ -449,10 +573,18 @@ private struct PDFKitView: UIViewRepresentable {
         v.displayMode = .singlePageContinuous
         v.usePageViewController(false)
         v.installTapIfNeeded()
+        NotificationCenter.default.addObserver(
+            context.coordinator, selector: #selector(Coordinator.pageChanged(_:)),
+            name: .PDFViewPageChanged, object: v)
         return v
     }
 
+    static func dismantleUIView(_ view: PDFView, coordinator: Coordinator) {
+        NotificationCenter.default.removeObserver(coordinator, name: .PDFViewPageChanged, object: view)
+    }
+
     func updateUIView(_ view: PDFView, context: Context) {
+        context.coordinator.parent = self    // keep the coordinator's binding current
         guard let view = view as? MarkupPDFView else { return }
         view.onMark = onApplyTool
         view.onTapAnnotation = onRequestDelete
@@ -473,6 +605,20 @@ private struct PDFKitView: UIViewRepresentable {
         // forces a refresh; we keep it unconditional rather than gated on
         // `view.document !== document` so highlight edits flow through.
         view.document = document
+
+        // A removed/moved signature is a custom-draw stamp baked into PDFView's
+        // cached page tile, which the reassignment above does NOT invalidate
+        // (standard highlights live in an overlay layer and refresh fine). When
+        // a signature actually changed, force a tile-clearing reload by nil'ing
+        // the document first, then restore the viewed page so scroll doesn't jump
+        // to the top. Gated so ordinary highlight edits don't pay this cost.
+        if signatureRevision != context.coordinator.lastSignatureRevision {
+            context.coordinator.lastSignatureRevision = signatureRevision
+            let page = view.currentPage
+            view.document = nil
+            view.document = document
+            if let page { view.go(to: page) }
+        }
 
         if let currentSelection {
             view.go(to: currentSelection)
