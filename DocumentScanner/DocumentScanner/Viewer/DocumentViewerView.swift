@@ -70,6 +70,7 @@ struct DocumentViewerView: View {
     @State private var extractName: String = ""
     @State private var extractError: String?
     @State private var showingSignCapture = false
+    @State private var showingSignaturePicker = false
     @State private var placement: PlacementRequest?
     @State private var pendingSignatureEdit: SignatureEdit?
     @State private var currentVisiblePageIndex = 0
@@ -84,6 +85,7 @@ struct DocumentViewerView: View {
     private struct PlacementRequest: Identifiable {
         let id = UUID()
         let signature: UIImage
+        var signatureID: String? = nil    // which saved signature this came from (for Move)
         let page: PDFPage
         let seedRect: CGRect?
         /// When moving an existing signature, the annotation to remove — but only
@@ -246,9 +248,13 @@ struct DocumentViewerView: View {
                 Button(editMode ? "Done" : "Edit") { editMode.toggle() }
                     .accessibilityIdentifier("Viewer.EditToggle")
                 Button("Sign") {
-                    guard let sig = signatureStore.all().first?.image else { showingSignCapture = true; return }
-                    if let page = currentPageForSigning(session: session) {
-                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    let sigs = signatureStore.all()
+                    if sigs.isEmpty { showingSignCapture = true }
+                    else if sigs.count == 1, let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
+                                                     page: page, seedRect: nil)
+                    } else {
+                        showingSignaturePicker = true
                     }
                 }
                 Spacer()
@@ -344,11 +350,25 @@ struct DocumentViewerView: View {
                 presenter: scannerPresenter, store: signatureStore,
                 onSaved: {
                     showingSignCapture = false
-                    if let sig = signatureStore.all().first?.image, let page = currentPageForSigning(session: session) {
-                        placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
+                    if let sig = signatureStore.all().first, let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig.image, signatureID: sig.id,
+                                                     page: page, seedRect: nil)
                     }
                 },
                 onCancel: { showingSignCapture = false }
+            )
+        }
+        .sheet(isPresented: $showingSignaturePicker) {
+            SignaturePicker(
+                signatures: signatureStore.all(),
+                onPick: { sig in
+                    showingSignaturePicker = false
+                    if let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sig.image, signatureID: sig.id,
+                                                     page: page, seedRect: nil)
+                    }
+                },
+                onCancel: { showingSignaturePicker = false }
             )
         }
         .sheet(item: $placement) { req in
@@ -361,7 +381,7 @@ struct DocumentViewerView: View {
                     // Remove the old annotation only now, on commit — so a Cancel
                     // above leaves the original signature untouched.
                     if let old = req.replacing { req.page.removeAnnotation(old) }
-                    placeSignature(req.signature, at: rect, on: req.page, session: session)
+                    placeSignature(req.signature, id: req.signatureID, at: rect, on: req.page, session: session)
                     placement = nil
                 },
                 onCancel: { placement = nil }
@@ -461,9 +481,10 @@ struct DocumentViewerView: View {
         PageImageRenderer().image(from: page) ?? UIImage()
     }
 
-    private func placeSignature(_ image: UIImage, at rect: CGRect, on page: PDFPage, session: DocumentSession) {
+    private func placeSignature(_ image: UIImage, id: String?, at rect: CGRect, on page: PDFPage, session: DocumentSession) {
         let stamp = ImageStampAnnotation(image: image, bounds: rect,
                                          userName: DocumentSession.signatureAnnotationName)
+        stamp.contents = id    // remember which saved signature this is, for Move
         page.addAnnotation(stamp)
         _ = try? session.save()
         annotationRevision &+= 1
