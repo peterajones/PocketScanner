@@ -42,11 +42,15 @@ struct SettingsView: View {
             #endif
             Section {
                 if let signatureThumbnail {
-                    HStack {
-                        Image(uiImage: signatureThumbnail).resizable().scaledToFit()
-                            .frame(height: 40)
-                        Spacer()
-                    }
+                    Image(uiImage: signatureThumbnail)
+                        .resizable().scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 72)
+                        .padding(8)
+                        .background(Color.white)   // black ink on transparent — keep it visible in dark mode too
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray4)))
+                        .padding(.vertical, 4)
                     Button("Replace Signature") { showingSignatureCapture = true }
                     Button("Remove Signature", role: .destructive) {
                         signatureStore.clear(); self.signatureThumbnail = nil
