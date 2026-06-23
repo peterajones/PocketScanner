@@ -75,7 +75,7 @@ struct SignatureCaptureView: View {
 
     private func save() {
         guard let processed else { return }
-        try? store.save(processed)
+        _ = try? store.add(processed)
         onSaved()
     }
 }

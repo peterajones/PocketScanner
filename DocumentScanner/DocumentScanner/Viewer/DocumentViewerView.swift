@@ -246,7 +246,7 @@ struct DocumentViewerView: View {
                 Button(editMode ? "Done" : "Edit") { editMode.toggle() }
                     .accessibilityIdentifier("Viewer.EditToggle")
                 Button("Sign") {
-                    guard let sig = signatureStore.load() else { showingSignCapture = true; return }
+                    guard let sig = signatureStore.all().first?.image else { showingSignCapture = true; return }
                     if let page = currentPageForSigning(session: session) {
                         placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
                     }
@@ -344,7 +344,7 @@ struct DocumentViewerView: View {
                 presenter: scannerPresenter, store: signatureStore,
                 onSaved: {
                     showingSignCapture = false
-                    if let sig = signatureStore.load(), let page = currentPageForSigning(session: session) {
+                    if let sig = signatureStore.all().first?.image, let page = currentPageForSigning(session: session) {
                         placement = PlacementRequest(signature: sig, page: page, seedRect: nil)
                     }
                 },
@@ -376,7 +376,7 @@ struct DocumentViewerView: View {
                 // current spot, carrying the old annotation to remove on commit
                 // (so Cancel keeps the original). If the saved signature was
                 // cleared meanwhile, abort the move rather than lose what's placed.
-                guard let sig = signatureStore.load() else { pendingSignatureEdit = nil; return }
+                guard let sig = signatureStore.all().first?.image else { pendingSignatureEdit = nil; return }
                 placement = PlacementRequest(signature: sig, page: item.page,
                                              seedRect: item.annotation.bounds,
                                              replacing: item.annotation)

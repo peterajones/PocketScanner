@@ -53,7 +53,8 @@ struct SettingsView: View {
                         .padding(.vertical, 4)
                     Button("Replace Signature") { showingSignatureCapture = true }
                     Button("Remove Signature", role: .destructive) {
-                        signatureStore.clear(); self.signatureThumbnail = nil
+                        if let first = signatureStore.all().first { signatureStore.remove(id: first.id) }
+                        self.signatureThumbnail = signatureStore.all().first?.image
                     }
                 } else {
                     Button("Add Signature") { showingSignatureCapture = true }
@@ -75,12 +76,12 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { signatureThumbnail = signatureStore.load() }
+        .onAppear { signatureThumbnail = signatureStore.all().first?.image }
         .sheet(isPresented: $showingSignatureCapture) {
             SignatureCaptureView(
                 presenter: scannerPresenter,
                 store: signatureStore,
-                onSaved: { showingSignatureCapture = false; signatureThumbnail = signatureStore.load() },
+                onSaved: { showingSignatureCapture = false; signatureThumbnail = signatureStore.all().first?.image },
                 onCancel: { showingSignatureCapture = false }
             )
         }
