@@ -367,7 +367,7 @@ struct DocumentViewerView: View {
                 onCancel: { placement = nil }
             )
         }
-        .confirmationDialog("Signature", isPresented: Binding(
+        .alert("Signature", isPresented: Binding(
             get: { pendingSignatureEdit != nil },
             set: { if !$0 { pendingSignatureEdit = nil } }
         ), presenting: pendingSignatureEdit) { item in
