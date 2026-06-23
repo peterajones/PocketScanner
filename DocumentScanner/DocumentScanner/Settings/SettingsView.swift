@@ -43,13 +43,13 @@ struct SettingsView: View {
             Section {
                 if let signatureThumbnail {
                     Image(uiImage: signatureThumbnail)
-                        .resizable().scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 72)
-                        .padding(8)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: 100)   // single frame: scales the signature up, centered
+                        .padding(.vertical, 10)
                         .background(Color.white)   // black ink on transparent — keep it visible in dark mode too
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray4)))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
                         .padding(.vertical, 4)
                     Button("Replace Signature") { showingSignatureCapture = true }
                     Button("Remove Signature", role: .destructive) {
