@@ -19,6 +19,10 @@ struct SingleShotCameraScanner: DocumentScannerPresenting {
 
         let picker = UIImagePickerController()
         picker.sourceType = .camera
+        // Restores a crop: after the shutter, the native Move & Scale screen lets
+        // you zoom/position onto the signature before Use Photo (returns
+        // `.editedImage`). The band-crop in SignatureProcessor tightens further.
+        picker.allowsEditing = true
         let coordinator = Coordinator(onFinish: onFinish, onCancel: onCancel)
         picker.delegate = coordinator
         // Keep the coordinator alive for the controller's lifetime (same pattern
@@ -39,7 +43,9 @@ struct SingleShotCameraScanner: DocumentScannerPresenting {
 
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let image = info[.originalImage] as? UIImage {
+            // Prefer the cropped result from Move & Scale; fall back to the full
+            // photo if editing produced nothing.
+            if let image = (info[.editedImage] as? UIImage) ?? (info[.originalImage] as? UIImage) {
                 onFinish([image])
             } else {
                 onCancel()

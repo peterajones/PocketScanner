@@ -16,8 +16,12 @@ the friction where `VNDocumentCameraViewController` keeps auto-capturing until y
 - **Signature-only.** Document scanning stays the multi-page `VNDocumentCameraViewController`
   (unchanged) — documents are genuinely multi-page. There is **no user toggle**; the capture mode
   is implied by the task ("Add Signature" → single-shot; "Scan Document" → multi-page).
-- **No crop step.** Rely on `SignatureProcessor` (B&W → key white→alpha → largest-ink-band crop,
-  which drops separated background) + the existing **Rescan** button for bad framing.
+- **Crop step: native Move & Scale.** *(Revised 2026-06-24 during device testing — the original
+  "no crop step" decision wasn't enough in practice.)* `UIImagePickerController.allowsEditing = true`
+  shows Apple's standard move/zoom crop right after the shutter (returns `.editedImage`); the
+  `SignatureProcessor` band-crop then tightens further. The crop frame is a fixed square — you zoom
+  onto the signature and let the band-crop finish. A custom wide-aspect crop was considered and
+  declined as too "editor-y" for a one-line native win.
 - **No "Choose from Photos."** Most people don't keep signature photos in their library; the camera
   is the universal path. A photo picker stays a clean future follow-up if demand appears.
 - **No perspective correction.** `VNDocumentCamera` auto-dewarped; the single-shot photo won't be.
@@ -60,7 +64,7 @@ are unchanged.** Document-scan call sites are untouched.
 ```
 Add Signature (Settings or viewer first-run)
   → SignatureCaptureView(presenter: SingleShotCameraScanner(), store:)
-  → UIImagePickerController(.camera): shutter → Use Photo → onFinish([photo])
+  → UIImagePickerController(.camera, allowsEditing): shutter → Move & Scale → Use Photo → onFinish([photo])
   → SignatureProcessor.process(photo) → preview (Save / Rescan / Cancel)   [unchanged]
 ```
 
@@ -91,6 +95,6 @@ Add Signature (Settings or viewer first-run)
 ## Non-goals
 
 - Any change to document scanning (stays multi-page) or a single/multi toggle.
-- A manual crop step.
+- A *custom* crop step (the native Move & Scale crop is used instead — see Scope decisions).
 - "Choose from Photos" / a photo-library import path.
 - Perspective correction of the single-shot photo.
