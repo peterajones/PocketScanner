@@ -1,9 +1,15 @@
 # Spec: Single-shot signature capture
 
 **Date:** 2026-06-24
-**Status:** Approved (design) — ready for implementation plan
+**Status:** IN PROGRESS on branch `single-shot-signature-capture` (not merged) — see Implementation status below.
 **Roadmap origin:** Signing follow-up ("single-shot signature capture" candidate).
 **Target release:** v2.1 (the next release after v2.0; build on a feature branch so `main` stays v2.0).
+
+## Implementation status (2026-06-24, end of day)
+
+- ✅ **Single-shot camera** — `Capture/SingleShotCameraScanner.swift` (conforms to `DocumentScannerPresenting`); both `SignatureCaptureView` call sites swapped; dead `scannerPresenter` removed from `SettingsView`. Commit `a35fd41`. Verified on device. Manual shutter (no auto-capture) is intended — user confirmed.
+- ✅ **Orientation fix** — `SignatureProcessor` read `.cgImage` and dropped `imageOrientation`; a portrait `UIImagePickerController` capture (`.right`) saved rotated. `normalizedUp()` redraws to `.up` first. Regression test `test_process_honorsImageOrientation`. Commit `7eac7ad`. User confirmed upright.
+- ⏳ **Crop step (OPEN)** — native Move & Scale via `allowsEditing = true`, prefers `.editedImage`. Commit `7f9c829`. **User reported "it doesn't look right"; exact symptom not yet captured.** Leading hypothesis: the fixed-square crop frame is wrong for a wide signature. Resume: confirm the symptom, then accept square / build the custom wide-aspect crop / drop the crop step.
 
 ## Goal
 
