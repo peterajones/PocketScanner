@@ -66,6 +66,23 @@ final class SignatureAnnotationPersistenceTests: XCTestCase {
             "Image stamp annotation did not survive the PDF data round-trip — editable-stamp model is not viable as-is; escalate for the flatten fallback.")
     }
 
+    func test_signatureID_inContents_survivesRoundTrip() throws {
+        let pdf = PDFDocument(); let page = PDFPage(); pdf.insert(page, at: 0)
+        let stamp = ImageStampAnnotation(
+            image: solidImage(.black, CGSize(width: 80, height: 30)),
+            bounds: CGRect(x: 20, y: 20, width: 80, height: 30),
+            userName: "DocumentScanner.signature")
+        stamp.contents = "sig-id-123"
+        page.addAnnotation(stamp)
+
+        let data = try XCTUnwrap(pdf.dataRepresentation())
+        let reloaded = try XCTUnwrap(PDFDocument(data: data))
+        let anno = try XCTUnwrap(reloaded.page(at: 0)?.annotations.first {
+            $0.userName == "DocumentScanner.signature"
+        })
+        XCTAssertEqual(anno.contents, "sig-id-123", "signature id must survive in contents for Move")
+    }
+
     // MARK: - Visual render spike
 
     /// Empirically determines whether the image drawn by ImageStampAnnotation's
