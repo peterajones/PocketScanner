@@ -26,7 +26,7 @@ struct SignatureCaptureView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 200)
                             .padding()
-                        Text("Tip: a bold pen on a plain sheet gives the cleanest cut-out.")
+                        Text("Tip: a bold pen on a plain sheet gives the cleanest results.")
                             .font(.footnote).foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
