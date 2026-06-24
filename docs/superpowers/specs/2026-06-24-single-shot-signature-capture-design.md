@@ -9,7 +9,8 @@
 
 - ✅ **Single-shot camera** — `Capture/SingleShotCameraScanner.swift` (conforms to `DocumentScannerPresenting`); both `SignatureCaptureView` call sites swapped; dead `scannerPresenter` removed from `SettingsView`. Commit `a35fd41`. Verified on device. Manual shutter (no auto-capture) is intended — user confirmed.
 - ✅ **Orientation fix** — `SignatureProcessor` read `.cgImage` and dropped `imageOrientation`; a portrait `UIImagePickerController` capture (`.right`) saved rotated. `normalizedUp()` redraws to `.up` first. Regression test `test_process_honorsImageOrientation`. Commit `7eac7ad`. User confirmed upright.
-- ⏳ **Crop step (OPEN)** — native Move & Scale via `allowsEditing = true`, prefers `.editedImage`. Commit `7f9c829`. **User reported "it doesn't look right"; exact symptom not yet captured.** Leading hypothesis: the fixed-square crop frame is wrong for a wide signature. Resume: confirm the symptom, then accept square / build the custom wide-aspect crop / drop the crop step.
+- ✅ **Crop step** — native Move & Scale via `allowsEditing = true`, prefers `.editedImage`. Commit `7f9c829`. Works; not the problem (see below).
+- ⏳ **Uneven-lighting halo (OPEN — real issue) —** the saved signature shows a faint **radial gradient / vignette around the signature** that the old path never had. Root cause: `VNDocumentCameraViewController` (the old "auto-select") does document *enhancement* — it flattens the page to uniform white (shadow/vignette removal) before returning the image. `UIImagePickerController` returns a **raw** photo with natural lighting falloff (center brighter than edges). `SignatureProcessor` keys near-white paper to transparent, but the darker gradient edges don't reach white, so they survive as a halo. **This is a `SignatureProcessor` gap, not a crop gap.** Resume: add background normalization before keying — e.g. flat-field correction (divide by a heavily-blurred copy of the image to estimate and cancel the lighting), or an adaptive/local threshold (`CIDocumentEnhancer` if usable, or a homemade local-mean threshold). Must not eat faint signature strokes. Add a regression test with a synthetic vignette background.
 
 ## Goal
 
@@ -50,7 +51,7 @@ protocol DocumentScannerPresenting {
 - Wraps **`UIImagePickerController`** with `sourceType = .camera` (a single-photo camera: shutter →
   Retake / Use Photo → returns one image; no batch, no "tap fast").
 - A `Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate`:
-  - `didFinishPickingMediaWithInfo` → take the `.originalImage` → `onFinish([image])`.
+  - `didFinishPickingMediaWithInfo` → take the cropped `.editedImage` (fallback `.originalImage`) → `onFinish([image])`.
   - `imagePickerControllerDidCancel` → `onCancel()`.
 - **Camera availability guard:** if `!UIImagePickerController.isSourceTypeAvailable(.camera)`
   (e.g. simulator), the presenter calls `onCancel()` rather than presenting (signature capture is
