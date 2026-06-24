@@ -26,8 +26,11 @@ struct SignatureCaptureView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 200)
                             .padding()
-                        Text("Looks good? Save it to reuse on any document.")
+                        Text("Tip: a bold pen on a plain sheet gives the cleanest cut-out.")
                             .font(.footnote).foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                        Button("Rescan") { showingScanner = true }
                     }
                 } else if processingFailed {
                     ContentUnavailableView("Couldn't read that",
