@@ -353,7 +353,7 @@ struct DocumentViewerView: View {
         }
         .sheet(isPresented: $showingSignCapture) {
             SignatureCaptureView(
-                presenter: scannerPresenter, store: signatureStore,
+                presenter: SingleShotCameraScanner(), store: signatureStore,
                 onSaved: {
                     showingSignCapture = false
                     if let sig = signatureStore.all().first, let page = currentPageForSigning(session: session) {
