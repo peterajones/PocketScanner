@@ -58,6 +58,21 @@ final class SignatureProcessorTests: XCTestCase {
         XCTAssertLessThan(out.size.height, 120, "separated artifact line should be cropped out")
     }
 
+    func test_process_honorsImageOrientation() throws {
+        // A raw portrait buffer with a VERTICAL ink bar, tagged `.right` like a
+        // portrait camera capture (UIImagePickerController). Displayed upright,
+        // the bar is HORIZONTAL — so the crop must come out wide. If orientation
+        // were ignored (processing the raw buffer), the crop would be tall.
+        let raw = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 200)).image { ctx in
+            UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 100, height: 200))
+            UIColor.black.setFill(); ctx.fill(CGRect(x: 40, y: 40, width: 20, height: 120))
+        }
+        let oriented = UIImage(cgImage: raw.cgImage!, scale: raw.scale, orientation: .right)
+        let out = try XCTUnwrap(SignatureProcessor().process(oriented))
+        XCTAssertGreaterThan(out.size.width, out.size.height,
+            "output must reflect the displayed (oriented) image, not the raw buffer")
+    }
+
     func test_process_blankPage_returnsNil() {
         let blank = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 100)).image { ctx in
             UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 100, height: 100))

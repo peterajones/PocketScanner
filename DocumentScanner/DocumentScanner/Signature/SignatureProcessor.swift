@@ -10,7 +10,12 @@ struct SignatureProcessor {
     private let filterEngine = ImageFilterEngine()
 
     func process(_ scanned: UIImage) -> UIImage? {
-        let bw = filterEngine.apply(.blackAndWhite, to: scanned) ?? scanned
+        // Normalize to `.up` first. `cgImage` below reads the raw pixel buffer and
+        // drops `imageOrientation`; the document scanner always handed back upright
+        // images, but UIImagePickerController tags a portrait capture `.right`, so
+        // without this the ink would be processed sideways. Bake the rotation in.
+        let upright = normalizedUp(scanned)
+        let bw = filterEngine.apply(.blackAndWhite, to: upright) ?? upright
         guard let cg = bw.cgImage else { return nil }
         let input = CIImage(cgImage: cg)
 
@@ -26,7 +31,20 @@ struct SignatureProcessor {
 
         guard let crop = inkBounds(of: blackInk), !crop.isEmpty else { return nil }
         guard let outCG = context.createCGImage(blackInk, from: crop) else { return nil }
-        return UIImage(cgImage: outCG, scale: scanned.scale, orientation: .up)
+        return UIImage(cgImage: outCG, scale: upright.scale, orientation: .up)
+    }
+
+    /// Redraw `image` so its pixels are upright and `imageOrientation` is `.up`.
+    /// `image.size` is already in display (oriented) coordinates and `draw(in:)`
+    /// honors orientation, so the rendered result needs no metadata correction.
+    private func normalizedUp(_ image: UIImage) -> UIImage {
+        guard image.imageOrientation != .up else { return image }
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = image.scale
+        format.opaque = false
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+        }
     }
 
     private func inkBounds(of image: CIImage) -> CGRect? {
