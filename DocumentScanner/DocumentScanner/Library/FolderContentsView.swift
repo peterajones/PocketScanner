@@ -22,6 +22,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var folders: [URL] = []
     @State private var folderActionError: String?
     @State private var docBeingDeleted: DocumentSummary?
+    @State private var mergePlan: MergePlan?
+    @State private var mergeError: String?
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
     @AppStorage("libraryUsesGrid") private var usesGrid = false
@@ -78,6 +80,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         } message: { summary in
             Text("This will permanently remove \"\(summary.displayName).pdf\".")
         }
+        .modifier(MergeAlerts(mergePlan: $mergePlan, mergeError: $mergeError,
+                              mergeAction: mergeDocument))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 SortMenu(sort: sort, onSelect: selectSort)
@@ -153,6 +157,16 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         }
     }
 
+    private func mergeDocument(_ source: DocumentSummary, into target: DocumentSummary) {
+        do {
+            try DocumentMerge.merge(source: source.url, into: target.url,
+                                    targetName: target.displayName)
+            store.refresh()
+        } catch {
+            mergeError = "Couldn't merge \"\(source.displayName)\" into \"\(target.displayName)\". Please try again."
+        }
+    }
+
     private var sort: DocumentSort {
         DocumentSort(key: SortKey(rawValue: sortKeyRaw) ?? .date, ascending: sortAscending)
     }
@@ -180,6 +194,11 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 root: storage.documentsURL,
                 folders: folders,
                 move: { moveDocument(summary, to: $0) }
+            )
+            MergeIntoMenu(
+                source: summary,
+                candidates: MergeCandidates.list(source: summary, all: store.summaries),
+                merge: { target in mergePlan = MergePlan(source: summary, target: target) }
             )
             Button(role: .destructive) {
                 docBeingDeleted = summary

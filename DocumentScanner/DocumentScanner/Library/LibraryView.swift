@@ -22,6 +22,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var renameFolderName = ""
     @State private var folderBeingDeleted: URL?
     @State private var docBeingDeleted: DocumentSummary?
+    @State private var mergePlan: MergePlan?
+    @State private var mergeError: String?
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
@@ -206,6 +208,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             } message: { summary in
                 Text("This will permanently remove \"\(summary.displayName).pdf\".")
             }
+            .modifier(MergeAlerts(mergePlan: $mergePlan, mergeError: $mergeError,
+                                   mergeAction: mergeDocument))
             .task { refreshFolders() }
             .onChange(of: path.count) { oldCount, newCount in
                 // Re-scan when navigation pops back toward the library. The
@@ -266,6 +270,11 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     move: { moveDocument(summary, to: $0) }
                 )
             }
+            MergeIntoMenu(
+                source: summary,
+                candidates: MergeCandidates.list(source: summary, all: store.summaries),
+                merge: { target in mergePlan = MergePlan(source: summary, target: target) }
+            )
             Button(role: .destructive) {
                 docBeingDeleted = summary
             } label: {
@@ -489,6 +498,16 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         }
     }
 
+    private func mergeDocument(_ source: DocumentSummary, into target: DocumentSummary) {
+        do {
+            try DocumentMerge.merge(source: source.url, into: target.url,
+                                    targetName: target.displayName)
+            store.refresh()
+        } catch {
+            mergeError = "Couldn't merge \"\(source.displayName)\" into \"\(target.displayName)\". Please try again."
+        }
+    }
+
     private func renameFolder() {
         guard let folder = folderBeingRenamed else { return }
         let trimmed = renameFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -522,3 +541,4 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         }
     }
 }
+
