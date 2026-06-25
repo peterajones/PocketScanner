@@ -1,6 +1,13 @@
 import SwiftUI
 import PDFKit
 
+/// A pending merge awaiting confirmation: `source` will be absorbed into
+/// `target`, then deleted.
+private struct MergePlan {
+    let source: DocumentSummary
+    let target: DocumentSummary
+}
+
 struct LibraryView<Store: LibraryStoring & Observable>: View {
     @Bindable var store: Store
 
@@ -22,6 +29,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var renameFolderName = ""
     @State private var folderBeingDeleted: URL?
     @State private var docBeingDeleted: DocumentSummary?
+    @State private var mergePlan: MergePlan?
+    @State private var mergeError: String?
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("sortKey") private var sortKeyRaw = SortKey.date.rawValue
     @AppStorage("sortAscending") private var sortAscending = false
@@ -206,6 +215,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             } message: { summary in
                 Text("This will permanently remove \"\(summary.displayName).pdf\".")
             }
+            .modifier(MergeAlerts(mergePlan: $mergePlan, mergeError: $mergeError,
+                                   mergeAction: mergeDocument))
             .task { refreshFolders() }
             .onChange(of: path.count) { oldCount, newCount in
                 // Re-scan when navigation pops back toward the library. The
@@ -266,6 +277,11 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     move: { moveDocument(summary, to: $0) }
                 )
             }
+            MergeIntoMenu(
+                source: summary,
+                candidates: MergeCandidates.list(source: summary, all: store.summaries),
+                merge: { target in mergePlan = MergePlan(source: summary, target: target) }
+            )
             Button(role: .destructive) {
                 docBeingDeleted = summary
             } label: {
@@ -489,6 +505,16 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         }
     }
 
+    private func mergeDocument(_ source: DocumentSummary, into target: DocumentSummary) {
+        do {
+            try DocumentMerge.merge(source: source.url, into: target.url,
+                                    targetName: target.displayName, using: storage)
+            store.refresh()
+        } catch {
+            mergeError = "Couldn't merge \"\(source.displayName)\" into \"\(target.displayName)\". Please try again."
+        }
+    }
+
     private func renameFolder() {
         guard let folder = folderBeingRenamed else { return }
         let trimmed = renameFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -520,5 +546,42 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         return !store.summaries.contains {
             $0.url.deletingLastPathComponent().standardizedFileURL.path == path
         }
+    }
+}
+
+// MARK: - Merge alerts modifier
+
+/// Pulled out of `LibraryView.body` to reduce type-checker complexity.
+private struct MergeAlerts: ViewModifier {
+    @Binding var mergePlan: MergePlan?
+    @Binding var mergeError: String?
+    let mergeAction: (DocumentSummary, DocumentSummary) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .alert(
+                "Merge \"\(mergePlan?.source.displayName ?? "")\" into \"\(mergePlan?.target.displayName ?? "")\"?",
+                isPresented: Binding(
+                    get: { mergePlan != nil },
+                    set: { if !$0 { mergePlan = nil } }
+                ),
+                presenting: mergePlan
+            ) { plan in
+                Button("Merge") { mergeAction(plan.source, plan.target) }
+                Button("Cancel", role: .cancel) {}
+            } message: { plan in
+                Text("\"\(plan.source.displayName)\"'s pages will be added to the end of \"\(plan.target.displayName)\", and \"\(plan.source.displayName)\" will be deleted.")
+            }
+            .alert(
+                "Couldn't merge",
+                isPresented: Binding(
+                    get: { mergeError != nil },
+                    set: { if !$0 { mergeError = nil } }
+                )
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(mergeError ?? "")
+            }
     }
 }
