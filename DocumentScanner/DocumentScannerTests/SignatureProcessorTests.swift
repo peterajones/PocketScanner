@@ -58,6 +58,34 @@ final class SignatureProcessorTests: XCTestCase {
         XCTAssertLessThan(out.size.height, 120, "separated artifact line should be cropped out")
     }
 
+    /// Ink on paper lit unevenly: a left→right brightness ramp from white to
+    /// mid-grey, like a raw camera photo's lighting falloff. The old document
+    /// scanner flattened this; a raw single-shot photo doesn't.
+    private func unevenlyLitInk(size: CGSize = CGSize(width: 240, height: 120)) -> UIImage {
+        UIGraphicsImageRenderer(size: size).image { ctx in
+            let cg = ctx.cgContext
+            let grad = CGGradient(colorsSpace: CGColorSpaceCreateDeviceGray(),
+                                  colors: [UIColor(white: 1.0, alpha: 1).cgColor,
+                                           UIColor(white: 0.5, alpha: 1).cgColor] as CFArray,
+                                  locations: [0, 1])!
+            cg.drawLinearGradient(grad, start: CGPoint(x: 0, y: 0),
+                                  end: CGPoint(x: size.width, y: 0), options: [])
+            UIColor.black.setFill()
+            cg.fill(CGRect(x: 20, y: 52, width: 200, height: 16))
+        }
+    }
+
+    func test_process_flattensUnevenLighting_noHalo() throws {
+        let out = try XCTUnwrap(SignatureProcessor().process(unevenlyLitInk()))
+        let w = out.cgImage!.width, h = out.cgImage!.height
+        // Ink stays opaque.
+        XCTAssertGreaterThan(alpha(of: out, atX: w / 2, y: h / 2), 0.8, "ink should stay opaque")
+        // The dim (right) side's paper, just above the ink, must key fully to
+        // transparent — without flat-fielding it survives as a grey halo.
+        XCTAssertLessThan(alpha(of: out, atX: w - 3, y: 2), 0.2,
+            "dim-side paper must be transparent, not a halo")
+    }
+
     func test_process_honorsImageOrientation() throws {
         // A raw portrait buffer with a VERTICAL ink bar, tagged `.right` like a
         // portrait camera capture (UIImagePickerController). Displayed upright,

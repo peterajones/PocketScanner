@@ -3,11 +3,11 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 /// Turns a scanned signature (dark ink on light paper) into a tight transparent
-/// cut-out: Black & White → key the paper to alpha → crop to the ink bounds.
+/// cut-out: flatten uneven lighting → Black & White → key the paper to alpha →
+/// crop to the ink bounds.
 /// Pure: same input → same output; no I/O. Returns nil when there's no ink.
 struct SignatureProcessor {
     private let context = CIContext()
-    private let filterEngine = ImageFilterEngine()
 
     func process(_ scanned: UIImage) -> UIImage? {
         // Normalize to `.up` first. `cgImage` below reads the raw pixel buffer and
@@ -15,11 +15,15 @@ struct SignatureProcessor {
         // images, but UIImagePickerController tags a portrait capture `.right`, so
         // without this the ink would be processed sideways. Bake the rotation in.
         let upright = normalizedUp(scanned)
-        let bw = filterEngine.apply(.blackAndWhite, to: upright) ?? upright
-        guard let cg = bw.cgImage else { return nil }
-        let input = CIImage(cgImage: cg)
+        guard let cg = upright.cgImage else { return nil }
+        let src = CIImage(cgImage: cg)
 
-        let inverted = input.applyingFilter("CIColorInvert")
+        let flat = flatField(src)
+        let bw = flat.applyingFilter("CIColorControls", parameters: [
+            kCIInputSaturationKey: 0, kCIInputContrastKey: 1.8, kCIInputBrightnessKey: 0,
+        ])
+
+        let inverted = bw.applyingFilter("CIColorInvert")
         let masked = inverted.applyingFilter("CIMaskToAlpha")
         let blackInk = masked.applyingFilter("CIColorMatrix", parameters: [
             "inputRVector": CIVector(x: 0, y: 0, z: 0, w: 0),
@@ -32,6 +36,28 @@ struct SignatureProcessor {
         guard let crop = inkBounds(of: blackInk), !crop.isEmpty else { return nil }
         guard let outCG = context.createCGImage(blackInk, from: crop) else { return nil }
         return UIImage(cgImage: outCG, scale: upright.scale, orientation: .up)
+    }
+
+    /// Flat-field correction: cancel uneven lighting so paper reads as uniform
+    /// white before keying. A raw camera photo has a lighting falloff (a radial
+    /// vignette) that `VNDocumentCameraViewController` used to remove for us;
+    /// without this, the dim edges don't key to white and survive as a grey halo
+    /// around the signature. Estimate the illumination with a heavy blur, then
+    /// divide the grey image by it: paper/paper ≈ 1 (white), ink stays darker
+    /// than its local background so its ratio stays dark.
+    private func flatField(_ image: CIImage) -> CIImage {
+        let mono = image.applyingFilter("CIColorControls", parameters: [kCIInputSaturationKey: 0])
+        // Radius large vs. ink strokes but small vs. the lighting gradient.
+        // Clamp first so the blur doesn't darken the image edges, then crop back.
+        let radius = max(8, min(mono.extent.width, mono.extent.height) * 0.06)
+        let background = mono.clampedToExtent()
+            .applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: radius])
+            .cropped(to: mono.extent)
+        // CIDivideBlendMode matches Photoshop "Divide": result = background ÷ input.
+        // We want mono ÷ background, so background is the receiver and mono the param.
+        return background.applyingFilter("CIDivideBlendMode", parameters: [
+            kCIInputBackgroundImageKey: mono,
+        ])
     }
 
     /// Redraw `image` so its pixels are upright and `imageOrientation` is `.up`.
