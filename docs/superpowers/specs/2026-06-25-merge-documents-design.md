@@ -1,9 +1,9 @@
 # Spec: Merge two documents
 
 **Date:** 2026-06-25
-**Status:** Approved (design) — ready for implementation plan
+**Status:** SHIPPED to `main` 2026-06-25 (merge commit `da893ea`), device-verified. Not yet released.
 **Roadmap origin:** FutureEnhancements ▸ Documents ▸ "Merge two documents".
-**Target release:** v2.2 (next after v2.1; build on a feature branch).
+**Target release:** v2.2 (20) — to be archived/released **after** v2.1 (19) is live on the App Store. The uploaded build 19 (v2.1) does NOT contain this feature (it was archived before merge was built); `main` still carries the 2.1 (19) version label but its code = single-shot + merge, and will be bumped to 2.2 (20) at the next archive.
 
 ## Goal
 
