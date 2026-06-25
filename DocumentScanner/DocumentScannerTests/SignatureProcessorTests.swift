@@ -86,6 +86,30 @@ final class SignatureProcessorTests: XCTestCase {
             "dim-side paper must be transparent, not a halo")
     }
 
+    /// Ink on paper that has a thin dark rim at the very edge — like a page edge
+    /// or crop-boundary shadow. After flat-fielding the bright interior, that rim
+    /// survives keying; if counted as ink it inflates the crop to the whole frame
+    /// and shows as a faint border.
+    private func inkWithEdgeRim(size: CGSize = CGSize(width: 400, height: 220)) -> UIImage {
+        UIGraphicsImageRenderer(size: size).image { ctx in
+            UIColor(white: 0.3, alpha: 1).setFill()                       // dark rim base
+            ctx.fill(CGRect(origin: .zero, size: size))
+            UIColor.white.setFill()                                       // paper, inset 3px
+            ctx.fill(CGRect(x: 3, y: 3, width: size.width - 6, height: size.height - 6))
+            UIColor.black.setFill()                                       // ink bar
+            ctx.fill(CGRect(x: 40, y: 100, width: 320, height: 20))
+        }
+    }
+
+    func test_process_dropsPerimeterRim() throws {
+        let out = try XCTUnwrap(SignatureProcessor().process(inkWithEdgeRim()))
+        // Crop must hug the ~20px ink bar, not expand to the ~220px frame the rim
+        // would otherwise pull it to.
+        XCTAssertLessThan(out.size.height, 80, "perimeter rim must not inflate the crop")
+        XCTAssertGreaterThan(alpha(of: out, atX: out.cgImage!.width / 2, y: out.cgImage!.height / 2),
+                             0.8, "ink should stay opaque")
+    }
+
     func test_process_honorsImageOrientation() throws {
         // A raw portrait buffer with a VERTICAL ink bar, tagged `.right` like a
         // portrait camera capture (UIImagePickerController). Displayed upright,

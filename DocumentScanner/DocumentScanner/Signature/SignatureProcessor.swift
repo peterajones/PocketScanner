@@ -85,11 +85,19 @@ struct SignatureProcessor {
               let cg = context.createCGImage(image, from: extent) else { return nil }
         ctx.draw(cg, in: CGRect(x: 0, y: 0, width: w, height: h))
 
-        // Per-row ink counts.
+        // Ignore a thin perimeter margin. A raw photo has a faint dark rim at the
+        // very edge (page edge / crop-boundary shadow); flat-fielding the bright
+        // interior leaves it just visible, and counting it as ink would both show
+        // a border and inflate the crop to the whole frame. The signature is
+        // always framed centrally, so trimming the outer ~2% is safe.
+        let inset = min(max(2, Int((Double(min(w, h)) * 0.02).rounded())), (min(w, h) - 1) / 2)
+        let xRange = inset..<(w - inset), yRange = inset..<(h - inset)
+
+        // Per-row ink counts (perimeter margin excluded).
         var rowInk = [Int](repeating: 0, count: h)
-        for y in 0..<h {
+        for y in yRange {
             var c = 0
-            for x in 0..<w where px[(y * w + x) * 4 + 3] > 40 { c += 1 }
+            for x in xRange where px[(y * w + x) * 4 + 3] > 40 { c += 1 }
             rowInk[y] = c
         }
         // Group inky rows into vertical bands, merging across small gaps (so a
@@ -112,10 +120,10 @@ struct SignatureProcessor {
             y = j
         }
         guard bestStart >= 0 else { return nil }
-        // Column extent within the chosen band.
+        // Column extent within the chosen band (perimeter margin excluded).
         var minX = w, maxX = -1
         for yy in bestStart...bestEnd {
-            for x in 0..<w where px[(yy * w + x) * 4 + 3] > 40 {
+            for x in xRange where px[(yy * w + x) * 4 + 3] > 40 {
                 if x < minX { minX = x }; if x > maxX { maxX = x }
             }
         }
