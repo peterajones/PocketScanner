@@ -77,7 +77,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
-                        SettingsView(lockSettings: lockSettings, scannerPresenter: scannerPresenter)
+                        SettingsView(lockSettings: lockSettings)
                     } label: {
                         Image(systemName: "gearshape")
                     }

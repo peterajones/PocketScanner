@@ -58,6 +58,73 @@ final class SignatureProcessorTests: XCTestCase {
         XCTAssertLessThan(out.size.height, 120, "separated artifact line should be cropped out")
     }
 
+    /// Ink on paper lit unevenly: a left→right brightness ramp from white to
+    /// mid-grey, like a raw camera photo's lighting falloff. The old document
+    /// scanner flattened this; a raw single-shot photo doesn't.
+    private func unevenlyLitInk(size: CGSize = CGSize(width: 240, height: 120)) -> UIImage {
+        UIGraphicsImageRenderer(size: size).image { ctx in
+            let cg = ctx.cgContext
+            let grad = CGGradient(colorsSpace: CGColorSpaceCreateDeviceGray(),
+                                  colors: [UIColor(white: 1.0, alpha: 1).cgColor,
+                                           UIColor(white: 0.5, alpha: 1).cgColor] as CFArray,
+                                  locations: [0, 1])!
+            cg.drawLinearGradient(grad, start: CGPoint(x: 0, y: 0),
+                                  end: CGPoint(x: size.width, y: 0), options: [])
+            UIColor.black.setFill()
+            cg.fill(CGRect(x: 20, y: 52, width: 200, height: 16))
+        }
+    }
+
+    func test_process_flattensUnevenLighting_noHalo() throws {
+        let out = try XCTUnwrap(SignatureProcessor().process(unevenlyLitInk()))
+        let w = out.cgImage!.width, h = out.cgImage!.height
+        // Ink stays opaque.
+        XCTAssertGreaterThan(alpha(of: out, atX: w / 2, y: h / 2), 0.8, "ink should stay opaque")
+        // The dim (right) side's paper, just above the ink, must key fully to
+        // transparent — without flat-fielding it survives as a grey halo.
+        XCTAssertLessThan(alpha(of: out, atX: w - 3, y: 2), 0.2,
+            "dim-side paper must be transparent, not a halo")
+    }
+
+    /// Ink on paper that has a thin dark rim at the very edge — like a page edge
+    /// or crop-boundary shadow. After flat-fielding the bright interior, that rim
+    /// survives keying; if counted as ink it inflates the crop to the whole frame
+    /// and shows as a faint border.
+    private func inkWithEdgeRim(size: CGSize = CGSize(width: 400, height: 220)) -> UIImage {
+        UIGraphicsImageRenderer(size: size).image { ctx in
+            UIColor(white: 0.3, alpha: 1).setFill()                       // dark rim base
+            ctx.fill(CGRect(origin: .zero, size: size))
+            UIColor.white.setFill()                                       // paper, inset 3px
+            ctx.fill(CGRect(x: 3, y: 3, width: size.width - 6, height: size.height - 6))
+            UIColor.black.setFill()                                       // ink bar
+            ctx.fill(CGRect(x: 40, y: 100, width: 320, height: 20))
+        }
+    }
+
+    func test_process_dropsPerimeterRim() throws {
+        let out = try XCTUnwrap(SignatureProcessor().process(inkWithEdgeRim()))
+        // Crop must hug the ~20px ink bar, not expand to the ~220px frame the rim
+        // would otherwise pull it to.
+        XCTAssertLessThan(out.size.height, 80, "perimeter rim must not inflate the crop")
+        XCTAssertGreaterThan(alpha(of: out, atX: out.cgImage!.width / 2, y: out.cgImage!.height / 2),
+                             0.8, "ink should stay opaque")
+    }
+
+    func test_process_honorsImageOrientation() throws {
+        // A raw portrait buffer with a VERTICAL ink bar, tagged `.right` like a
+        // portrait camera capture (UIImagePickerController). Displayed upright,
+        // the bar is HORIZONTAL — so the crop must come out wide. If orientation
+        // were ignored (processing the raw buffer), the crop would be tall.
+        let raw = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 200)).image { ctx in
+            UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 100, height: 200))
+            UIColor.black.setFill(); ctx.fill(CGRect(x: 40, y: 40, width: 20, height: 120))
+        }
+        let oriented = UIImage(cgImage: raw.cgImage!, scale: raw.scale, orientation: .right)
+        let out = try XCTUnwrap(SignatureProcessor().process(oriented))
+        XCTAssertGreaterThan(out.size.width, out.size.height,
+            "output must reflect the displayed (oriented) image, not the raw buffer")
+    }
+
     func test_process_blankPage_returnsNil() {
         let blank = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 100)).image { ctx in
             UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 100, height: 100))

@@ -3,7 +3,6 @@ import UIKit
 
 struct SettingsView: View {
     @Bindable var lockSettings: AppLockSettings
-    let scannerPresenter: DocumentScannerPresenting
     @State private var authError: String?
     @State private var signatures: [Signature] = []
     @State private var showingSignatureCapture = false
@@ -79,7 +78,7 @@ struct SettingsView: View {
         .onAppear { signatures = signatureStore.all() }
         .sheet(isPresented: $showingSignatureCapture) {
             SignatureCaptureView(
-                presenter: scannerPresenter,
+                presenter: SingleShotCameraScanner(),
                 store: signatureStore,
                 onSaved: { showingSignatureCapture = false; signatures = signatureStore.all() },
                 onCancel: { showingSignatureCapture = false }
