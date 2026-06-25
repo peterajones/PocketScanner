@@ -160,7 +160,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     private func mergeDocument(_ source: DocumentSummary, into target: DocumentSummary) {
         do {
             try DocumentMerge.merge(source: source.url, into: target.url,
-                                    targetName: target.displayName, using: storage)
+                                    targetName: target.displayName)
             store.refresh()
         } catch {
             mergeError = "Couldn't merge \"\(source.displayName)\" into \"\(target.displayName)\". Please try again."

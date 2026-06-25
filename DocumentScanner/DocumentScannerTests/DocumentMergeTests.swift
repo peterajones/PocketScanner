@@ -29,12 +29,11 @@ final class DocumentMergeTests: XCTestCase {
     }
 
     func test_merge_appendsSourcePagesToTargetAndDeletesSource() throws {
-        let storage = DocumentStorage(documentsURL: tempDir)
         let target = try writePDF("Target", pages: 2)
         let source = try writePDF("Source", pages: 3)
 
         try DocumentMerge.merge(source: source, into: target,
-                                targetName: "Target", using: storage)
+                                targetName: "Target")
 
         let merged = try XCTUnwrap(PDFDocument(url: target))
         XCTAssertEqual(merged.pageCount, 5, "target should hold both docs' pages")
@@ -43,7 +42,6 @@ final class DocumentMergeTests: XCTestCase {
     }
 
     func test_merge_unreadableSource_throwsAndDeletesNothing() throws {
-        let storage = DocumentStorage(documentsURL: tempDir)
         let target = try writePDF("Target", pages: 2)
         // A non-PDF file standing in for a corrupt/unreadable source.
         let source = tempDir.appendingPathComponent("Source.pdf")
@@ -51,11 +49,24 @@ final class DocumentMergeTests: XCTestCase {
 
         XCTAssertThrowsError(
             try DocumentMerge.merge(source: source, into: target,
-                                    targetName: "Target", using: storage))
+                                    targetName: "Target"))
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: source.path),
                       "source must NOT be deleted when the merge fails")
         let untouched = try XCTUnwrap(PDFDocument(url: target))
         XCTAssertEqual(untouched.pageCount, 2, "target must be unchanged on failure")
+    }
+
+    func test_merge_unreadableTarget_throwsAndDeletesNothing() throws {
+        // A non-PDF file standing in for a corrupt/unreadable target.
+        let target = tempDir.appendingPathComponent("Target.pdf")
+        try Data("not a pdf".utf8).write(to: target)
+        let source = try writePDF("Source", pages: 3)
+
+        XCTAssertThrowsError(
+            try DocumentMerge.merge(source: source, into: target, targetName: "Target"))
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: source.path),
+                      "source must NOT be deleted when the merge fails")
     }
 }
