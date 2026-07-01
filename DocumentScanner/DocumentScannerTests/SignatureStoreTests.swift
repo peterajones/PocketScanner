@@ -64,4 +64,78 @@ final class SignatureStoreTests: XCTestCase {
                        "legacy file renamed away")
         XCTAssertEqual(store.all().count, 1, "migration is idempotent")
     }
+
+    func test_all_noSidecar_namesAreNil() throws {
+        let store = SignatureStore(directory: tempDir())
+        _ = try store.add(image())
+        XCTAssertNil(store.all().first?.name, "no sidecar ⇒ unnamed")
+    }
+
+    func test_all_attachesNameFromSidecar() throws {
+        let dir = tempDir()
+        let store = SignatureStore(directory: dir)
+        let sig = try store.add(image())
+        let json = try JSONEncoder().encode([sig.id: "Work"])
+        try json.write(to: dir.appendingPathComponent("names.json"))
+        XCTAssertEqual(store.all().first?.name, "Work")
+        XCTAssertEqual(store.signature(withID: sig.id)?.name, "Work", "name also attached via signature(withID:)")
+    }
+
+    func test_rename_setsName_roundTrips() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "Work")
+        XCTAssertEqual(store.all().first?.name, "Work")
+    }
+
+    func test_rename_overwritesPreviousName() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "Work")
+        store.rename(id: sig.id, to: "Personal")
+        XCTAssertEqual(store.all().first?.name, "Personal")
+    }
+
+    func test_rename_blankClearsName() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "Work")
+        store.rename(id: sig.id, to: "   ")
+        XCTAssertNil(store.all().first?.name, "whitespace-only clears the name")
+    }
+
+    func test_rename_trimsWhitespace() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "  Work  ")
+        XCTAssertEqual(store.all().first?.name, "Work")
+    }
+
+    func test_remove_prunesNameFromSidecar() throws {
+        let dir = tempDir()
+        let store = SignatureStore(directory: dir)
+        let a = try store.add(image())
+        store.rename(id: a.id, to: "Work")
+        store.remove(id: a.id)
+        // A new signature reuses no ids (UUIDs), and the old name must not linger.
+        let b = try store.add(image())
+        XCTAssertNil(store.all().first(where: { $0.id == b.id })?.name)
+        // And the pruned id is gone from the sidecar contents. Read directly
+        // (not `if let`) so the assertion is guaranteed to run — a regression
+        // that stopped writing names.json would fail here, not silently skip.
+        let data = try Data(contentsOf: dir.appendingPathComponent("names.json"))
+        let dict = try JSONDecoder().decode([String: String].self, from: data)
+        XCTAssertNil(dict[a.id], "removed signature's name pruned")
+    }
+
+    func test_all_ignoresSidecarEntriesWithNoPng() throws {
+        let dir = tempDir()
+        let store = SignatureStore(directory: dir)
+        let sig = try store.add(image())
+        let json = try JSONEncoder().encode([sig.id: "Work", "ghost-id": "Nobody"])
+        try json.write(to: dir.appendingPathComponent("names.json"))
+        let all = store.all()
+        XCTAssertEqual(all.count, 1, "ghost entry adds no signature")
+        XCTAssertEqual(all.first?.name, "Work")
+    }
 }

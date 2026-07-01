@@ -29,14 +29,22 @@ struct SignaturePicker: View {
     private var pickerList: some View {
         List(signatures) { sig in
             Button { onPick(sig) } label: {
-                Image(uiImage: sig.image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: 90)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
+                VStack(alignment: .leading, spacing: 6) {
+                    Image(uiImage: sig.image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: 90)
+                        .padding(.vertical, 8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
+                    if let name = sig.name, !name.isEmpty {
+                        Text(name)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                }
             }
             .buttonStyle(.plain)
         }
