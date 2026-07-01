@@ -80,4 +80,34 @@ final class SignatureStoreTests: XCTestCase {
         XCTAssertEqual(store.all().first?.name, "Work")
         XCTAssertEqual(store.signature(withID: sig.id)?.name, "Work", "name also attached via signature(withID:)")
     }
+
+    func test_rename_setsName_roundTrips() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "Work")
+        XCTAssertEqual(store.all().first?.name, "Work")
+    }
+
+    func test_rename_overwritesPreviousName() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "Work")
+        store.rename(id: sig.id, to: "Personal")
+        XCTAssertEqual(store.all().first?.name, "Personal")
+    }
+
+    func test_rename_blankClearsName() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "Work")
+        store.rename(id: sig.id, to: "   ")
+        XCTAssertNil(store.all().first?.name, "whitespace-only clears the name")
+    }
+
+    func test_rename_trimsWhitespace() throws {
+        let store = SignatureStore(directory: tempDir())
+        let sig = try store.add(image())
+        store.rename(id: sig.id, to: "  Work  ")
+        XCTAssertEqual(store.all().first?.name, "Work")
+    }
 }

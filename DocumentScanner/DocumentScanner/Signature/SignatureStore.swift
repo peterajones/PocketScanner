@@ -50,6 +50,19 @@ struct SignatureStore {
         try? FileManager.default.removeItem(at: directory.appendingPathComponent("\(id).png"))
     }
 
+    /// Sets or clears a signature's name. A blank/whitespace-only name removes the
+    /// entry (reverts to unnamed). Name is trimmed before saving.
+    func rename(id: String, to newName: String) {
+        let trimmed = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+        var names = loadNames()
+        if trimmed.isEmpty {
+            names.removeValue(forKey: id)
+        } else {
+            names[id] = trimmed
+        }
+        saveNames(names)
+    }
+
     func signature(withID id: String) -> Signature? {
         let url = directory.appendingPathComponent("\(id).png")
         guard let data = try? Data(contentsOf: url), let img = UIImage(data: data) else { return nil }
