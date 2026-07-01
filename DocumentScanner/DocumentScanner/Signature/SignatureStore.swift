@@ -48,6 +48,10 @@ struct SignatureStore {
 
     func remove(id: String) {
         try? FileManager.default.removeItem(at: directory.appendingPathComponent("\(id).png"))
+        var names = loadNames()
+        if names.removeValue(forKey: id) != nil {
+            saveNames(names)
+        }
     }
 
     /// Sets or clears a signature's name. A blank/whitespace-only name removes the
