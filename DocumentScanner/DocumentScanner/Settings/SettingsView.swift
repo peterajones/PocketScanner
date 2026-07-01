@@ -6,6 +6,8 @@ struct SettingsView: View {
     @State private var authError: String?
     @State private var signatures: [Signature] = []
     @State private var showingSignatureCapture = false
+    @State private var renamingID: String?
+    @State private var renameField = ""
     private let signatureStore = SignatureStore()
     @AppStorage("showFolders") private var showFolders = true
     #if DEBUG
@@ -41,21 +43,33 @@ struct SettingsView: View {
             #endif
             Section {
                 ForEach(signatures) { sig in
-                    Image(uiImage: sig.image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: 100)
-                        .padding(.vertical, 10)
-                        .background(Color.white)   // black ink on transparent — visible in dark mode
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4)))
-                        .padding(.vertical, 4)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                signatureStore.remove(id: sig.id)
-                                signatures = signatureStore.all()
-                            } label: { Label("Delete", systemImage: "trash") }
+                    HStack(spacing: 12) {
+                        Image(uiImage: sig.image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 56, height: 32)
+                            .padding(6)
+                            .background(Color.white)   // black ink on transparent — visible in dark mode
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray4)))
+                        if let name = sig.name, !name.isEmpty {
+                            Text(name).lineLimit(1).truncationMode(.tail)
+                        } else {
+                            Text("Add a name").foregroundStyle(.secondary)
                         }
+                        Spacer()
+                        Image(systemName: "pencil")
+                            .font(.footnote)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture { beginRename(sig) }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            signatureStore.remove(id: sig.id)
+                            signatures = signatureStore.all()
+                        } label: { Label("Delete", systemImage: "trash") }
+                    }
                 }
                 Button("Add Signature") { showingSignatureCapture = true }
             } header: {
@@ -84,6 +98,21 @@ struct SettingsView: View {
                 onCancel: { showingSignatureCapture = false }
             )
         }
+        .alert("Rename Signature",
+               isPresented: Binding(
+                get: { renamingID != nil },
+                set: { if !$0 { renamingID = nil; renameField = "" } }
+               )) {
+            TextField("Name", text: $renameField)
+                .autocorrectionDisabled()
+                .onChange(of: renameField) { _, new in
+                    if new.count > 40 { renameField = String(new.prefix(40)) }
+                }
+            Button("Rename") { commitRename() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Give this signature a name so you can tell it apart when signing.")
+        }
     }
 
     /// Toggle the lock setting — but require successful auth before applying.
@@ -102,5 +131,17 @@ struct SettingsView: View {
             // No need to manually revert — the Toggle binding's `get` still
             // reads the unchanged isEnabled.
         }
+    }
+
+    private func beginRename(_ sig: Signature) {
+        renameField = sig.name ?? ""
+        renamingID = sig.id
+    }
+
+    private func commitRename() {
+        guard let id = renamingID else { return }
+        signatureStore.rename(id: id, to: renameField)
+        signatures = signatureStore.all()
+        renamingID = nil
     }
 }
