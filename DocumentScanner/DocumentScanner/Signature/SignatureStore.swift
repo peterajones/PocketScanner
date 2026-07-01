@@ -19,6 +19,7 @@ struct SignatureStore {
     /// All saved signatures, newest first.
     func all() -> [Signature] {
         migrateLegacyIfNeeded()
+        let names = loadNames()
         let fm = FileManager.default
         guard let urls = try? fm.contentsOfDirectory(
             at: directory, includingPropertiesForKeys: [.creationDateKey],
@@ -31,7 +32,8 @@ struct SignatureStore {
         }
         return newestFirst.compactMap { url in
             guard let data = try? Data(contentsOf: url), let img = UIImage(data: data) else { return nil }
-            return Signature(id: url.deletingPathExtension().lastPathComponent, image: img)
+            let id = url.deletingPathExtension().lastPathComponent
+            return Signature(id: id, image: img, name: names[id])
         }
     }
 
@@ -51,7 +53,22 @@ struct SignatureStore {
     func signature(withID id: String) -> Signature? {
         let url = directory.appendingPathComponent("\(id).png")
         guard let data = try? Data(contentsOf: url), let img = UIImage(data: data) else { return nil }
-        return Signature(id: id, image: img)
+        return Signature(id: id, image: img, name: loadNames()[id])
+    }
+
+    private var namesURL: URL { directory.appendingPathComponent("names.json") }
+
+    /// id → name. Absent or unreadable sidecar ⇒ empty (all unnamed).
+    private func loadNames() -> [String: String] {
+        guard let data = try? Data(contentsOf: namesURL),
+              let dict = try? JSONDecoder().decode([String: String].self, from: data)
+        else { return [:] }
+        return dict
+    }
+
+    private func saveNames(_ names: [String: String]) {
+        guard let data = try? JSONEncoder().encode(names) else { return }
+        try? data.write(to: namesURL, options: .atomic)
     }
 
     /// One-time: fold a legacy single `signature.png` into the collection by

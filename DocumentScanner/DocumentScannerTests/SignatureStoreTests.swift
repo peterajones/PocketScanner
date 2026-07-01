@@ -64,4 +64,20 @@ final class SignatureStoreTests: XCTestCase {
                        "legacy file renamed away")
         XCTAssertEqual(store.all().count, 1, "migration is idempotent")
     }
+
+    func test_all_noSidecar_namesAreNil() throws {
+        let store = SignatureStore(directory: tempDir())
+        _ = try store.add(image())
+        XCTAssertNil(store.all().first?.name, "no sidecar ⇒ unnamed")
+    }
+
+    func test_all_attachesNameFromSidecar() throws {
+        let dir = tempDir()
+        let store = SignatureStore(directory: dir)
+        let sig = try store.add(image())
+        let json = try JSONEncoder().encode([sig.id: "Work"])
+        try json.write(to: dir.appendingPathComponent("names.json"))
+        XCTAssertEqual(store.all().first?.name, "Work")
+        XCTAssertEqual(store.signature(withID: sig.id)?.name, "Work", "name also attached via signature(withID:)")
+    }
 }
