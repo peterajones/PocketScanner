@@ -35,8 +35,11 @@ struct SignaturePlacementView: View {
                                 .onEnded { v in center.x += v.translation.width; center.y += v.translation.height }
                         )
                         .simultaneousGesture(
-                            MagnificationGesture().updating($pinch) { v, s, _ in s = v }
-                                .onEnded { v in scale *= v }
+                            // MagnifyGesture, not the deprecated MagnificationGesture: the latter's
+                            // pinch stopped updating once built against the Xcode 26.6 SDK (drag
+                            // still worked). MagnifyGesture is the iOS 17+ replacement.
+                            MagnifyGesture().updating($pinch) { v, s, _ in s = v.magnification }
+                                .onEnded { v in scale *= v.magnification }
                         )
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
