@@ -1,0 +1,8 @@
+What's New — v2.3 (21)
+(covers everything since the last LIVE version, v2.1 — v2.2 was never released)
+
+Two ways to keep your documents in order:
+
+• Merge documents — got a document split across two scans? Touch and hold one, choose Merge into…, and its pages join another, text and all.
+
+• Name your signatures — give each saved signature a name so you can tell them apart when it's time to sign.
