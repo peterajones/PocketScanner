@@ -1,7 +1,10 @@
 # App Preview video
 
-The App Store preview video for Pocket Scanner (6.9" iPhone slot), framed in iPhone 17
-chrome.
+The App Store preview video for Pocket Scanner (6.9" iPhone slot). **As of v2.3 the shipping
+preview is UNFRAMED** (raw screen capture) — the earlier framed-in-chrome version was rejected
+under Guideline 2.3.4 (see Lessons ▸ "Framed App Previews are NOT allowed"). Current upload:
+`v2.3/PocketScanner-v2.3-AppPreview-886x1920.mp4`. The framing pipeline below is kept for
+reference/history (and is still valid for framed *screenshots* / web/press use).
 
 Spec: `docs/superpowers/specs/2026-06-10-app-preview-design.md`
 (Note: the spec/plan describe an earlier iMovie-based plan. This README documents what
@@ -146,6 +149,23 @@ locked, so this ships with the next version.
 - **Export at 4K from the editor.** Quality is set by how many pixels the phone occupies in
   the export. A 1080p export downscales the ~1206-wide source; 4K preserves it, and the
   final downscale to 1290 stays sharp.
-- **Framed vs unframed.** We shipped framed (in chrome) for a premium look; Apple slightly
-  prefers raw screen recordings, so a framed preview carries a small review risk. The
-  unframed full-bleed version is the lower-risk fallback.
+- **Framed App Previews are NOT allowed — they get rejected (confirmed 2026-07-03).** We
+  shipped the framed (in-chrome) preview from v1.8 and it passed v1.8→v2.1 (reviewer
+  inconsistency), but **v2.2 (20) was REJECTED under Guideline 2.3.4** ("previews may only use
+  video screen captures of the app itself" — a composited device frame is not a screen capture
+  of the app). The evidence stills Apple attached were paused frames from the framed video
+  showing the device frame; reviewed on an iPad Air (an iPhone-only app still runs/reviews on
+  iPad in compatibility mode, which made the iPhone frame conspicuous). **Ship the UNFRAMED
+  full-bleed screen recording, always.** NOTE: this is App Preview *video* only — device frames
+  on *screenshots* are fine (those fall under the looser Guideline 2.3.3).
+  - **The fix (v2.3):** conform the raw unframed capture straight to 886×1920, no chrome step:
+    ```bash
+    ffmpeg -i v1.7/PocketScanner-v1.7.mp4 \
+      -vf "scale=886:-2,crop=886:1920" \
+      -c:v libx264 -profile:v high -pix_fmt yuv420p -r 30 -crf 18 -preset medium \
+      -c:a aac -b:a 128k -ar 44100 -ac 2 -movflags +faststart \
+      v2.3/PocketScanner-v2.3-AppPreview-886x1920.mp4
+    ```
+    (The raw `v1.7/PocketScanner-v1.7.mp4` is 2160×4692 with an already-silent AAC track. Scale
+    to width 886, trim 4px of height to hit exactly 886×1920 — imperceptible, no distortion, no
+    frame. Guideline: <https://developer.apple.com/app-store/review/guidelines/> §2.3.4.)
