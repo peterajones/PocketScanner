@@ -158,14 +158,19 @@ locked, so this ships with the next version.
   iPad in compatibility mode, which made the iPhone frame conspicuous). **Ship the UNFRAMED
   full-bleed screen recording, always.** NOTE: this is App Preview *video* only — device frames
   on *screenshots* are fine (those fall under the looser Guideline 2.3.3).
-  - **The fix (v2.3):** conform the raw unframed capture straight to 886×1920, no chrome step:
+  - **The fix (v2.3):** conform the raw unframed capture straight to 886×1920, no chrome step.
+    ⚠️ **`setsar=1` is mandatory** — without it, scaling 2160×4692 down to 886 leaves a non-1:1
+    pixel aspect (SAR ≈ 173160:173213), so the video *displays* at 885×1920 and Media Manager
+    rejects it as "885×1920, should be 886×1920" (this bit v2.3's first upload — coded width was
+    886 but display width was 885):
     ```bash
     ffmpeg -i v1.7/PocketScanner-v1.7.mp4 \
-      -vf "scale=886:-2,crop=886:1920" \
+      -vf "scale=886:1920:flags=lanczos,setsar=1" \
       -c:v libx264 -profile:v high -pix_fmt yuv420p -r 30 -crf 18 -preset medium \
       -c:a aac -b:a 128k -ar 44100 -ac 2 -movflags +faststart \
       v2.3/PocketScanner-v2.3-AppPreview-886x1920.mp4
     ```
-    (The raw `v1.7/PocketScanner-v1.7.mp4` is 2160×4692 with an already-silent AAC track. Scale
-    to width 886, trim 4px of height to hit exactly 886×1920 — imperceptible, no distortion, no
-    frame. Guideline: <https://developer.apple.com/app-store/review/guidelines/> §2.3.4.)
+    (The raw `v1.7/PocketScanner-v1.7.mp4` is 2160×4692 with an already-silent AAC track. The
+    886×1920 forced scale is a ~0.24% vertical squash — imperceptible, no frame. Verify with
+    `ffprobe … sample_aspect_ratio` and confirm it reads **1:1**. Guideline:
+    <https://developer.apple.com/app-store/review/guidelines/> §2.3.4.)
