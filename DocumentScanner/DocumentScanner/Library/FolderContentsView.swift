@@ -21,7 +21,23 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var nameSheet: NameSheetContext?
     @State private var folders: [URL] = []
     @State private var subfolders: [URL] = []
+    @State private var showingNewSubfolderAlert = false
+    @State private var newSubfolderName = ""
+    @State private var subfolderBeingRenamed: URL?
+    @State private var renameSubfolderName = ""
+    @State private var subfolderBeingDeleted: URL?
     @State private var folderActionError: String?
+
+    /// True only for a level-1 folder (can hold sub-folders). A level-2 folder cannot.
+    private var canCreateSubfolder: Bool {
+        FolderPaths.level(of: folderURL, root: storage.documentsURL) < 2
+    }
+
+    /// A sub-folder is empty if no known document lives anywhere inside it.
+    private func isSubfolderEmpty(_ url: URL) -> Bool {
+        let prefix = url.standardizedFileURL.path + "/"
+        return !store.summaries.contains { $0.url.standardizedFileURL.path.hasPrefix(prefix) }
+    }
     @State private var docBeingDeleted: DocumentSummary?
     @State private var mergePlan: MergePlan?
     @State private var mergeError: String?
@@ -51,7 +67,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         }
         .navigationTitle(folderURL.lastPathComponent)
         .task { refreshFolders() }
-        .alert("Couldn't move document",
+        .alert("Couldn't update folder",
                isPresented: Binding(
                 get: { folderActionError != nil },
                 set: { _ in folderActionError = nil }
@@ -76,6 +92,34 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         } message: { summary in
             Text("This will permanently remove \"\(summary.displayName).pdf\".")
         }
+        .alert("New Sub-folder", isPresented: $showingNewSubfolderAlert) {
+            TextField("Folder name", text: $newSubfolderName).autocorrectionDisabled()
+            Button("Create") { createSubfolder() }
+            Button("Cancel", role: .cancel) {}
+        } message: { Text("Enter a name for the new sub-folder.") }
+        .alert("Rename Folder",
+               isPresented: Binding(
+                get: { subfolderBeingRenamed != nil },
+                set: { if !$0 { subfolderBeingRenamed = nil } }
+               )) {
+            TextField("Folder name", text: $renameSubfolderName).autocorrectionDisabled()
+            Button("Rename") { renameSubfolder() }
+            Button("Cancel", role: .cancel) {}
+        } message: { Text("Choose a new name for this folder.") }
+        .alert("Delete Folder?",
+               isPresented: Binding(
+                get: { subfolderBeingDeleted != nil },
+                set: { if !$0 { subfolderBeingDeleted = nil } }
+               )) {
+            Button("Delete", role: .destructive) { deleteSubfolder() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            if let folder = subfolderBeingDeleted, !isSubfolderEmpty(folder) {
+                Text("This folder and all documents inside it will be deleted.")
+            } else {
+                Text("This folder will be deleted.")
+            }
+        }
         .modifier(MergeAlerts(mergePlan: $mergePlan, mergeError: $mergeError,
                               mergeAction: mergeDocument))
         .toolbar {
@@ -86,12 +130,31 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 LayoutToggle(usesGrid: usesGrid, onToggle: { usesGrid.toggle() })
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    triggerScan()
-                } label: {
-                    Image(systemName: "plus")
+                if canCreateSubfolder {
+                    Menu {
+                        Button {
+                            triggerScan()
+                        } label: {
+                            Label("Scan Document", systemImage: "doc.viewfinder")
+                        }
+                        Button {
+                            newSubfolderName = ""
+                            showingNewSubfolderAlert = true
+                        } label: {
+                            Label("New Sub-folder", systemImage: "folder.badge.plus")
+                        }
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityIdentifier("Folder.AddButton")
+                } else {
+                    Button {
+                        triggerScan()
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityIdentifier("Folder.AddButton")
                 }
-                .accessibilityIdentifier("Folder.AddButton")
             }
         }
         .fullScreenCover(isPresented: $showingCapture) {
@@ -250,7 +313,15 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         }
     }
 
-    @ViewBuilder private func subfolderContextMenu(_ url: URL) -> some View { EmptyView() }
+    @ViewBuilder private func subfolderContextMenu(_ url: URL) -> some View {
+        Button {
+            renameSubfolderName = url.lastPathComponent
+            subfolderBeingRenamed = url
+        } label: { Label("Rename", systemImage: "pencil") }
+        Button(role: .destructive) {
+            subfolderBeingDeleted = url
+        } label: { Label("Delete", systemImage: "trash") }
+    }
 
     @ViewBuilder
     private func docTile(_ summary: DocumentSummary) -> some View {
@@ -328,6 +399,29 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             store.refresh()
             refreshFolders()
         }
+    }
+
+    private func createSubfolder() {
+        let trimmed = newSubfolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        do { _ = try storage.createFolder(named: trimmed, in: folderURL); refreshFolders() }
+        catch { folderActionError = error.localizedDescription }
+    }
+
+    private func renameSubfolder() {
+        guard let folder = subfolderBeingRenamed else { return }
+        let trimmed = renameSubfolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        do { _ = try storage.renameFolder(at: folder, to: trimmed); refreshFolders() }
+        catch { folderActionError = error.localizedDescription }
+        subfolderBeingRenamed = nil
+    }
+
+    private func deleteSubfolder() {
+        guard let folder = subfolderBeingDeleted else { return }
+        do { try storage.deleteFolder(at: folder); store.refresh(); refreshFolders() }
+        catch { folderActionError = error.localizedDescription }
+        subfolderBeingDeleted = nil
     }
 
     private func triggerScan() {
