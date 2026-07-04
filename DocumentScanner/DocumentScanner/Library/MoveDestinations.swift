@@ -27,7 +27,7 @@ enum MoveDestinations {
             result.append(MoveDestination(url: root, name: "Main Library"))
         }
         for folder in folders where folder.standardizedFileURL.path != currentPath {
-            result.append(MoveDestination(url: folder, name: folder.lastPathComponent))
+            result.append(MoveDestination(url: folder, name: FolderPaths.label(for: folder, root: root)))
         }
         return result
     }

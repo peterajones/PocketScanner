@@ -50,4 +50,15 @@ final class MoveDestinationsTests: XCTestCase {
         )
         XCTAssertEqual(result.map(\.name), ["Main Library", "A"])
     }
+
+    func test_list_labelsSubfoldersWithParentContext() {
+        let root = URL(fileURLWithPath: "/docs", isDirectory: true)
+        let taxes = root.appendingPathComponent("Taxes", isDirectory: true)
+        let t3 = taxes.appendingPathComponent("T3", isDirectory: true)
+        // Doc currently at root; destinations should include the sub-folder, labeled with parent.
+        let dests = MoveDestinations.list(currentParent: root, root: root, folders: [taxes, t3])
+        let t3Dest = dests.first { $0.url == t3 }
+        XCTAssertEqual(t3Dest?.name, "Taxes ▸ T3")
+        XCTAssertEqual(dests.first { $0.url == taxes }?.name, "Taxes")
+    }
 }
