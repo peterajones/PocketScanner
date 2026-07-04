@@ -9,7 +9,7 @@ struct MoveToMenu: View {
     let currentParent: URL
     /// The root documents directory (`storage.documentsURL`).
     let root: URL
-    /// Root-level folders.
+    /// All move-destination folders (top-level and sub-folders).
     let folders: [URL]
     /// Invoked with the chosen destination directory URL.
     let move: (URL) -> Void
