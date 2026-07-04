@@ -1,0 +1,7 @@
+What's New — v2.4 (23)
+
+Organize as you scan.
+
+• Sub-folders — group a folder into sub-folders (e.g. Taxes 2026 → T3, T4RSP, Expenses).
+
+• Save to any folder — pick the destination folder or sub-folder right on the Save screen, so scans file themselves instead of landing in the main library.
