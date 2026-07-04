@@ -227,6 +227,37 @@ final class DocumentStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.renameFolder(at: folder, to: "   "))
     }
 
+    // MARK: - Nested Folders
+
+    func test_createFolder_inParent_createsNestedSubfolder() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let parent = try storage.createFolder(named: "Taxes2026")
+        let sub = try storage.createFolder(named: "T3", in: parent)
+        var isDir: ObjCBool = false
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sub.path, isDirectory: &isDir))
+        XCTAssertTrue(isDir.boolValue)
+        XCTAssertEqual(sub.deletingLastPathComponent().standardizedFileURL.path,
+                       parent.standardizedFileURL.path)
+        XCTAssertEqual(sub.lastPathComponent, "T3")
+    }
+
+    func test_listFolders_inParent_listsOnlyThatParentsSubfolders() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let a = try storage.createFolder(named: "A")
+        let b = try storage.createFolder(named: "B")
+        _ = try storage.createFolder(named: "A1", in: a)
+        _ = try storage.createFolder(named: "A2", in: a)
+        _ = try storage.createFolder(named: "B1", in: b)
+        let subsOfA = try storage.listFolders(in: a).map(\.lastPathComponent)
+        XCTAssertEqual(Set(subsOfA), ["A1", "A2"])
+    }
+
+    func test_listFolders_rootWrapper_unchanged() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        _ = try storage.createFolder(named: "Receipts")
+        XCTAssertEqual(try storage.listFolders().map(\.lastPathComponent), ["Receipts"])
+    }
+
     func test_deleteFolder_removesFolderAndContents() throws {
         let storage = DocumentStorage(documentsURL: tempDir)
         let folder = try storage.createFolder(named: "Receipts")

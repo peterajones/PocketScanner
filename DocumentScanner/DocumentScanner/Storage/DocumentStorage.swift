@@ -96,14 +96,13 @@ struct DocumentStorage {
 
     // MARK: - Folders
 
-    /// Create a folder at the root documents URL. Sanitizes the name the same
-    /// way doc names get sanitized so paths stay portable. Throws if the name
-    /// is empty or collides with an existing folder.
+    /// Create a folder inside `parent`. Sanitizes the name the same way doc
+    /// names get sanitized so paths stay portable. Throws if the name is empty.
     @discardableResult
-    func createFolder(named name: String) throws -> URL {
+    func createFolder(named name: String, in parent: URL) throws -> URL {
         let sanitized = Self.sanitize(name)
         guard !sanitized.isEmpty else { throw DocumentStorageError.emptyName }
-        let folderURL = documentsURL.appendingPathComponent(sanitized, isDirectory: true)
+        let folderURL = parent.appendingPathComponent(sanitized, isDirectory: true)
 
         var coordinatorError: NSError?
         var createError: Error?
@@ -117,6 +116,14 @@ struct DocumentStorage {
         }
         if let error = coordinatorError ?? (createError as NSError?) { throw error }
         return folderURL
+    }
+
+    /// Create a folder at the root documents URL. Sanitizes the name the same
+    /// way doc names get sanitized so paths stay portable. Throws if the name
+    /// is empty or collides with an existing folder.
+    @discardableResult
+    func createFolder(named name: String) throws -> URL {
+        try createFolder(named: name, in: documentsURL)
     }
 
     /// Move a document from its current URL into the given folder. Returns the
@@ -145,16 +152,21 @@ struct DocumentStorage {
         return destinationURL
     }
 
-    /// List folder URLs at the root level (non-recursive).
-    func listFolders() throws -> [URL] {
+    /// List folder URLs inside `parent` (non-recursive).
+    func listFolders(in parent: URL) throws -> [URL] {
         let contents = try FileManager.default.contentsOfDirectory(
-            at: documentsURL,
+            at: parent,
             includingPropertiesForKeys: [.isDirectoryKey],
             options: [.skipsHiddenFiles]
         )
         return contents.filter { url in
             (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
         }
+    }
+
+    /// List folder URLs at the root level (non-recursive).
+    func listFolders() throws -> [URL] {
+        try listFolders(in: documentsURL)
     }
 
     /// Rename a folder in place. Sanitizes the new name and resolves
