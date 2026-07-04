@@ -14,7 +14,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var showingCameraDenied = false
     @State private var nameSheet: NameSheetContext?
     @State private var path = NavigationPath()
-    @State private var folders: [URL] = []
+    @State private var folders: [URL] = []          // root display: top-level folders only
+    @State private var moveTargets: [URL] = []       // Move menu: top-level folders + sub-folders
     @State private var showingNewFolderAlert = false
     @State private var newFolderName = ""
     @State private var folderActionError: String?
@@ -264,10 +265,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             }
         } else {
             if showFolders {
-                MoveToMenu(
+                MoveToMenu(  // note: moveTargets (all folders), not the top-level display list
                     currentParent: summary.url.deletingLastPathComponent(),
                     root: storage.documentsURL,
-                    folders: folders,
+                    folders: moveTargets,
                     move: { moveDocument(summary, to: $0) }
                 )
             }
@@ -476,11 +477,13 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     }
 
     private func refreshFolders() {
-        let top = (try? storage.listFolders()) ?? []
+        let top = (try? storage.listFolders())?
+            .sorted { $0.lastPathComponent < $1.lastPathComponent } ?? []
+        folders = top   // root display: top-level folders only
         var all = top
         for folder in top { all += (try? storage.listFolders(in: folder)) ?? [] }
         // Byte-sort by full path keeps each sub-folder adjacent to its parent.
-        folders = all.sorted { $0.path < $1.path }
+        moveTargets = all.sorted { $0.path < $1.path }   // Move menu: all folders
     }
 
     private func createFolder() {
