@@ -20,6 +20,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var showingCameraDenied = false
     @State private var nameSheet: NameSheetContext?
     @State private var folders: [URL] = []
+    @State private var subfolders: [URL] = []
     @State private var folderActionError: String?
     @State private var docBeingDeleted: DocumentSummary?
     @State private var mergePlan: MergePlan?
@@ -36,7 +37,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
 
     var body: some View {
         Group {
-            if docsInFolder.isEmpty {
+            if docsInFolder.isEmpty && subfolders.isEmpty {
                 ContentUnavailableView(
                     "Empty folder",
                     systemImage: "folder",
@@ -142,6 +143,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     private func refreshFolders() {
         folders = (try? storage.listFolders())?
             .sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) ?? []
+        subfolders = (try? storage.listFolders(in: folderURL))?
+            .sorted { $0.lastPathComponent.localizedCaseInsensitiveCompare($1.lastPathComponent) == .orderedAscending }
+            ?? []
     }
 
     private func moveDocument(_ summary: DocumentSummary, to destination: URL) {
@@ -235,6 +239,19 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         }
     }
 
+    private func folderRow(_ url: URL) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "folder.fill")
+                .foregroundStyle(.tint)
+                .font(.title3)
+            Text(url.lastPathComponent)
+                .font(.body)
+            Spacer()
+        }
+    }
+
+    @ViewBuilder private func subfolderContextMenu(_ url: URL) -> some View { EmptyView() }
+
     @ViewBuilder
     private func docTile(_ summary: DocumentSummary) -> some View {
         if summary.isCorrupt {
@@ -251,8 +268,24 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
 
     @ViewBuilder
     private var listBody: some View {
-        List(filtered) { summary in
-            docRow(summary)
+        List {
+            if !subfolders.isEmpty && searchText.isEmpty {
+                Section {
+                    ForEach(subfolders, id: \.self) { subfolderURL in
+                        NavigationLink(value: subfolderURL) {
+                            folderRow(subfolderURL)
+                        }
+                        .contextMenu { subfolderContextMenu(subfolderURL) }
+                    }
+                }
+            }
+            if !filtered.isEmpty {
+                Section {
+                    ForEach(filtered) { summary in
+                        docRow(summary)
+                    }
+                }
+            }
         }
         .searchable(text: $searchText, prompt: "Search this folder")
         .overlay {
@@ -270,6 +303,15 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     private var gridBody: some View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 16) {
+                if !subfolders.isEmpty && searchText.isEmpty {
+                    ForEach(subfolders, id: \.self) { subfolderURL in
+                        NavigationLink(value: subfolderURL) {
+                            FolderTile(url: subfolderURL)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu { subfolderContextMenu(subfolderURL) }
+                    }
+                }
                 ForEach(filtered) { summary in
                     docTile(summary)
                 }
