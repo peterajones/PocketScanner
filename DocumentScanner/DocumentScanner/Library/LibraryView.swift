@@ -140,7 +140,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     images: ctx.images,
                     recognizeTask: ctx.recognizeTask,
                     pipeline: pipeline,
-                    storage: storage,
+                    rootStorage: storage,
+                    defaultDestination: storage.documentsURL,
                     onSaved: {
                         nameSheet = nil
                         store.refresh()

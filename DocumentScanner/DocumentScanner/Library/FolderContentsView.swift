@@ -5,9 +5,9 @@ import SwiftUI
 /// Inherits the navigationDestination handlers from the root, so
 /// tapping a document still pushes the existing DocumentViewerView.
 ///
-/// Has its own scan flow that writes new documents into this folder
-/// rather than into the root — a folder-scoped DocumentStorage is
-/// constructed from `folderURL` and passed to NameDocumentSheet.
+/// Has its own scan flow whose Save sheet defaults its destination to this
+/// folder (`defaultDestination: folderURL`); the sheet can still retarget the
+/// scan to any folder or sub-folder.
 struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     let folderURL: URL
     @Bindable var store: Store
@@ -32,11 +32,6 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         let id = UUID()
         let images: [UIImage]
         let recognizeTask: Task<[ScannedPage], Never>
-    }
-
-    /// Storage scoped to this folder so write() puts new scans here.
-    private var folderStorage: DocumentStorage {
-        DocumentStorage(documentsURL: folderURL)
     }
 
     var body: some View {
@@ -119,7 +114,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 images: ctx.images,
                 recognizeTask: ctx.recognizeTask,
                 pipeline: pipeline,
-                storage: folderStorage,
+                rootStorage: storage,
+                defaultDestination: folderURL,
                 onSaved: {
                     nameSheet = nil
                     store.refresh()

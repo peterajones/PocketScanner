@@ -8,7 +8,8 @@ struct NameDocumentSheet: View {
     let images: [UIImage]
     let recognizeTask: Task<[ScannedPage], Never>
     let pipeline: ScanPipeline
-    let storage: DocumentStorage
+    let rootStorage: DocumentStorage
+    let defaultDestination: URL
     let onSaved: () -> Void
     let onCancel: () -> Void
 
@@ -18,6 +19,8 @@ struct NameDocumentSheet: View {
     @State private var filter: ImageFilter = .none
     @State private var previewBase: UIImage?     // downscaled page 1
     @State private var previewImage: UIImage?    // previewBase with `filter` applied
+    @State private var selectedDestination: URL = URL(fileURLWithPath: "/")
+    @State private var destinationTree: (main: ScanDestination, groups: [ScanDestinationGroup])?
     private let filterEngine = ImageFilterEngine()
     @Environment(\.alertCenter) private var alertCenter
 
@@ -46,6 +49,34 @@ struct NameDocumentSheet: View {
                     .pickerStyle(.segmented)
                     .disabled(isWorking)
                     .accessibilityIdentifier("NameSheet.FilterPicker")
+                }
+                Section("Save to") {
+                    Menu {
+                        if let tree = destinationTree {
+                            Button { selectedDestination = tree.main.url } label: { Text(tree.main.name) }
+                            ForEach(tree.groups) { group in
+                                if group.subfolders.isEmpty {
+                                    Button { selectedDestination = group.folder.url } label: { Text(group.folder.name) }
+                                } else {
+                                    Menu(group.folder.name) {
+                                        Button { selectedDestination = group.folder.url } label: { Text(group.folder.name) }
+                                        ForEach(group.subfolders) { sub in
+                                            Button { selectedDestination = sub.url } label: { Text(sub.name) }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text("Folder")
+                            Spacer()
+                            Text(FolderPaths.label(for: selectedDestination, root: rootStorage.documentsURL))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .disabled(isWorking)
+                    .accessibilityIdentifier("NameSheet.DestinationMenu")
                 }
                 Section("Name") {
                     TextField("Name", text: Binding(
@@ -83,10 +114,22 @@ struct NameDocumentSheet: View {
             }
             .task { await refineDefaultName() }
             .task { await loadPreviewBase() }
+            .onAppear { loadDestinations() }
             .onChange(of: filter) { _, _ in applyFilterToPreview() }
             .onDisappear { recognizeTask.cancel() }
         }
         .interactiveDismissDisabled(isWorking)
+    }
+
+    private func loadDestinations() {
+        selectedDestination = defaultDestination
+        let root = rootStorage.documentsURL
+        let folders = (try? rootStorage.listFolders()) ?? []
+        var subs: [URL: [URL]] = [:]
+        for folder in folders {
+            subs[folder] = (try? rootStorage.listFolders(in: folder)) ?? []
+        }
+        destinationTree = ScanDestinations.build(root: root, folders: folders, subfoldersByFolder: subs)
     }
 
     /// While OCR runs, the sheet shows a timestamp default. Once recognition
@@ -107,7 +150,8 @@ struct NameDocumentSheet: View {
         do {
             let pages = await recognizeTask.value
             let result = try await pipeline.assemble(pages: pages, filter: filter)
-            _ = try storage.write(result.pdf, preferredName: name)
+            let destinationStorage = DocumentStorage(documentsURL: selectedDestination)
+            _ = try destinationStorage.write(result.pdf, preferredName: name)
             onSaved()
         } catch {
             alertCenter.present(AppAlert(
