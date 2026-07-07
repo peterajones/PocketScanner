@@ -91,7 +91,7 @@ struct PDFAssembler {
     /// to the uncompressed normalized image if compression fails (a large page beats a
     /// failed save). Long-edge cap and quality are tuned for document legibility.
     private func compressedCGImage(from image: UIImage) throws -> CGImage {
-        if let jpeg = PageImageCompressor.compressedJPEGData(from: image, maxLongEdge: 2400, quality: 0.65),
+        if let jpeg = PageImageCompressor.compressedJPEGData(from: image, maxLongEdge: 2800, quality: 0.65),
            let source = CGImageSourceCreateWithData(jpeg as CFData, nil),
            let cg = CGImageSourceCreateImageAtIndex(source, 0, nil) {
             return cg

@@ -101,7 +101,7 @@ final class PDFAssemblerTests: XCTestCase {
         let page = ScannedPage(image: largeGradientImage(3000, 4000), observations: [])
         let pdf = try PDFAssembler().assemble(pages: [page], createdAt: Date())
         let bounds = try XCTUnwrap(pdf.page(at: 0)).bounds(for: .mediaBox)
-        XCTAssertLessThanOrEqual(max(bounds.width, bounds.height), 2400 + 1)
+        XCTAssertLessThanOrEqual(max(bounds.width, bounds.height), 2800 + 1)
     }
 
     func test_assemble_doesNotUpsampleSmallPage() throws {
