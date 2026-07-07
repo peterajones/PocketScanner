@@ -6,6 +6,14 @@ Versions earlier than the current shipping release are deleted from this doc as 
 
 ---
 
+## Next up — planned (from 2026-07-07 post-v2.4 review)
+
+Three features, sequenced **C → B → A**, one per release.
+
+- **C — Reduce scanned-PDF file size (v2.5 / 24) [FIRST].** Finding: a single-page PocketScanner scan = **~3.5 MB** vs **~146 KB** for the same kind of doc off a Canon flatbed (VueScan) — ~24×. Root cause: `PDFAssembler.renderPage` embeds each page at **full camera resolution, 1pt/px, no downsampling, no JPEG** (Quartz lossless default). Fix: at assemble time, **downsample** to a document-sensible resolution (long edge ≈ letter @ ~200 DPI) + **JPEG-compress** the embedded image → expect **10–20× smaller**, flatbed-comparable. SAFE: the OCR text layer is separate invisible glyphs (`drawInvisibleText`), so compressing the image doesn't touch searchability. RISK to tune on-device: small tax-slip print must stay legible (VueScan proves 146 KB + legible is achievable). Contained to `PDFAssembler` (+ maybe `ScanPipeline`). Motivated by the tax workflow (dozens of slips → archive → Dropbox → TaxSlipReader; 3.5 MB/page = ~90 MB folders).
+- **B — Default scan filter + optional stronger "Document" preset (v2.6 / 25).** Finding: scans default to **Color (`.none`)** → washed out, and you must change it every scan (racy vs auto-capture). NOTE: applying filters **when editing already exists** (`PageEditorView` has a filter picker + "apply to all pages") — that half is done. So the gap = **no persistent default**. Reframe (respecting "scanner, not editor — presets, not sliders"): add a **settable default filter** (Settings), optionally **one crisper Document preset** (could reuse `SignatureProcessor`'s flat-field trick) — **NOT** Camera-app sliders. `ImageFilter` presets today: none/greyscale/blackAndWhite/photo via `CIColorControls`.
+- **A — Signature iCloud sync (v2.7 / 26).** Finding: signatures live in **Application Support** (`SignatureStore`) — local-only, per-install; delete/reinstall wipes them (why they "vanished"). Fix: move signature storage into the iCloud container with local fallback (reuse the `ICloudContainer` pattern documents use), migrate existing local signatures on first run, and place them **hidden from the scan library / Files** (not under `/Documents`). Store was built for this ("a future iCloud move [is] a localized change"). Rounds out the signatures project.
+
 ## Enhancements v1.3 and beyond
 
 Lower priority. Some of these may never ship. The list exists to capture what we considered.
