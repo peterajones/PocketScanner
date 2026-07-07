@@ -1,4 +1,5 @@
 import CoreGraphics
+import ImageIO
 import PDFKit
 import UIKit
 
@@ -54,37 +55,19 @@ struct PDFAssembler {
     }
 
     private func renderPage(_ page: ScannedPage, into context: CGContext) throws {
-        // VisionKit returns UIImages with a non-`.up` orientation flag (the camera
-        // sensor is landscape; portrait photos carry a "rotate 90°" hint). Pulling
-        // `.cgImage` returns the raw sensor-orientation pixels, losing that flag —
-        // which lands the page rotated in the PDF. Normalize first so the bytes
-        // we draw match what the user saw in the scanner.
-        guard let cgImage = normalizedCGImage(from: page.image) else {
-            throw PDFAssemblerError.pageCreationFailed
-        }
+        let cgImage = try compressedCGImage(from: page.image)
 
-        // Page size in points matches the image's pixel size at 1pt-per-pixel; this
-        // preserves aspect ratio without resampling.
+        // Page size in points matches the (possibly downsampled) image's pixel size at
+        // 1pt-per-pixel; preserves aspect ratio without further resampling.
         let size = CGSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height))
         var pageRect = CGRect(origin: .zero, size: size)
 
         context.beginPage(mediaBox: &pageRect)
-
-        // CGContext for PDF uses bottom-left origin. `draw(_:in:)` already handles
-        // that and renders the image right-side up — an explicit y-flip here would
-        // render it upside-down.
         context.draw(cgImage, in: pageRect)
 
-        // Draw OCR-recognized text invisibly so `pdf.string` returns it and search
-        // highlights align with the visible content. We use the PDF text-rendering
-        // mode "invisible" (3), which keeps the glyphs in the content stream — and
-        // therefore in the text extraction — while not painting any pixels. Each
-        // observation is positioned at its Vision-normalized bounding box scaled to
-        // page coordinates, so per-line highlights match the underlying text.
         if !page.observations.isEmpty {
             drawInvisibleText(page.observations, in: pageRect, into: context)
         }
-
         context.endPage()
     }
 
@@ -101,6 +84,22 @@ struct PDFAssembler {
         return renderer.image { _ in
             image.draw(at: .zero)
         }.cgImage
+    }
+
+    /// Downsampled + JPEG-encoded page image, built from the JPEG bytes via ImageIO so
+    /// the CoreGraphics PDF context embeds the compressed (DCTDecode) stream. Falls back
+    /// to the uncompressed normalized image if compression fails (a large page beats a
+    /// failed save). Long-edge cap and quality are tuned for document legibility.
+    private func compressedCGImage(from image: UIImage) throws -> CGImage {
+        if let jpeg = PageImageCompressor.compressedJPEGData(from: image, maxLongEdge: 2400, quality: 0.65),
+           let source = CGImageSourceCreateWithData(jpeg as CFData, nil),
+           let cg = CGImageSourceCreateImageAtIndex(source, 0, nil) {
+            return cg
+        }
+        guard let normalized = normalizedCGImage(from: image) else {
+            throw PDFAssemblerError.pageCreationFailed
+        }
+        return normalized
     }
 
     private func drawInvisibleText(_ observations: [OCRObservation], in pageRect: CGRect, into context: CGContext) {

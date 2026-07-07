@@ -88,7 +88,48 @@ final class PDFAssemblerTests: XCTestCase {
         XCTAssertEqual(bounds.height, 100, accuracy: 0.5)
     }
 
+    // MARK: - Compression tests
+
+    func test_assemble_compressesLargePageWellBelowLosslessSize() throws {
+        let page = ScannedPage(image: largeGradientImage(), observations: [])
+        let pdf = try PDFAssembler().assemble(pages: [page], createdAt: Date())
+        let data = try XCTUnwrap(pdf.dataRepresentation())
+        XCTAssertLessThan(data.count, 800_000, "expected downsampled+JPEG page, got \(data.count) bytes")
+    }
+
+    func test_assemble_downsamplesLargePageToCap() throws {
+        let page = ScannedPage(image: largeGradientImage(3000, 4000), observations: [])
+        let pdf = try PDFAssembler().assemble(pages: [page], createdAt: Date())
+        let bounds = try XCTUnwrap(pdf.page(at: 0)).bounds(for: .mediaBox)
+        XCTAssertLessThanOrEqual(max(bounds.width, bounds.height), 2400 + 1)
+    }
+
+    func test_assemble_doesNotUpsampleSmallPage() throws {
+        let small = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 800)).image { ctx in
+            UIColor.white.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 600, height: 800))
+        }
+        let pdf = try PDFAssembler().assemble(pages: [ScannedPage(image: small, observations: [])], createdAt: Date())
+        let bounds = try XCTUnwrap(pdf.page(at: 0)).bounds(for: .mediaBox)
+        XCTAssertEqual(max(bounds.width, bounds.height), 800, accuracy: 2)
+    }
+
+    func test_assemble_preservesSearchableText_afterCompression() throws {
+        let page = ScannedPage(image: largeGradientImage(), observations: [obs("INVOICE", y: 0.8)])
+        let pdf = try PDFAssembler().assemble(pages: [page], createdAt: Date())
+        XCTAssertTrue((pdf.string ?? "").contains("INVOICE"))
+    }
+
     // MARK: - Helpers
+
+    private func largeGradientImage(_ w: CGFloat = 3000, _ h: CGFloat = 4000) -> UIImage {
+        let fmt = UIGraphicsImageRendererFormat(); fmt.scale = 1; fmt.opaque = true
+        return UIGraphicsImageRenderer(size: CGSize(width: w, height: h), format: fmt).image { ctx in
+            let colors = [UIColor.systemRed.cgColor, UIColor.systemBlue.cgColor] as CFArray
+            let space = CGColorSpaceCreateDeviceRGB()
+            let gradient = CGGradient(colorsSpace: space, colors: colors, locations: [0, 1])!
+            ctx.cgContext.drawLinearGradient(gradient, start: .zero, end: CGPoint(x: w, y: h), options: [])
+        }
+    }
 
     private func whitePageImage() -> UIImage {
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 612, height: 792), true, 1)
