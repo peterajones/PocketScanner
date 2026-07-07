@@ -56,6 +56,7 @@ struct DocumentViewerView: View {
     @State private var session: DocumentSession?
     @State private var loadError: String?
     @State private var isRenaming = false
+    @State private var renameText = ""
     @State private var showDeleteConfirm = false
     @State private var editMode = false
     @State private var showAddPages = false
@@ -173,123 +174,15 @@ struct DocumentViewerView: View {
                 // and falls through to the main body below.
             })
         } else {
-            VStack(spacing: 0) {
-            PDFKitView(
-                document: session.pdf,
-                highlightedSelections: searchHighlight?.matches ?? [],
-                currentSelection: searchHighlight?.current,
-                annotationRevision: annotationRevision,
-                signatureRevision: signatureRevision,
-                onApplyTool: { tool, selection in
-                    applyTool(tool, to: selection, session: session)
-                },
-                onRequestDelete: { annotation, page in
-                    if annotation.userName == DocumentSession.signatureAnnotationName {
-                        pendingSignatureEdit = SignatureEdit(annotation: annotation, page: page)
-                    } else {
-                        pendingDeletion = PendingDeletion(annotation: annotation, page: page)
-                    }
-                },
-                currentPageIndex: $currentVisiblePageIndex
-            )
-            .ignoresSafeArea(edges: editMode ? [] : .bottom)
-            .confirmationDialog(
-                "Remove this mark?",
-                isPresented: Binding(
-                    get: { pendingDeletion != nil },
-                    set: { if !$0 { pendingDeletion = nil } }
-                ),
-                presenting: pendingDeletion
-            ) { item in
-                Button("Delete", role: .destructive) {
-                    item.page.removeAnnotation(item.annotation)
-                    _ = try? session.save()
-                    annotationRevision &+= 1
-                    pendingDeletion = nil
-                }
-                Button("Cancel", role: .cancel) { pendingDeletion = nil }
-            }
-            if editMode {
-                EditModeView(
-                    session: session,
-                    onEditPage: { editingPageIndex = $0 },
-                    onAddPages: { showAddPages = true },
-                    onExtract: { indices in
-                        let extracted = DocumentMutations.extractPages(from: session.pdf, at: indices)
-                        guard extracted.pageCount > 0 else { return }
-                        extractName = "\(session.displayName) extract"
-                        pendingExtraction = PendingExtraction(pdf: extracted)
-                    }
-                )
-                .transition(.move(edge: .bottom))
-            }
-        }
+            documentContent(session: session)
         .animation(.easeInOut(duration: 0.2), value: editMode)
         .task(id: ObjectIdentifier(session.pdf)) {
             rebuildHighlight(session: session)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                if isRenaming {
-                    TextField("Name", text: Binding(
-                        get: { session.displayName },
-                        set: { session.displayName = $0 }
-                    ))
-                    .textFieldStyle(.roundedBorder)
-                    .submitLabel(.done)
-                    .onSubmit { commitRename(session: session) }
-                    .frame(minWidth: 200)
-                } else {
-                    Button(session.displayName) { isRenaming = true }
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
-            }
-            ToolbarItemGroup(placement: .bottomBar) {
-                Button(editMode ? "Done" : "Edit") { editMode.toggle() }
-                    .accessibilityIdentifier("Viewer.EditToggle")
-                Button("Sign") {
-                    let sigs = signatureStore.all()
-                    if sigs.isEmpty {
-                        showingSignCapture = true
-                    } else if sigs.count == 1 {
-                        // place the only signature directly (no-op if no page to sign)
-                        if let page = currentPageForSigning(session: session) {
-                            placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
-                                                         page: page, seedRect: nil)
-                        }
-                    } else {
-                        showingSignaturePicker = true
-                    }
-                }
-                Spacer()
-                if let h = searchHighlight, h.matchCount > 0 {
-                    Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
-                    Text(counterLabel(highlight: h))
-                        .font(.footnote.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                    Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
-                    Spacer()
-                }
-                ShareLink(item: session.url)
-                Menu {
-                    Button {
-                        isRenaming = true
-                    } label: {
-                        Label("Rename", systemImage: "pencil")
-                    }
-                    .accessibilityIdentifier("Viewer.Rename")
-                    Button(role: .destructive) {
-                        showDeleteConfirm = true
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                    .accessibilityIdentifier("Viewer.Delete")
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
+        .toolbar { viewerToolbar(session: session) }
+        .alert("Rename Document", isPresented: $isRenaming) {
+            renameAlertActions(session: session)
         }
         .confirmationDialog("Delete this document?", isPresented: $showDeleteConfirm) {
             Button("Delete", role: .destructive) {
@@ -485,6 +378,129 @@ struct DocumentViewerView: View {
             extractError = "Couldn't save \"\(name)\". Please try again."
         }
         pendingExtraction = nil
+    }
+
+    private func beginRename(session: DocumentSession) {
+        renameText = session.displayName
+        isRenaming = true
+    }
+
+    @ViewBuilder
+    private func documentContent(session: DocumentSession) -> some View {
+        VStack(spacing: 0) {
+            PDFKitView(
+                document: session.pdf,
+                highlightedSelections: searchHighlight?.matches ?? [],
+                currentSelection: searchHighlight?.current,
+                annotationRevision: annotationRevision,
+                signatureRevision: signatureRevision,
+                onApplyTool: { tool, selection in
+                    applyTool(tool, to: selection, session: session)
+                },
+                onRequestDelete: { annotation, page in
+                    if annotation.userName == DocumentSession.signatureAnnotationName {
+                        pendingSignatureEdit = SignatureEdit(annotation: annotation, page: page)
+                    } else {
+                        pendingDeletion = PendingDeletion(annotation: annotation, page: page)
+                    }
+                },
+                currentPageIndex: $currentVisiblePageIndex
+            )
+            .ignoresSafeArea(edges: editMode ? [] : .bottom)
+            .confirmationDialog(
+                "Remove this mark?",
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { if !$0 { pendingDeletion = nil } }
+                ),
+                presenting: pendingDeletion
+            ) { item in
+                Button("Delete", role: .destructive) {
+                    item.page.removeAnnotation(item.annotation)
+                    _ = try? session.save()
+                    annotationRevision &+= 1
+                    pendingDeletion = nil
+                }
+                Button("Cancel", role: .cancel) { pendingDeletion = nil }
+            }
+            if editMode {
+                EditModeView(
+                    session: session,
+                    onEditPage: { editingPageIndex = $0 },
+                    onAddPages: { showAddPages = true },
+                    onExtract: { indices in
+                        let extracted = DocumentMutations.extractPages(from: session.pdf, at: indices)
+                        guard extracted.pageCount > 0 else { return }
+                        extractName = "\(session.displayName) extract"
+                        pendingExtraction = PendingExtraction(pdf: extracted)
+                    }
+                )
+                .transition(.move(edge: .bottom))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func renameAlertActions(session: DocumentSession) -> some View {
+        TextField("Name", text: $renameText).autocorrectionDisabled()
+        Button("Rename") {
+            session.displayName = renameText
+            commitRename(session: session)
+        }
+        Button("Cancel", role: .cancel) {}
+    }
+
+    @ToolbarContentBuilder
+    private func viewerToolbar(session: DocumentSession) -> some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            Button(session.displayName) { beginRename(session: session) }
+                .font(.headline)
+                .foregroundStyle(.primary)
+        }
+        ToolbarItemGroup(placement: .bottomBar) {
+            Button(editMode ? "Done" : "Edit") { editMode.toggle() }
+                .accessibilityIdentifier("Viewer.EditToggle")
+            Button("Sign") {
+                let sigs = signatureStore.all()
+                if sigs.isEmpty {
+                    showingSignCapture = true
+                } else if sigs.count == 1 {
+                    // place the only signature directly (no-op if no page to sign)
+                    if let page = currentPageForSigning(session: session) {
+                        placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
+                                                     page: page, seedRect: nil)
+                    }
+                } else {
+                    showingSignaturePicker = true
+                }
+            }
+            Spacer()
+            if let h = searchHighlight, h.matchCount > 0 {
+                Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
+                Text(counterLabel(highlight: h))
+                    .font(.footnote.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+                Spacer()
+            }
+            ShareLink(item: session.url)
+            Menu {
+                Button {
+                    beginRename(session: session)
+                } label: {
+                    Label("Rename", systemImage: "pencil")
+                }
+                .accessibilityIdentifier("Viewer.Rename")
+                Button(role: .destructive) {
+                    showDeleteConfirm = true
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .accessibilityIdentifier("Viewer.Delete")
+            } label: {
+                Image(systemName: "ellipsis.circle")
+            }
+        }
     }
 
     private func commitRename(session: DocumentSession) {
