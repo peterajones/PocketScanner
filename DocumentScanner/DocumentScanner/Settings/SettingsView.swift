@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var renameField = ""
     private let signatureStore = SignatureStore()
     @AppStorage("showFolders") private var showFolders = true
+    @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
     #if DEBUG
     @AppStorage(TouchIndicatorSettings.key) private var touchIndicatorsEnabled = TouchIndicatorSettings.defaultEnabled
     #endif
@@ -31,6 +32,17 @@ struct SettingsView: View {
                 Text("Library")
             } footer: {
                 Text("When off, all documents appear in a single flat list.")
+            }
+            Section {
+                Picker("Default Filter", selection: $defaultScanFilterRaw) {
+                    ForEach(ImageFilter.allCases) { f in
+                        Text(f.displayName).tag(f.rawValue)
+                    }
+                }
+            } header: {
+                Text("Scanning")
+            } footer: {
+                Text("New scans start with this filter. You can still change it for any scan.")
             }
             #if DEBUG
             Section {

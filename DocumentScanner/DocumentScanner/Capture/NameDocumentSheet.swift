@@ -21,6 +21,7 @@ struct NameDocumentSheet: View {
     @State private var previewImage: UIImage?    // previewBase with `filter` applied
     @State private var selectedDestination: URL = URL(fileURLWithPath: "/")
     @State private var destinationTree: (main: ScanDestination, groups: [ScanDestinationGroup])?
+    @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
     private let filterEngine = ImageFilterEngine()
     @Environment(\.alertCenter) private var alertCenter
 
@@ -114,7 +115,10 @@ struct NameDocumentSheet: View {
             }
             .task { await refineDefaultName() }
             .task { await loadPreviewBase() }
-            .onAppear { loadDestinations() }
+            .onAppear {
+                loadDestinations()
+                filter = ImageFilter(rawValue: defaultScanFilterRaw) ?? .none
+            }
             .onChange(of: filter) { _, _ in applyFilterToPreview() }
             .onDisappear { recognizeTask.cancel() }
         }
@@ -176,7 +180,7 @@ struct NameDocumentSheet: View {
         let target = Self.previewSize(for: first.size, maxDimension: 1000)
         let base = await first.byPreparingThumbnail(ofSize: target) ?? first
         previewBase = base
-        previewImage = base   // filter defaults to .none
+        previewImage = filterEngine.apply(filter, to: base) ?? base   // reflect the (possibly default) filter
     }
 
     private func applyFilterToPreview() {
