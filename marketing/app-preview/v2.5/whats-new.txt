@@ -1,0 +1,3 @@
+What's New — v2.5 (24)
+
+Smaller scans. Documents now save much smaller — pages are compressed like a real scanner — so your library takes far less space and syncs faster, with no loss of sharpness or searchable text.
