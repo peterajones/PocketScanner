@@ -1,0 +1,7 @@
+What's New — v2.6 (25)
+
+Two improvements:
+
+• Default scan filter — pick your preferred look (Color, Greyscale, B&W, or Photo) in Settings, and every new scan starts with it. You can still change it for any single scan.
+
+• Fixed: renaming a document now works again.
