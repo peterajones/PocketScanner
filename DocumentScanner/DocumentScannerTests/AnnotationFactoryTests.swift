@@ -75,5 +75,15 @@ final class AnnotationFactoryTests: XCTestCase {
         // A non-mark annotation (free text) → NOT deletable.
         let note = PDFAnnotation(bounds: bounds, forType: .freeText, withProperties: nil)
         XCTAssertFalse(AnnotationFactory.isUserDeletable(note))
+
+        // Signature stamp → deletable (tap opens Move/Remove).
+        let sig = PDFAnnotation(bounds: bounds, forType: .stamp, withProperties: nil)
+        sig.userName = DocumentSession.signatureAnnotationName
+        XCTAssertTrue(AnnotationFactory.isUserDeletable(sig))
+
+        // Date stamp → deletable (tap opens Move/Remove).
+        let dateStamp = PDFAnnotation(bounds: bounds, forType: .stamp, withProperties: nil)
+        dateStamp.userName = DocumentSession.dateStampAnnotationName
+        XCTAssertTrue(AnnotationFactory.isUserDeletable(dateStamp))
     }
 }
