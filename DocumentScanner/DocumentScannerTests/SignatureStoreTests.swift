@@ -54,31 +54,10 @@ final class SignatureStoreTests: XCTestCase {
         XCTAssertNil(store.signature(withID: "does-not-exist"))
     }
 
-    func test_migratesLegacySignaturePng() throws {
-        let dir = tempDir()
-        try image(70, 35).pngData()!.write(to: dir.appendingPathComponent("signature.png"))
-        let store = SignatureStore(directory: dir)
-        let all = store.all()
-        XCTAssertEqual(all.count, 1, "legacy signature folded into the collection")
-        XCTAssertFalse(FileManager.default.fileExists(atPath: dir.appendingPathComponent("signature.png").path),
-                       "legacy file renamed away")
-        XCTAssertEqual(store.all().count, 1, "migration is idempotent")
-    }
-
-    func test_all_noSidecar_namesAreNil() throws {
+    func test_all_freshStore_namesAreNil() throws {
         let store = SignatureStore(directory: tempDir())
         _ = try store.add(image())
-        XCTAssertNil(store.all().first?.name, "no sidecar ⇒ unnamed")
-    }
-
-    func test_all_attachesNameFromSidecar() throws {
-        let dir = tempDir()
-        let store = SignatureStore(directory: dir)
-        let sig = try store.add(image())
-        let json = try JSONEncoder().encode([sig.id: "Work"])
-        try json.write(to: dir.appendingPathComponent("names.json"))
-        XCTAssertEqual(store.all().first?.name, "Work")
-        XCTAssertEqual(store.signature(withID: sig.id)?.name, "Work", "name also attached via signature(withID:)")
+        XCTAssertNil(store.all().first?.name, "a fresh signature is unnamed")
     }
 
     func test_rename_setsName_roundTrips() throws {
@@ -111,31 +90,42 @@ final class SignatureStoreTests: XCTestCase {
         XCTAssertEqual(store.all().first?.name, "Work")
     }
 
-    func test_remove_prunesNameFromSidecar() throws {
-        let dir = tempDir()
-        let store = SignatureStore(directory: dir)
+    func test_remove_dropsNameToo() throws {
+        let store = SignatureStore(directory: tempDir())
         let a = try store.add(image())
         store.rename(id: a.id, to: "Work")
         store.remove(id: a.id)
-        // A new signature reuses no ids (UUIDs), and the old name must not linger.
+        XCTAssertTrue(store.all().isEmpty)
         let b = try store.add(image())
-        XCTAssertNil(store.all().first(where: { $0.id == b.id })?.name)
-        // And the pruned id is gone from the sidecar contents. Read directly
-        // (not `if let`) so the assertion is guaranteed to run — a regression
-        // that stopped writing names.json would fail here, not silently skip.
-        let data = try Data(contentsOf: dir.appendingPathComponent("names.json"))
-        let dict = try JSONDecoder().decode([String: String].self, from: data)
-        XCTAssertNil(dict[a.id], "removed signature's name pruned")
+        XCTAssertNil(store.all().first(where: { $0.id == b.id })?.name, "removed name does not linger")
     }
 
-    func test_all_ignoresSidecarEntriesWithNoPng() throws {
+    // MARK: - Migration from the old PNG format
+
+    func test_migratesOldFormatPngsAndNames() throws {
         let dir = tempDir()
+        let id1 = UUID().uuidString, id2 = UUID().uuidString
+        try image(50, 20).pngData()!.write(to: dir.appendingPathComponent("\(id1).png"))
+        try image(60, 20).pngData()!.write(to: dir.appendingPathComponent("\(id2).png"))
+        try JSONEncoder().encode([id1: "Work"]).write(to: dir.appendingPathComponent("names.json"))
+
         let store = SignatureStore(directory: dir)
-        let sig = try store.add(image())
-        let json = try JSONEncoder().encode([sig.id: "Work", "ghost-id": "Nobody"])
-        try json.write(to: dir.appendingPathComponent("names.json"))
         let all = store.all()
-        XCTAssertEqual(all.count, 1, "ghost entry adds no signature")
-        XCTAssertEqual(all.first?.name, "Work")
+        XCTAssertEqual(all.count, 2, "both old PNGs migrated into the archive")
+        XCTAssertEqual(all.first(where: { $0.id == id1 })?.name, "Work", "name migrated from sidecar")
+        XCTAssertNil(all.first(where: { $0.id == id2 })?.name)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: dir.appendingPathComponent("\(id1).png").path),
+                      "old PNGs left in place as backup")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: dir.appendingPathComponent("signatures.dat").path),
+                      "archive written")
+        XCTAssertEqual(store.all().count, 2, "migration is idempotent")
+    }
+
+    func test_migratesLegacySingleSignaturePng() throws {
+        let dir = tempDir()
+        try image(70, 35).pngData()!.write(to: dir.appendingPathComponent("signature.png"))
+        let store = SignatureStore(directory: dir)
+        XCTAssertEqual(store.all().count, 1, "legacy signature.png folded into the archive")
+        XCTAssertEqual(store.all().count, 1, "idempotent")
     }
 }
