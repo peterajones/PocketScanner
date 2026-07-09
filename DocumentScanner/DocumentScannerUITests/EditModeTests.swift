@@ -6,22 +6,17 @@ final class EditModeTests: XCTestCase {
     func test_editMode_addAndDeletePage() async throws {
         let app = TestHelpers.launchedApp()
 
-        // Camera permission may prompt on the first scanner present — accept it.
-        let permissionMonitor = addUIInterruptionMonitor(withDescription: "Camera permission") { alert in
-            for label in ["Allow", "OK", "Continue", "Allow While Using App"] {
-                if alert.buttons[label].exists {
-                    alert.buttons[label].tap()
-                    return true
-                }
-            }
-            return false
-        }
-        defer { removeUIInterruptionMonitor(permissionMonitor) }
+        // In -UITestMode the scanner is stubbed and CameraPermission reports
+        // authorized, so no system permission dialog appears — no interruption
+        // monitor needed.
 
         // --- 1. Create initial 1-page document.
         app.buttons["Library.AddButton"].waitForElementOrFail()
         app.buttons["Library.AddButton"].tap()
-        app.tap() // wake interruption monitor if needed
+        // v2.4+ the library + is a menu (Scan Document / New Folder) —
+        // choose Scan Document to launch the (stub) scanner.
+        app.buttons["Scan Document"].waitForElementOrFail()
+        app.buttons["Scan Document"].tap()
 
         app.buttons["StubScanner.Finish"].waitForElementOrFail()
         app.buttons["StubScanner.Finish"].tap()
@@ -53,7 +48,6 @@ final class EditModeTests: XCTestCase {
         let addPages = app.buttons["EditMode.AddPages"]
         addPages.waitForElementOrFail()
         addPages.tap()
-        app.tap() // wake interruption monitor if needed
 
         app.buttons["StubScanner.Finish"].waitForElementOrFail()
         app.buttons["StubScanner.Finish"].tap()
