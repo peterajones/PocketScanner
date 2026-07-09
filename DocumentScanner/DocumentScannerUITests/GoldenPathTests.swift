@@ -6,17 +6,9 @@ final class GoldenPathTests: XCTestCase {
     func test_scan_save_viewLibrary_openViewer() async throws {
         let app = TestHelpers.launchedApp()
 
-        // Auto-dismiss the camera permission system alert (Allow) if it appears.
-        addUIInterruptionMonitor(withDescription: "System Dialog") { alert in
-            for label in ["Allow", "OK", "Continue"] {
-                let button = alert.buttons[label]
-                if button.exists {
-                    button.tap()
-                    return true
-                }
-            }
-            return false
-        }
+        // In -UITestMode the scanner is stubbed and CameraPermission reports
+        // authorized, so no system permission dialog appears — no interruption
+        // monitor needed.
 
         // 1. Empty state visible.
         XCTAssertTrue(app.staticTexts["No documents yet"].waitForExistence(timeout: 8),
@@ -26,8 +18,10 @@ final class GoldenPathTests: XCTestCase {
         let addButton = app.buttons["Library.AddButton"]
         addButton.waitForElementOrFail()
         addButton.tap()
-        // Poke the app to give the interruption monitor a chance to fire.
-        app.tap()
+        // v2.4+ the library + is a menu (Scan Document / New Folder) —
+        // choose Scan Document to launch the (stub) scanner.
+        app.buttons["Scan Document"].waitForElementOrFail()
+        app.buttons["Scan Document"].tap()
 
         // 3. Stub scanner appears; tap Finish.
         let finishButton = app.buttons["StubScanner.Finish"]
