@@ -50,6 +50,7 @@ enum AnnotationFactory {
     /// Signature stamps are recognised by their explicit userName tag.
     static func isUserDeletable(_ annotation: PDFAnnotation) -> Bool {
         if annotation.userName == DocumentSession.signatureAnnotationName { return true }
+        if annotation.userName == DocumentSession.dateStampAnnotationName { return true }
         let isMarkSubtype = annotation.type == "Highlight" || annotation.type == "StrikeOut"
         return isMarkSubtype && annotation.userName != DocumentSession.searchHighlightAnnotationName
     }
