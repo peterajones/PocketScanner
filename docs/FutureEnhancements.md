@@ -12,12 +12,16 @@ Lower priority. Some of these may never ship. The list exists to capture what we
 
 ### Signing follow-ups
 
-The core signing project is complete — sign a document, multiple signatures, single-shot capture, signature names, and iCloud sync all shipped through v2.7. Remaining unscheduled ideas:
+The core signing project is complete — sign a document, multiple signatures, single-shot capture, signature names, and iCloud sync all shipped through v2.7.
 
-- **Typed / finger-drawn signatures** — create a signature without scanning paper.
-- **Initials / date / text stamps** — quick reusable stamps beyond a signature.
-- **Auto-detect the signature line** — find the "X_____" line and offer to place there.
-- **Sign multiple pages at once** — apply a placed signature across a page range.
+- **Initials / date / text stamps** — quick reusable stamps beyond a signature (dating a document is a common real need alongside signing). **Currently exploring (2026-07-09).**
+
+**Maybe (parked — genuine value, but meaningful error/UX risk):**
+
+- **Auto-detect the signature line** — find the "X_____" line and offer to place there. Too much room for error, especially on long/multi-page documents.
+- **Sign multiple pages at once** — apply a placed signature across a page range. Same error/UX concern as auto-detect.
+
+**Dropped:** typed / finger-drawn signatures — typed text can't be placed cleanly (stamps are the better path), and finger-drawn signatures always look bad.
 
 ### Business / pricing
 
