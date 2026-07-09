@@ -1,9 +1,10 @@
 import UIKit
 
 /// Persists the user's reusable signatures as a single binary-plist archive
-/// (`signatures.dat`). Local-only in this task; Task 3 adds iCloud resolution.
-/// The public API (all/add/remove/rename/signature(withID:)) is unchanged so
-/// callers stay untouched.
+/// (`signatures.dat`). Stored in the hidden iCloud sibling of the document scope
+/// when signed into iCloud, else locally; a lazy converge-on-load path migrates
+/// the old PNG format and promotes local data up to iCloud. The public API
+/// (all/add/remove/rename/signature(withID:)) is unchanged so callers stay untouched.
 struct SignatureStore {
     private let localDirectory: URL
     private let iCloudDirectoryProvider: () -> URL?
@@ -11,7 +12,7 @@ struct SignatureStore {
 
     init(
         localDirectory: URL = SignatureStore.defaultLocalDirectory,
-        iCloudDirectoryProvider: @escaping () -> URL? = { nil }
+        iCloudDirectoryProvider: @escaping () -> URL? = SignatureStore.defaultICloudDirectoryProvider
     ) {
         self.localDirectory = localDirectory
         self.iCloudDirectoryProvider = iCloudDirectoryProvider
@@ -26,6 +27,17 @@ struct SignatureStore {
     static var defaultLocalDirectory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Signature", isDirectory: true)
+    }
+
+    /// The hidden sibling of the document scope: `<container>/Signatures/`. NOT
+    /// under `/Documents`, so iCloud syncs it but Files.app and the scan library
+    /// (which enumerate `/Documents`) never surface it. nil when signed out of iCloud.
+    static var defaultICloudDirectoryProvider: () -> URL? {
+        {
+            FileManager.default
+                .url(forUbiquityContainerIdentifier: nil)?
+                .appendingPathComponent("Signatures", isDirectory: true)
+        }
     }
 
     // MARK: - Public API
@@ -74,9 +86,12 @@ struct SignatureStore {
 
     // MARK: - Location
 
-    /// The archive location writes/reads target. Local-only in this task.
+    /// iCloud archive when signed in, else the local archive.
     private func preferredArchiveURL() -> URL {
-        localDirectory.appendingPathComponent(archiveName)
+        if let cloudDir = iCloudDirectoryProvider() {
+            return cloudDir.appendingPathComponent(archiveName)
+        }
+        return localDirectory.appendingPathComponent(archiveName)
     }
 
     // MARK: - Load / converge
@@ -140,6 +155,9 @@ struct SignatureStore {
     // MARK: - Coordinated I/O
 
     private func readArchive(at url: URL) -> SignatureArchive? {
+        // Force download if this is a not-yet-materialized iCloud placeholder.
+        // Throws (harmlessly) for a non-ubiquitous local URL, hence try?.
+        try? FileManager.default.startDownloadingUbiquitousItem(at: url)
         var archive: SignatureArchive?
         var coordError: NSError?
         NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &coordError) { readURL in
