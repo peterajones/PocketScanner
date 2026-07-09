@@ -1,0 +1,3 @@
+What's New — v2.7 (26)
+
+• Your signatures now back up to iCloud — they'll be waiting for you after you reinstall the app or set up a new device, and they stay in sync across your devices. No setup needed; it just works when you're signed in to iCloud.
