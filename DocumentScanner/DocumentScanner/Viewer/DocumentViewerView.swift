@@ -72,6 +72,8 @@ struct DocumentViewerView: View {
     @State private var extractError: String?
     @State private var showingSignCapture = false
     @State private var showingSignaturePicker = false
+    @State private var showingAddDate = false
+    @State private var pendingDateEdit: SignatureEdit?
     @State private var placement: PlacementRequest?
     @State private var pendingSignatureEdit: SignatureEdit?
     @State private var showingMovePicker = false
@@ -94,6 +96,8 @@ struct DocumentViewerView: View {
         /// When moving an existing signature, the annotation to remove — but only
         /// once the user commits (taps Done), so a Cancel keeps the original.
         var replacing: PDFAnnotation? = nil
+        var title: String = "Place Signature"
+        var dateString: String? = nil     // non-nil ⇒ a date stamp (place via placeDateStamp)
     }
     private struct SignatureEdit: Identifiable {
         let id = UUID()
@@ -166,6 +170,51 @@ struct DocumentViewerView: View {
         }
     }
 
+    /// `documentContent` plus the date-stamp sheet + edit alert. Split into its own
+    /// helper so the modifier chain in `loadedBody` stays within the Swift
+    /// type-checker's budget — adding these two modifiers inline tripped "unable to
+    /// type-check this expression in reasonable time" (the same ceiling the rename
+    /// alert hit earlier).
+    @ViewBuilder
+    private func dateStampContent(session: DocumentSession) -> some View {
+        documentContent(session: session)
+            .sheet(isPresented: $showingAddDate) {
+                AddDateSheet(
+                    onPick: { date, format in
+                        showingAddDate = false
+                        guard let page = currentPageForSigning(session: session) else { return }
+                        let str = format.string(for: date)
+                        let img = DateStampRenderer.image(for: str)
+                        placement = PlacementRequest(signature: img, page: page, seedRect: nil,
+                                                     title: "Place Date", dateString: str)
+                    },
+                    onCancel: { showingAddDate = false }
+                )
+            }
+            .alert("Date", isPresented: Binding(
+                get: { pendingDateEdit != nil },
+                set: { if !$0 { pendingDateEdit = nil } }
+            ), presenting: pendingDateEdit) { item in
+                Button("Move") {
+                    // Re-render the SAME date from the string persisted in contents,
+                    // then re-place it (works before and after a save→reload).
+                    let str = item.annotation.contents ?? ""
+                    let img = DateStampRenderer.image(for: str)
+                    placement = PlacementRequest(signature: img, page: item.page,
+                                                 seedRect: item.annotation.bounds,
+                                                 replacing: item.annotation,
+                                                 title: "Place Date", dateString: str)
+                    pendingDateEdit = nil
+                }
+                Button("Remove", role: .destructive) {
+                    item.page.removeAnnotation(item.annotation)
+                    _ = try? session.save(); annotationRevision &+= 1; signatureRevision &+= 1
+                    pendingDateEdit = nil
+                }
+                Button("Cancel", role: .cancel) { pendingDateEdit = nil }
+            }
+    }
+
     @ViewBuilder
     private func loadedBody(session: DocumentSession) -> some View {
         if !session.conflicts.isEmpty {
@@ -174,7 +223,7 @@ struct DocumentViewerView: View {
                 // and falls through to the main body below.
             })
         } else {
-            documentContent(session: session)
+            dateStampContent(session: session)
         .animation(.easeInOut(duration: 0.2), value: editMode)
         .task(id: ObjectIdentifier(session.pdf)) {
             rebuildHighlight(session: session)
@@ -291,11 +340,16 @@ struct DocumentViewerView: View {
                 signature: req.signature,
                 pageBounds: req.page.bounds(for: .mediaBox),
                 initialPageRect: req.seedRect,
+                title: req.title,
                 onPlace: { rect in
                     // Remove the old annotation only now, on commit — so a Cancel
-                    // above leaves the original signature untouched.
+                    // above leaves the original untouched.
                     if let old = req.replacing { req.page.removeAnnotation(old) }
-                    placeSignature(req.signature, id: req.signatureID, at: rect, on: req.page, session: session)
+                    if let ds = req.dateString {
+                        placeDateStamp(req.signature, dateString: ds, at: rect, on: req.page, session: session)
+                    } else {
+                        placeSignature(req.signature, id: req.signatureID, at: rect, on: req.page, session: session)
+                    }
                     placement = nil
                 },
                 onCancel: { placement = nil }
@@ -400,6 +454,8 @@ struct DocumentViewerView: View {
                 onRequestDelete: { annotation, page in
                     if annotation.userName == DocumentSession.signatureAnnotationName {
                         pendingSignatureEdit = SignatureEdit(annotation: annotation, page: page)
+                    } else if annotation.userName == DocumentSession.dateStampAnnotationName {
+                        pendingDateEdit = SignatureEdit(annotation: annotation, page: page)
                     } else {
                         pendingDeletion = PendingDeletion(annotation: annotation, page: page)
                     }
@@ -474,6 +530,10 @@ struct DocumentViewerView: View {
                     showingSignaturePicker = true
                 }
             }
+            Button("Date") {
+                if currentPageForSigning(session: session) != nil { showingAddDate = true }
+            }
+            .accessibilityIdentifier("Viewer.DateButton")
             Spacer()
             if let h = searchHighlight, h.matchCount > 0 {
                 Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
@@ -527,6 +587,16 @@ struct DocumentViewerView: View {
         let stamp = ImageStampAnnotation(image: image, bounds: rect,
                                          userName: DocumentSession.signatureAnnotationName)
         stamp.contents = id    // remember which saved signature this is, for Move
+        page.addAnnotation(stamp)
+        _ = try? session.save()
+        annotationRevision &+= 1
+        signatureRevision &+= 1
+    }
+
+    private func placeDateStamp(_ image: UIImage, dateString: String, at rect: CGRect, on page: PDFPage, session: DocumentSession) {
+        let stamp = ImageStampAnnotation(image: image, bounds: rect,
+                                         userName: DocumentSession.dateStampAnnotationName)
+        stamp.contents = dateString   // persist the rendered date so Move can re-render it
         page.addAnnotation(stamp)
         _ = try? session.save()
         annotationRevision &+= 1

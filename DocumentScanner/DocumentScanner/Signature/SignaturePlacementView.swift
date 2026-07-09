@@ -9,6 +9,7 @@ struct SignaturePlacementView: View {
     let signature: UIImage
     let pageBounds: CGRect          // page.bounds(for: .mediaBox)
     var initialPageRect: CGRect? = nil   // seed position/scale when MOVING an existing signature
+    var title: String = "Place Signature"
     let onPlace: (CGRect) -> Void
     let onCancel: () -> Void
 
@@ -52,7 +53,7 @@ struct SignaturePlacementView: View {
                     }
                 }
             }
-            .navigationTitle("Place Signature")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
         }
     }

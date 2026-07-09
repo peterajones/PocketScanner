@@ -39,6 +39,11 @@ final class DocumentSession {
     /// save like user marks (not search-tagged, so save() keeps it).
     nonisolated static let signatureAnnotationName = "DocumentScanner.signature"
 
+    /// Annotation `userName` marking a placed date stamp. Persists across save like
+    /// a signature; its `contents` holds the rendered date string so Move can
+    /// re-render it (even after a reload). `nonisolated` for the same reason as above.
+    nonisolated static let dateStampAnnotationName = "DocumentScanner.dateStamp"
+
     enum InitError: Error { case unreadablePDF }
 
     init(summary: DocumentSummary, storage: DocumentStorage) throws {
