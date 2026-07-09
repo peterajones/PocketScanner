@@ -1,0 +1,16 @@
+// markdownlint config. Uses .jsonc (data, not JavaScript) so the VS Code
+// markdownlint extension loads it regardless of Workspace Trust — a .cjs
+// config is only executed in a trusted workspace, which is why it silently
+// stopped applying. Rules disabled to keep prose-style markdown from nagging.
+{
+  "MD004": false, // unordered-list-style
+  "MD013": false, // line-length
+  "MD022": false, // blanks-around-headings
+  "MD029": false, // ordered-list-item-prefix
+  "MD031": false, // blanks-around-fences
+  "MD032": false, // blanks-around-lists
+  "MD033": false, // no-inline-html
+  "MD040": false, // fenced-code-language
+  "MD058": false, // blanks-around-tables
+  "MD060": false  // table-column-style
+}

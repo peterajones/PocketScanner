@@ -22,9 +22,6 @@ Package.resolved
 # Claude Code local state (scheduled-task locks, etc.)
 .claude/
 
-#Markdownlint rules so I don't go crazy with the formatting of my markdown files.
-.markdownlint.cjs
-
 # App Preview working/source files (large takes, CapCut source, sample docs, bezel) —
 # kept locally as an archive, not committed. Final deliverables live in marketing/app-preview/.
 marketing/templates/App Preview Files/
