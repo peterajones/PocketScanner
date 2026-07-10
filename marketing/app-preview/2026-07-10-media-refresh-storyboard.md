@@ -17,8 +17,6 @@ signed-and-dated document.
 Six shots (trim to 5 by dropping #6 if it feels like filler). Framed device chrome
 is allowed on screenshots (Guideline 2.3.3) — unlike the App Preview.
 
-| # | Shot — what to capture | Caption |
-|---|---|---|
 **FINAL SET AS SHIPPED (v2.8, 6 shots, 1290×2796, all top-aligned captions):**
 
 | # | Shot | Caption (as shipped) |
