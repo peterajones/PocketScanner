@@ -10,6 +10,10 @@ real names, accounts, or bookings. Themed to match the app's demo content.
 | `lease-agreement.html` | One-page formal document |
 | `travel-itinerary.html` | Denser page (flights + hotel) for scan/annotate |
 | `legal-document.html` | **Multi-page** (3 pp.) for the multi-page scan + rotate beats |
+| `consulting-agreement.html` | **Official-looking** one-page agreement — corporate letterhead + two signature/date blocks. **Sign + date hero doc.** (Meridian Advisory Group) |
+| `offer-of-employment.html` | **Official-looking** offer letter — corporate letterhead + "Accepted and Agreed" sign/date block. Alt sign + date hero. (Northgate Technologies) |
+
+All fictional companies/people (Meridian Advisory Group, Northgate Technologies, Jordan Avery, Taylor Morgan) — no real trademarks, seals, or personal data, so the media stays App-Review-safe. Both are tuned to fit on **one page** including the signature/date block.
 
 ## Printing
 
