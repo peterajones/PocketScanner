@@ -10,6 +10,18 @@ Shipped and dropped items are deleted from this doc as they resolve; the history
 
 Lower priority. Some of these may never ship. The list exists to capture what we've considered.
 
+### Import a PDF (bring in an emailed document)
+
+Today Pocket Scanner is **camera-only** — no `CFBundleDocumentTypes`, no Share
+extension, no "Open in Pocket Scanner," no file picker. So the only way to get an
+emailed PDF in (to sign/date it) is to open it on another screen and scan it with
+the camera — which can't work when the PDF is already on the phone. A **Share-sheet
+/ document import** (Share → Pocket Scanner, or a Files picker) would let a received
+PDF drop straight in → sign → date, closing the "no printer" loop completely. Pairs
+naturally with the v2.7–v2.8 sign+date work, and would make the "handle an emailed
+contract" story seamless instead of a screen-scan workaround. (Surfaced 2026-07-10
+while shooting the App Store media.)
+
 ### Signing follow-ups
 
 The core signing project is complete — sign a document, multiple signatures, single-shot capture, signature names, and iCloud sync all shipped through v2.7.
