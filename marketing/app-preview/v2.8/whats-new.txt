@@ -1,0 +1,3 @@
+What's New — v2.8 (27)
+
+• Date stamp — need to date a document as well as sign it? Tap "Date," pick the format you need (from 2026-07-10 to "July 10, 2026" and more), and drop it onto the page — then drag, resize, move, or remove it, just like a signature.
