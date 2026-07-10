@@ -49,6 +49,23 @@ muted).
 Total ≈ 27s. Pacing: CapCut speed-ramps on the scan/save beats; linger on the
 sign + date moments (the hook).
 
+## Captions — decide placement BEFORE shooting
+
+**Lesson (v2.8):** pick the caption *position* for the whole set **up front** and frame
+every shot to leave room for it there. Retrofitting placement per-shot causes cramped
+captions (the signature-picker shot taught us this). What we settled:
+
+- **Font/format (fixed across the set):** SF Pro Display, 2 lines, line 1 **Bold** +
+  line 2 **Semibold**, centered, tight line-height. Color adapts to the background —
+  **navy `#14315C`** on light shots, **white** on dark.
+- **Position:** **top** for this set. When shooting, **scroll so there's a clean band**
+  under the nav bar before you capture.
+- **Per-shot reality:**
+  - *Viewer shots* (signed doc, etc.) — natural grey band under the nav bar; navy on light, roomy.
+  - *Scanner shot* — no band + dark UI + on-screen chrome to hide → a **dark banner** at top (white text) both masks the "screen" tell and carries the caption.
+  - *Signature picker* — cards start high, so the top band is shallow and the caption sits snug under the nav title. Next time, scroll for headroom first.
+- **Tool:** `caption.sh <in> <out> "line 1" "line 2" [top_px]` composites it (Chrome, no Krita). The `top_px` arg positions the band per shot.
+
 ## Production constraints (from `marketing/app-preview/README.md` + v1-status notes)
 
 **Screenshots:**
