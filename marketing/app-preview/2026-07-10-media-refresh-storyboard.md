@@ -19,16 +19,31 @@ is allowed on screenshots (Guideline 2.3.3) — unlike the App Preview.
 
 | # | Shot — what to capture | Caption |
 |---|---|---|
-| **1 — HERO** | A scanned document with a **signature *and* a date stamp** placed on it | **Sign and date documents — no printer required.** |
-| **2** | The scan result — a crisp scanned page (or the capture moment) | **Scan anything to a sharp, searchable PDF.** |
-| **3** | Signature placement / the "Choose a Signature" picker | **Save your signature. Sign in a tap.** |
-| **4** | The **Add Date sheet** showing the 5 format presets | **Date it — in whatever format the document needs.** |
-| **5** | Library showing **folders / sub-folders** | **Stay organized with folders.** |
-| **6** *(optional)* | Scan **filter presets** (Color / Greyscale / B&W) | **Color, greyscale, or crisp black & white.** |
+**FINAL SET AS SHIPPED (v2.8, 6 shots, 1290×2796, all top-aligned captions):**
 
-Rationale: #1 = the one-two punch (unique), #2 = the core scan, #3–4 = signing and
-the new date stamp broken out, #5–6 = organize + enhance. The first 3–4 convey the
-whole "scan → sign → date → organize" value on a swipe.
+| # | Shot | Caption (as shipped) |
+|---|---|---|
+| **1 — HERO** | Signed **Consulting Agreement** (Jordan Avery signature + date stamp on the Consultant line) | **Sign and date documents — right on your phone** |
+| **2** | Scan **capture moment** (offer letter, live scanner UI + edge-detect). Dark top banner masks the on-screen chrome and carries the caption. | **No printer? No problem. — Scan it right off your screen** |
+| **3** | "Choose a Signature" picker with 3 named signatures | **Save your signature — sign in a tap** |
+| **4** | The **Add Date sheet** showing all 5 format presets | **Date it — in any format you need** |
+| **5** | Library **grid view** — folder tiles + doc thumbnails | **Stay organized — with folders** |
+| **6** | Inside **Work → Contracts** sub-folder (nesting) | **Folders within folders — keep it all sorted** |
+
+Rationale: #1 = the sign+date one-two punch (unique), #2 = the core scan reframed as
+the emailed-doc workflow, #3–4 = signing + the new date stamp, #5–6 = organize + nest.
+
+**Changes from the original plan:** the optional filter shot was **dropped** (the
+Default-Filter dropdown read as cluttered, and the feature is covered in the App
+Store "What's New"). #2 became the **scan capture moment** (not the crisp result) to
+break the run of viewer screens — reframed as "scan an emailed doc off your screen"
+since the app is camera-only (see the **Import a PDF** candidate in
+`docs/FutureEnhancements.md`).
+
+**Caption style (locked):** SF Pro Display, line 1 Bold + line 2 Semibold, centered,
+navy `#14315C` on light shots / white on the dark scanner shot. **All top-aligned** —
+where a screen had no natural top band (grid, sub-folder), the content was nudged
+down in-app to open a caption band before capture. Composited with `caption.sh`.
 
 ## App Preview video (≤30s, unframed screen capture)
 
