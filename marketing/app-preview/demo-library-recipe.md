@@ -36,8 +36,8 @@ All props are fictional (no real trademarks, seals, or PII).
 Library (root)
 ├── Work
 │   └── Contracts              ← sub-folder (shows off v2.4 nesting)
-│       ├── Consulting Agreement          (consulting-agreement.html)
-│       └── Services Agreement (Multi-page)  (legal-document.html)
+│       ├── Consulting Agreement    (consulting-agreement.html)
+│       └── Services Agreement      (legal-document.html — 3-page)
 ├── Personal
 │   ├── Offer of Employment    (offer-of-employment.html)
 │   └── Residential Lease      (lease-agreement.html)
@@ -46,6 +46,13 @@ Library (root)
 ├── Travel Itinerary           (travel-itinerary.html)   ← at root
 └── Banana Bread Recipe        (banana-bread-recipe.html) ← at root
 ```
+
+**Keep document names short (≈ ≤ 20 characters).** The viewer's title bar truncates
+long names *and* the back chevron eats the left edge — a long name renders as broken
+in a hero shot (e.g. "…sulting Agreement — Meridian Advisory G…"). Name it just
+**`Consulting Agreement`**, not "Consulting Agreement — Meridian Advisory Group"; the
+letterhead already carries the full company identity, so no suffixes. The names above
+are all within budget. (Learned from the v2.8 hero shot.)
 
 ### Signatures (Settings ▸ Signature) — add all three, named
 | Name | Prop file | Handwriting |
