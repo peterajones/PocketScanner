@@ -62,6 +62,32 @@ muted).
 Total ≈ 27s. Pacing: CapCut speed-ramps on the scan/save beats; linger on the
 sign + date moments (the hook).
 
+### Record on DEVICE, not simulator
+
+The scan beat needs a real camera — the simulator has none, so it can't scan.
+Record the whole thing on a physical device. Best: **QuickTime Player** on the Mac
+with the iPhone connected by cable (File → New Movie Recording → pick the iPhone),
+which captures the device screen (incl. the live scanner viewfinder) at native res,
+straight to the Mac. (Control Center screen-record + AirDrop also works.) The status
+bar will show real time (not 9:41) — fine for App Previews. **The demo library must
+be on the device** (recipe §C) — if it only exists on the simulator, rebuild it there.
+
+### Shot list (teleprompter — one continuous take, trim later)
+
+**Before record:** demo library on the device (folders + docs + 3 signatures); a doc
+ready to scan (print, or on a 2nd screen); one dry run.
+
+1. **Library** — rest on the library, folders + docs visible. *(hold ~2s)*
+2. **＋ → Scan Document** → aim at the doc → let it auto-capture → **Keep Scan** → **Save**. *(brisk)*
+3. **Name sheet** → short name → **Save** → the new doc drops into the library. *(hold ~1s on the new row)*
+4. **Tap the new doc** → the viewer opens.
+5. **Sign** → pick the signature → **drag onto the signature line → pinch to size → Done**. *(slow — the hook)*
+6. **Date** → tap a **format** → **drag it beside the signature → Done**. *(slow)*
+7. **Rest on the finished signed + dated page.** *(hold ~3s)* → **Stop.**
+
+Then: CapCut rough-cut (trim, speed-ramp beats 2–3, add **Scan / Sign / Date it**
+overlays) → export → hand to Claude for the 886×1920 / `setsar=1` / silent-audio conform.
+
 ## Captions — decide placement BEFORE shooting
 
 **Lesson (v2.8):** pick the caption *position* for the whole set **up front** and frame
