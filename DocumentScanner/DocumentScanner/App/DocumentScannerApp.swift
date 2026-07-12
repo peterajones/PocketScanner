@@ -118,6 +118,22 @@ struct DocumentScannerApp: App {
             }
             }
             .touchIndicators()
+            .onOpenURL { url in handleIncomingPDF(url) }
+        }
+    }
+
+    /// Imports a PDF opened from another app (Mail/Files/Safari) into the library
+    /// root, then refreshes the active store. Errors surface via the alert center.
+    private func handleIncomingPDF(_ url: URL) {
+        guard url.pathExtension.lowercased() == "pdf" else { return }
+        let storage = DocumentStorage(documentsURL: resolvedDocumentsURL)
+        do {
+            _ = try PDFImporter.importPDF(from: url, using: storage)
+            if iCloudAvailable { metadataStore.refresh() } else { localStore.refresh() }
+        } catch {
+            alertCenter.present(AppAlert(
+                title: "Couldn't Import",
+                message: "That file isn't a readable PDF."))
         }
     }
 
