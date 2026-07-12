@@ -72,6 +72,16 @@ straight to the Mac. (Control Center screen-record + AirDrop also works.) The st
 bar will show real time (not 9:41) — fine for App Previews. **The demo library must
 be on the device** (recipe §C) — if it only exists on the simulator, rebuild it there.
 
+**Touch indicators + the iCloud staging library (the catch-22, solved):** the tap-circle
+overlay is DEBUG tooling, but the **Debug build uses the `.dev` bundle with no iCloud**,
+so it can't see the staging library that lives in iCloud on the **Release/prod** build.
+Fix (shipped): the overlay now also activates via a **`-TouchIndicators` launch argument**
+that works in Release. To record on the real iCloud build:
+- Edit Scheme → **Run → Info → Build Configuration = Release**
+- Run → **Arguments → Arguments Passed On Launch → add `-TouchIndicators`** (check while recording)
+- Run on the connected device (installs over the prod app → iCloud demo library intact)
+- Afterward, uncheck the arg / set config back to Debug.
+
 ### Shot list (teleprompter — one continuous take, trim later)
 
 **Before record:** demo library on the device (folders + docs + 3 signatures); a doc
