@@ -22,6 +22,13 @@ naturally with the v2.7–v2.8 sign+date work, and would make the "handle an ema
 contract" story seamless instead of a screen-scan workaround. (Surfaced 2026-07-10
 while shooting the App Store media.)
 
+  - **Follow-up: OCR image-only imported PDFs.** v1 import deliberately does NO OCR —
+    born-digital PDFs (the emailed-contract case) are already searchable via
+    `pdf.string`, but an *image-only* PDF (someone's camera scan) imports and is fully
+    usable yet **not text-searchable**. A later pass could detect a missing text layer
+    and OCR each page (render → Vision → rebuild with an invisible text layer, reusing
+    the scan pipeline) to make any imported PDF searchable. Deferred to keep v1 small.
+
 ### Signing follow-ups
 
 The core signing project is complete — sign a document, multiple signatures, single-shot capture, signature names, and iCloud sync all shipped through v2.7.
