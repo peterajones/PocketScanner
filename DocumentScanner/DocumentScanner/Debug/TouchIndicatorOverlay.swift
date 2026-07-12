@@ -1,14 +1,20 @@
 import SwiftUI
 import UIKit
 
-#if DEBUG
-
-/// Storage key + default for the DEBUG-only touch-indicator overlay used when
-/// recording App Preview / demo videos. Default is OFF so it never shows unless
-/// explicitly enabled in Settings.
+/// Storage key + default for the touch-indicator overlay used when recording App
+/// Preview / demo videos. Default is OFF so it never shows unless explicitly
+/// enabled — via the DEBUG Settings toggle, or the `-TouchIndicators` launch
+/// argument (which also works in Release, for recording on the iCloud build).
 enum TouchIndicatorSettings {
     static let key = "touchIndicatorsEnabled"
     static let defaultEnabled = false
+
+    /// Enables the overlay in ANY build (including Release) when launched with
+    /// `-TouchIndicators`. Harmless in the App Store — users can't pass launch
+    /// arguments, and the overlay stays inert unless enabled.
+    static var launchArgEnabled: Bool {
+        ProcessInfo.processInfo.arguments.contains("-TouchIndicators")
+    }
 }
 
 /// A passthrough overlay window that renders a fading circle per active touch.
@@ -172,26 +178,21 @@ struct TouchIndicatorInstaller: UIViewRepresentable {
 }
 
 private struct TouchIndicatorModifier: ViewModifier {
-    @AppStorage(TouchIndicatorSettings.key) private var enabled = TouchIndicatorSettings.defaultEnabled
+    @AppStorage(TouchIndicatorSettings.key) private var toggleEnabled = TouchIndicatorSettings.defaultEnabled
     func body(content: Content) -> some View {
         content.overlay(
-            TouchIndicatorInstaller(enabled: enabled)
+            TouchIndicatorInstaller(enabled: toggleEnabled || TouchIndicatorSettings.launchArgEnabled)
                 .frame(width: 0, height: 0)
                 .allowsHitTesting(false)
         )
     }
 }
 
-#endif
-
 extension View {
-    /// Installs the DEBUG touch-indicator overlay (driven by the Settings toggle).
-    /// A no-op in Release builds.
+    /// Installs the touch-indicator overlay for recording App Preview / demo videos.
+    /// Inert unless enabled via the DEBUG Settings toggle or the `-TouchIndicators`
+    /// launch argument — so it's safe to compile in Release.
     func touchIndicators() -> some View {
-        #if DEBUG
-        return modifier(TouchIndicatorModifier())
-        #else
-        return self
-        #endif
+        modifier(TouchIndicatorModifier())
     }
 }
