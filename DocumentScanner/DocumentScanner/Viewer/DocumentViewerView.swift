@@ -439,9 +439,40 @@ struct DocumentViewerView: View {
         isRenaming = true
     }
 
+    /// Slim find-in-page bar shown under the nav bar while a search is active
+    /// (and not while editing pages). Shows the search term and the match
+    /// position with prev/next controls — the standard iOS find pattern, kept
+    /// out of the crowded action toolbar.
+    @ViewBuilder
+    private func findBar(highlight h: SearchHighlight) -> some View {
+        HStack(spacing: 12) {
+            if let term = searchContext?.term, !term.isEmpty {
+                Label(term, systemImage: "magnifyingglass")
+                    .font(.subheadline)
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Text(counterLabel(highlight: h))
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.secondary)
+            Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
+                .accessibilityLabel("Previous match")
+            Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+                .accessibilityLabel("Next match")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.bar)
+        .overlay(alignment: .bottom) { Divider() }
+    }
+
     @ViewBuilder
     private func documentContent(session: DocumentSession) -> some View {
         VStack(spacing: 0) {
+            if !editMode, let h = searchHighlight, h.matchCount > 0 {
+                findBar(highlight: h)
+            }
             PDFKitView(
                 document: session.pdf,
                 highlightedSelections: searchHighlight?.matches ?? [],
@@ -512,20 +543,6 @@ struct DocumentViewerView: View {
             Button(session.displayName) { beginRename(session: session) }
                 .font(.headline)
                 .foregroundStyle(.primary)
-        }
-        // Find-in-page navigation lives top-right, shown only while a search is
-        // active. Kept as real toolbar buttons (not nested in a container) so the
-        // prev/next controls stay tappable.
-        if !editMode, let h = searchHighlight, h.matchCount > 0 {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
-                    .accessibilityLabel("Previous match")
-                Text(counterLabel(highlight: h))
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(.secondary)
-                Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
-                    .accessibilityLabel("Next match")
-            }
         }
         ToolbarItemGroup(placement: .bottomBar) {
             if editMode {
