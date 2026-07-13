@@ -439,9 +439,40 @@ struct DocumentViewerView: View {
         isRenaming = true
     }
 
+    /// Slim find-in-page bar shown under the nav bar while a search is active
+    /// (and not while editing pages). Shows the search term and the match
+    /// position with prev/next controls — the standard iOS find pattern, kept
+    /// out of the crowded action toolbar.
+    @ViewBuilder
+    private func findBar(highlight h: SearchHighlight) -> some View {
+        HStack(spacing: 12) {
+            if let term = searchContext?.term, !term.isEmpty {
+                Label(term, systemImage: "magnifyingglass")
+                    .font(.subheadline)
+                    .lineLimit(1)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Text(counterLabel(highlight: h))
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.secondary)
+            Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
+                .accessibilityLabel("Previous match")
+            Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+                .accessibilityLabel("Next match")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.bar)
+        .overlay(alignment: .bottom) { Divider() }
+    }
+
     @ViewBuilder
     private func documentContent(session: DocumentSession) -> some View {
         VStack(spacing: 0) {
+            if !editMode, let h = searchHighlight, h.matchCount > 0 {
+                findBar(highlight: h)
+            }
             PDFKitView(
                 document: session.pdf,
                 highlightedSelections: searchHighlight?.matches ?? [],
@@ -514,51 +545,56 @@ struct DocumentViewerView: View {
                 .foregroundStyle(.primary)
         }
         ToolbarItemGroup(placement: .bottomBar) {
-            Button(editMode ? "Done" : "Edit") { editMode.toggle() }
-                .accessibilityIdentifier("Viewer.EditToggle")
-            Button("Sign") {
-                let sigs = signatureStore.all()
-                if sigs.isEmpty {
-                    showingSignCapture = true
-                } else if sigs.count == 1 {
-                    // place the only signature directly (no-op if no page to sign)
-                    if let page = currentPageForSigning(session: session) {
-                        placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
-                                                     page: page, seedRect: nil)
-                    }
-                } else {
-                    showingSignaturePicker = true
-                }
-            }
-            Button("Date") {
-                if currentPageForSigning(session: session) != nil { showingAddDate = true }
-            }
-            .accessibilityIdentifier("Viewer.DateButton")
-            Spacer()
-            if let h = searchHighlight, h.matchCount > 0 {
-                Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
-                Text(counterLabel(highlight: h))
-                    .font(.footnote.monospacedDigit())
-                    .foregroundStyle(.secondary)
-                Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+            if editMode {
+                // In edit mode the bottom bar collapses to a single exit control;
+                // page operations live in the EditModeView panel above it.
+                Button("Done") { editMode = false }
+                    .accessibilityIdentifier("Viewer.EditDone")
                 Spacer()
-            }
-            ShareLink(item: session.url)
-            Menu {
-                Button {
-                    beginRename(session: session)
-                } label: {
-                    Label("Rename", systemImage: "pencil")
+            } else {
+                Button("Sign") {
+                    let sigs = signatureStore.all()
+                    if sigs.isEmpty {
+                        showingSignCapture = true
+                    } else if sigs.count == 1 {
+                        // place the only signature directly (no-op if no page to sign)
+                        if let page = currentPageForSigning(session: session) {
+                            placement = PlacementRequest(signature: sigs[0].image, signatureID: sigs[0].id,
+                                                         page: page, seedRect: nil)
+                        }
+                    } else {
+                        showingSignaturePicker = true
+                    }
                 }
-                .accessibilityIdentifier("Viewer.Rename")
-                Button(role: .destructive) {
-                    showDeleteConfirm = true
-                } label: {
-                    Label("Delete", systemImage: "trash")
+                Button("Date") {
+                    if currentPageForSigning(session: session) != nil { showingAddDate = true }
                 }
-                .accessibilityIdentifier("Viewer.Delete")
-            } label: {
-                Image(systemName: "ellipsis.circle")
+                .accessibilityIdentifier("Viewer.DateButton")
+                Spacer()
+                ShareLink(item: session.url)
+                Menu {
+                    Button {
+                        editMode = true
+                    } label: {
+                        Label("Edit Pages", systemImage: "rectangle.stack")
+                    }
+                    .accessibilityIdentifier("Viewer.EditToggle")
+                    Button {
+                        beginRename(session: session)
+                    } label: {
+                        Label("Rename", systemImage: "pencil")
+                    }
+                    .accessibilityIdentifier("Viewer.Rename")
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    .accessibilityIdentifier("Viewer.Delete")
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .accessibilityIdentifier("Viewer.MoreMenu")
             }
         }
     }

@@ -55,8 +55,8 @@ final class GoldenPathTests: XCTestCase {
         // 7. Tap row to open viewer.
         rowMatch.tap()
 
-        // 8. Viewer is presented (Edit toggle visible in bottom bar).
-        app.buttons["Viewer.EditToggle"].waitForElementOrFail()
+        // 8. Viewer is presented (Date button visible in bottom bar).
+        app.buttons["Viewer.DateButton"].waitForElementOrFail()
 
         // 9. Back to library.
         app.navigationBars.buttons.element(boundBy: 0).tap()
