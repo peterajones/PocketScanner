@@ -513,6 +513,20 @@ struct DocumentViewerView: View {
                 .font(.headline)
                 .foregroundStyle(.primary)
         }
+        // Find-in-page navigation lives top-right, shown only while a search is
+        // active. Kept as real toolbar buttons (not nested in a container) so the
+        // prev/next controls stay tappable.
+        if !editMode, let h = searchHighlight, h.matchCount > 0 {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
+                    .accessibilityLabel("Previous match")
+                Text(counterLabel(highlight: h))
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+                    .accessibilityLabel("Next match")
+            }
+        }
         ToolbarItemGroup(placement: .bottomBar) {
             if editMode {
                 // In edit mode the bottom bar collapses to a single exit control;
@@ -540,20 +554,6 @@ struct DocumentViewerView: View {
                 }
                 .accessibilityIdentifier("Viewer.DateButton")
                 Spacer()
-                if let h = searchHighlight, h.matchCount > 0 {
-                    // One HStack = one toolbar item, so the chevrons and counter
-                    // read as a single tight group instead of three separately
-                    // padded controls. Small glyphs keep the footprint minimal.
-                    HStack(spacing: 8) {
-                        Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
-                        Text(counterLabel(highlight: h))
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(.secondary)
-                        Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
-                    }
-                    .imageScale(.small)
-                    Spacer()
-                }
                 ShareLink(item: session.url)
                 Menu {
                     Button {
