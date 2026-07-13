@@ -39,10 +39,20 @@ final class EditModeTests: XCTestCase {
         row.waitForElementOrFail()
         row.tap()
 
-        // --- 3. Enter edit mode.
-        let editToggle = app.buttons["Viewer.EditToggle"]
-        editToggle.waitForElementOrFail()
-        editToggle.tap()
+        // --- 3. Enter edit mode ("Edit Pages" now lives in the ⋯ overflow menu).
+        let moreMenu = app.buttons["Viewer.MoreMenu"]
+        moreMenu.waitForElementOrFail()
+        moreMenu.tap()
+
+        let editPages = app.buttons["Edit Pages"]
+        if !editPages.waitForExistence(timeout: 4) {
+            // Menu items may surface as menuItems rather than buttons on iOS.
+            XCTAssertTrue(app.menuItems["Edit Pages"].waitForExistence(timeout: 4),
+                          "expected Edit Pages item in overflow menu")
+            app.menuItems["Edit Pages"].tap()
+        } else {
+            editPages.tap()
+        }
 
         // --- 4. Add a second page via the + tile.
         let addPages = app.buttons["EditMode.AddPages"]
@@ -87,6 +97,6 @@ final class EditModeTests: XCTestCase {
                       "expected first thumbnail still present")
 
         // --- 8. Exit Edit mode.
-        editToggle.tap()
+        app.buttons["Viewer.EditDone"].tap()
     }
 }
