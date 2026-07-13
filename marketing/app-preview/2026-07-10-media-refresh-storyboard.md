@@ -142,3 +142,51 @@ This is manual production work (on-device/simulator captures + CapCut), not a co
 change — no implementation plan. This doc is the shot list / checklist. Claude can
 help with the **final ffmpeg conform** (886×1920 / setsar / silent-audio) once the
 CapCut export exists, and with caption wording.
+
+---
+
+## v2.9 addendum — Import screenshots (A + B) — added 2026-07-13
+
+v2.9 ships **Import a PDF** (Open in Pocket Scanner from Mail/Files/Safari **+** the
+in-app `+` → Import PDF picker). The shipped v2.8 set never shows it and the v2.9
+"What's New" **leads** with it, so add **two** screenshots to the existing 6.9" set
+(6 of 10 slots used — room for both). Both are app-UI shots in the locked caption
+style. **The App Preview video ships as-is** (video well unchanged); these two stills
+cover the Import gap.
+
+This also supersedes the workaround in shot **#2** — its "scan it right off your
+screen" caption existed *because the app was camera-only* (see the reframing note
+under "Screenshots" above). Import now tells the emailed-document story directly.
+Leave #2 as-is for v2.9; optionally demote/re-caption it in a later pass.
+
+**Placement:** insert as the **new #2–#3, right after the hero**, so the carousel
+reads *sign & date (hero) → bring in an emailed PDF → scan → signature/date →
+organize* — mirroring the What's New order. Current #2–#6 shift to #4–#8 (still ≤10).
+
+**Captions — LOCKED** (SF Pro Display, line 1 **Bold** / line 2 **Semibold**,
+centered, navy `#14315C`, **top-aligned** band — identical treatment to the shipped
+set; composite with `caption.sh <in> <out> "line 1" "line 2" [top_px]`):
+
+| # | Shot | Caption line 1 (Bold) | Caption line 2 (Semibold) |
+|---|------|------|------|
+| **A** | Library with the **`+` menu open** → Scan Document / **Import PDF** / New Folder | **Already have a PDF?** | **Import it in a tap** |
+| **B** | An **imported contract open in the viewer**, clean **Sign · Date** bottom bar visible | **Emailed a contract?** | **Sign and date it — no printer** |
+
+**Capture notes:**
+- **Match the shipped set: 1290×2796**, 6.9" slot, framed device chrome OK.
+- **Simulator is fine for both** — neither A nor B needs a camera (unlike the scan
+  shot and the video). Use a **Release** build + **DemoSeeder**, with the canonical
+  **9:41** status bar (`xcrun simctl status_bar booted override --time "9:41" …`, then
+  capture via `xcrun simctl io booted screenshot` — a plain Cmd-S can miss the override).
+- **Shot A:** from the library, tap **`+`** so all three menu items are visible
+  (Scan Document / **Import PDF** / New Folder). Leave a clean band under the nav bar
+  for the top caption.
+- **Shot B:** open an official-looking demo contract (e.g., the **Consulting
+  Agreement** or a **bank Transfer Receipt**) in the viewer. **No active search** (so
+  the find bar stays hidden) and **not in edit mode** — we want the clean
+  **Sign · Date · —— · Share · ⋯** bar on screen, which also showcases the v2.9 toolbar
+  cleanup. The natural grey band under the nav bar carries the navy caption.
+- Keep the caption band position consistent with #1 (`top_px`).
+
+**Upload:** add A + B to the 6.9" slot in the new #2–#3 positions; the video well is
+unchanged (existing App Preview ships as-is).
