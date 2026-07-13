@@ -541,11 +541,17 @@ struct DocumentViewerView: View {
                 .accessibilityIdentifier("Viewer.DateButton")
                 Spacer()
                 if let h = searchHighlight, h.matchCount > 0 {
-                    Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
-                    Text(counterLabel(highlight: h))
-                        .font(.footnote.monospacedDigit())
-                        .foregroundStyle(.secondary)
-                    Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+                    // One HStack = one toolbar item, so the chevrons and counter
+                    // read as a single tight group instead of three separately
+                    // padded controls. Small glyphs keep the footprint minimal.
+                    HStack(spacing: 8) {
+                        Button { handlePrevious(h) } label: { Image(systemName: "chevron.up") }
+                        Text(counterLabel(highlight: h))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                        Button { handleNext(h) } label: { Image(systemName: "chevron.down") }
+                    }
+                    .imageScale(.small)
                     Spacer()
                 }
                 ShareLink(item: session.url)
