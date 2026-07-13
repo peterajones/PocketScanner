@@ -23,6 +23,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var subfolders: [URL] = []
     @State private var showingNewSubfolderAlert = false
     @State private var newSubfolderName = ""
+    @State private var showingImporter = false
     @State private var subfolderBeingRenamed: URL?
     @State private var renameSubfolderName = ""
     @State private var subfolderBeingDeleted: URL?
@@ -97,6 +98,10 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             Button("Create") { createSubfolder() }
             Button("Cancel", role: .cancel) {}
         } message: { Text("Enter a name for the new sub-folder.") }
+        .importPDF(isPresented: $showingImporter,
+                   storage: DocumentStorage(documentsURL: folderURL)) {
+            store.refresh()
+        }
         .alert("Rename Folder",
                isPresented: Binding(
                 get: { subfolderBeingRenamed != nil },
@@ -130,31 +135,29 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 LayoutToggle(usesGrid: usesGrid, onToggle: { usesGrid.toggle() })
             }
             ToolbarItem(placement: .topBarTrailing) {
-                if canCreateSubfolder {
-                    Menu {
-                        Button {
-                            triggerScan()
-                        } label: {
-                            Label("Scan Document", systemImage: "doc.viewfinder")
-                        }
+                Menu {
+                    Button {
+                        triggerScan()
+                    } label: {
+                        Label("Scan Document", systemImage: "doc.viewfinder")
+                    }
+                    Button {
+                        showingImporter = true
+                    } label: {
+                        Label("Import PDF", systemImage: "square.and.arrow.down")
+                    }
+                    if canCreateSubfolder {
                         Button {
                             newSubfolderName = ""
                             showingNewSubfolderAlert = true
                         } label: {
                             Label("New Sub-folder", systemImage: "folder.badge.plus")
                         }
-                    } label: {
-                        Image(systemName: "plus")
                     }
-                    .accessibilityIdentifier("Folder.AddButton")
-                } else {
-                    Button {
-                        triggerScan()
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .accessibilityIdentifier("Folder.AddButton")
+                } label: {
+                    Image(systemName: "plus")
                 }
+                .accessibilityIdentifier("Folder.AddButton")
             }
         }
         .fullScreenCover(isPresented: $showingCapture) {

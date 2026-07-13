@@ -10,19 +10,24 @@ Shipped and dropped items are deleted from this doc as they resolve; the history
 
 Lower priority. Some of these may never ship. The list exists to capture what we've considered.
 
-### Import a PDF (bring in an emailed document)
+### ~~Import a PDF (bring in an emailed document)~~ — **Built (branch `feature/import-pdf`)**
 
-Today Pocket Scanner is **camera-only** — no `CFBundleDocumentTypes`, no Share
-extension, no "Open in Pocket Scanner," no file picker. So the only way to get an
-emailed PDF in (to sign/date it) is to open it on another screen and scan it with
-the camera — which can't work when the PDF is already on the phone. A **Share-sheet
-/ document import** (Share → Pocket Scanner, or a Files picker) would let a received
-PDF drop straight in → sign → date, closing the "no printer" loop completely. Pairs
-naturally with the v2.7–v2.8 sign+date work, and would make the "handle an emailed
-contract" story seamless instead of a screen-scan workaround. (Surfaced 2026-07-10
+Both entry points shipped, closing the "no printer" loop for emailed PDFs:
+**(1) Document handler** — `CFBundleDocumentTypes` (PDF, Editor, rank Alternate) +
+`LSSupportsOpeningDocumentsInPlace`, so "Open in Pocket Scanner" appears in Mail /
+Files / Safari; `.onOpenURL` routes to `handleIncomingPDF`. **(2) In-app picker** —
+an "Import PDF" item in the `+` menu on both the library root and folder screens,
+backed by `.fileImporter` (`UTType.pdf`). Both paths funnel through a shared
+`PDFImporter.importPDF(from:using:)` that reads the PDF over a security-scoped URL
+and copies it in via the existing `DocumentStorage.write` (name sanitized,
+collisions de-duped, atomic coordinated write); unreadable files throw and surface a
+"Couldn't Import" alert. iCloud-agnostic — rides `DocumentStorage`, so it works
+signed-out into local storage. The picker's `fileImporter` + error alert live in a
+shared `ImportPDFModifier` (also keeps both views under the SwiftUI type-check
+ceiling). Spec/plan under `docs/superpowers/` dated 2026-07-12. (Surfaced 2026-07-10
 while shooting the App Store media.)
 
-  - **Follow-up: OCR image-only imported PDFs.** v1 import deliberately does NO OCR —
+  - **Follow-up (still open): OCR image-only imported PDFs.** v1 import deliberately does NO OCR —
     born-digital PDFs (the emailed-contract case) are already searchable via
     `pdf.string`, but an *image-only* PDF (someone's camera scan) imports and is fully
     usable yet **not text-searchable**. A later pass could detect a missing text layer

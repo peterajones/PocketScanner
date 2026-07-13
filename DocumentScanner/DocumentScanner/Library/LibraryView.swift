@@ -18,6 +18,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var moveTargets: [URL] = []       // Move menu: top-level folders + sub-folders
     @State private var showingNewFolderAlert = false
     @State private var newFolderName = ""
+    @State private var showingImporter = false
     @State private var folderActionError: String?
     @State private var folderBeingRenamed: URL?
     @State private var renameFolderName = ""
@@ -93,31 +94,29 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     LayoutToggle(usesGrid: usesGrid, onToggle: { usesGrid.toggle() })
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    if showFolders {
-                        Menu {
-                            Button {
-                                triggerScan()
-                            } label: {
-                                Label("Scan Document", systemImage: "doc.viewfinder")
-                            }
+                    Menu {
+                        Button {
+                            triggerScan()
+                        } label: {
+                            Label("Scan Document", systemImage: "doc.viewfinder")
+                        }
+                        Button {
+                            showingImporter = true
+                        } label: {
+                            Label("Import PDF", systemImage: "square.and.arrow.down")
+                        }
+                        if showFolders {
                             Button {
                                 newFolderName = ""
                                 showingNewFolderAlert = true
                             } label: {
                                 Label("New Folder", systemImage: "folder.badge.plus")
                             }
-                        } label: {
-                            Image(systemName: "plus")
                         }
-                        .accessibilityIdentifier("Library.AddButton")
-                    } else {
-                        Button {
-                            triggerScan()
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                        .accessibilityIdentifier("Library.AddButton")
+                    } label: {
+                        Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("Library.AddButton")
                 }
             }
             .fullScreenCover(isPresented: $showingCapture) {
@@ -158,6 +157,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Enter a name for the new folder.")
+            }
+            .importPDF(isPresented: $showingImporter, storage: storage) {
+                store.refresh()
             }
             .alert("Rename Folder",
                    isPresented: Binding(
