@@ -98,7 +98,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             Button("Create") { createSubfolder() }
             Button("Cancel", role: .cancel) {}
         } message: { Text("Enter a name for the new sub-folder.") }
-        .importPDF(isPresented: $showingImporter, storage: storage) {
+        .importPDF(isPresented: $showingImporter,
+                   storage: DocumentStorage(documentsURL: folderURL)) {
             store.refresh()
         }
         .alert("Rename Folder",
