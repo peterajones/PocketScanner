@@ -1,0 +1,5 @@
+What's New — v2.9 (28)
+
+• Bring in a PDF — no scanning required. Got a contract or receipt by email? Open it in Pocket Scanner straight from Mail, Files, or Safari ("Open in Pocket Scanner"), or tap + → Import PDF to pick a file. It drops right into your library — or the folder you're in — ready to sign, date, and share. No printer, no re-scanning.
+
+• A tidier document viewer — the toolbar's been cleaned up, and searching within a document now has its own find bar for easy jumping between matches.
