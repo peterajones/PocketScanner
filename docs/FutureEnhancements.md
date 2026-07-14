@@ -42,8 +42,9 @@ The core signing project is complete — sign a document, multiple signatures, s
 
 **Maybe (parked — genuine value, but meaningful error/UX risk):**
 
-- **Auto-detect the signature line** — find the "X_____" line and offer to place there. Too much room for error, especially on long/multi-page documents.
-- **Sign multiple pages at once** — apply a placed signature across a page range. Same error/UX concern as auto-detect.
+**Dropped:** — find the "X_____" line and offer to place there. Too much room for error, especially on long/multi-page documents.
+
+**Dropped:** — apply a placed signature across a page range. Same error/UX concern as auto-detect.
 
 **Dropped:** typed / finger-drawn signatures — typed text can't be placed cleanly (stamps are the better path), and finger-drawn signatures always look bad.
 
