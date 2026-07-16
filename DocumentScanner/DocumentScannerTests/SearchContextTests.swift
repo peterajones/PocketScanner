@@ -50,6 +50,34 @@ final class SearchContextTests: XCTestCase {
         XCTAssertNotEqual(a, b)
     }
 
+    // MARK: - liveTotalMatches (audit #5 follow-up: stale find-bar total)
+
+    /// Editing pages in the open doc changes its live match count. The find-bar
+    /// total must substitute that for the frozen search-time snapshot while
+    /// keeping the (unedited) snapshot counts of the other docs.
+    func test_liveTotalMatches_substitutesCurrentDocLiveCount() {
+        let ctx = makeContext(counts: [5, 3, 2]) // snapshot total = 10
+        // Deleted 2 matches from the doc at index 1 (was 3, now 1).
+        XCTAssertEqual(ctx.liveTotalMatches(currentDocIndex: 1, liveCurrentDocMatchCount: 1), 8)
+    }
+
+    func test_liveTotalMatches_unchangedWhenLiveEqualsSnapshot() {
+        let ctx = makeContext(counts: [5, 3, 2])
+        XCTAssertEqual(ctx.liveTotalMatches(currentDocIndex: 0, liveCurrentDocMatchCount: 5), 10)
+    }
+
+    func test_liveTotalMatches_outOfRangeIndexFallsBackToSnapshotTotal() {
+        let ctx = makeContext(counts: [5, 3, 2])
+        XCTAssertEqual(ctx.liveTotalMatches(currentDocIndex: 9, liveCurrentDocMatchCount: 0), 10)
+    }
+
+    private func makeContext(counts: [Int]) -> SearchContext {
+        let docs = counts.enumerated().map { index, count in
+            SearchContext.DocEntry(summary: makeSummary(name: "doc\(index)"), matchCount: count)
+        }
+        return SearchContext(term: "x", docs: docs, startDocIndex: 0)
+    }
+
     // MARK: - Helpers
 
     private func makeSummary(name: String) -> DocumentSummary {

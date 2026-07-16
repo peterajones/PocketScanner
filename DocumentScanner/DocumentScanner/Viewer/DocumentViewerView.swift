@@ -147,7 +147,11 @@ struct DocumentViewerView: View {
         let priorMatches = ctx.docs[..<currentDocIndex]
             .reduce(0) { $0 + $1.matchCount }
         let global = priorMatches + (h.currentIndex ?? 0) + 1
-        return "\(global)/\(ctx.totalMatches)"
+        // Use the live total so the denominator reflects page edits in the open
+        // doc (its snapshot count in `ctx` is frozen at search time).
+        let liveTotal = ctx.liveTotalMatches(currentDocIndex: currentDocIndex,
+                                             liveCurrentDocMatchCount: h.matchCount)
+        return "\(global)/\(liveTotal)"
     }
 
     var body: some View {
