@@ -34,9 +34,11 @@ extension DocumentSummary {
     /// (or a read-error message for corrupt documents). Shared so the two
     /// presentations never diverge.
     var formattedSubtitle: String {
-        if isCorrupt { return "Couldn't read this file" }
+        if isCorrupt { return String(localized: "Couldn't read this file") }
         let date = createdAt.formatted(date: .abbreviated, time: .omitted)
-        let pages = pageCount == 1 ? "1 page" : "\(pageCount) pages"
+        // Localized plural: the catalog varies "%lld pages" by count (one/other)
+        // per language, so page grammar stays correct in es/fr too.
+        let pages = String(localized: "\(pageCount) pages")
         return "\(date) · \(pages)"
     }
 }

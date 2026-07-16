@@ -422,8 +422,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Pocket Scanner Dev";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Document Scanner uses the camera to scan paper documents.";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Document Scanner can lock your library behind Face ID.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Pocket Scanner uses the camera to scan paper documents.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Pocket Scanner can lock your library behind Face ID.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;
@@ -464,8 +464,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Pocket Scanner";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Document Scanner uses the camera to scan paper documents.";
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Document Scanner can lock your library behind Face ID.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Pocket Scanner uses the camera to scan paper documents.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Pocket Scanner can lock your library behind Face ID.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = NO;

@@ -31,8 +31,8 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Document Scanner uses the camera to scan paper documents."
+            "state" : "translated",
+            "value" : "Pocket Scanner uses the camera to scan paper documents."
           }
         },
         "es" : {
@@ -55,8 +55,8 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Document Scanner can lock your library behind Face ID."
+            "state" : "translated",
+            "value" : "Pocket Scanner can lock your library behind Face ID."
           }
         },
         "es" : {
