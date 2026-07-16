@@ -16,17 +16,7 @@ struct LockGate<Content: View>: View {
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
-            switch newPhase {
-            case .active:
-                if lockSettings.shouldRelock() {
-                    lockSettings.lock()
-                }
-                lockSettings.clearBackground()
-            case .inactive, .background:
-                lockSettings.recordBackground()
-            @unknown default:
-                break
-            }
+            lockSettings.scenePhaseChanged(to: newPhase)
         }
         .task(id: lockSettings.isLocked) {
             // Auto-prompt on cold launch (isLocked started true) and any

@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import LocalAuthentication
+import SwiftUI
 
 @MainActor
 @Observable
@@ -48,6 +49,28 @@ final class AppLockSettings {
     func shouldRelock(now: Date = Date()) -> Bool {
         guard isEnabled, let backgroundedAt = recordedBackgroundedAt else { return false }
         return now.timeIntervalSince(backgroundedAt) > Self.backgroundThreshold
+    }
+
+    /// Central handler for scene-phase transitions, so the re-lock policy is
+    /// unit-testable rather than buried in the view's `.onChange`.
+    ///
+    /// Only `.background` records the deactivation time. `.inactive` is a
+    /// TRANSIENT state — the system fires it for Control Center, the
+    /// incoming-call banner, and the app switcher, none of which mean the user
+    /// left the app. Recording on `.inactive` (the old behavior) relocked users
+    /// after a >30s peek they never intended as a background.
+    func scenePhaseChanged(to phase: ScenePhase, now: Date = Date()) {
+        switch phase {
+        case .active:
+            if shouldRelock(now: now) { lock() }
+            clearBackground()
+        case .background:
+            recordBackground()
+        case .inactive:
+            break
+        @unknown default:
+            break
+        }
     }
 
     // MARK: - LocalAuthentication (not unit-tested — hardware call)
