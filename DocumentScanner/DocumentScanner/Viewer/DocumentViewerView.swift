@@ -215,6 +215,16 @@ struct DocumentViewerView: View {
             }
     }
 
+    /// Fires the search-highlight rebuild on BOTH document switches (a new
+    /// `PDFDocument` object) AND in-place page mutations (same object, bumped
+    /// `revision`). Keying on `ObjectIdentifier(pdf)` alone left highlights and
+    /// the n/m counter stale after an edit-mode delete/reorder (audit #5),
+    /// because `DocumentMutations` mutates the PDF in place.
+    private struct HighlightRebuildKey: Equatable {
+        let pdf: ObjectIdentifier
+        let revision: Int
+    }
+
     @ViewBuilder
     private func loadedBody(session: DocumentSession) -> some View {
         if !session.conflicts.isEmpty {
@@ -225,7 +235,7 @@ struct DocumentViewerView: View {
         } else {
             dateStampContent(session: session)
         .animation(.easeInOut(duration: 0.2), value: editMode)
-        .task(id: ObjectIdentifier(session.pdf)) {
+        .task(id: HighlightRebuildKey(pdf: ObjectIdentifier(session.pdf), revision: session.revision)) {
             rebuildHighlight(session: session)
         }
         .navigationBarTitleDisplayMode(.inline)
