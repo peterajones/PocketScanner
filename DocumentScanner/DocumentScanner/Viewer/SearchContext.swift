@@ -27,4 +27,14 @@ struct SearchContext: Hashable {
     var totalMatches: Int {
         docs.reduce(0) { $0 + $1.matchCount }
     }
+
+    /// Total matches with the currently-open doc's LIVE match count substituted
+    /// for its search-time snapshot. Page edits in the viewer change how many
+    /// matches the open doc has; the other docs are unedited, so their snapshot
+    /// counts stay correct. Falls back to the snapshot total if the index is
+    /// out of range.
+    func liveTotalMatches(currentDocIndex: Int, liveCurrentDocMatchCount: Int) -> Int {
+        guard docs.indices.contains(currentDocIndex) else { return totalMatches }
+        return totalMatches - docs[currentDocIndex].matchCount + liveCurrentDocMatchCount
+    }
 }

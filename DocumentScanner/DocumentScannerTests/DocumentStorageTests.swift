@@ -80,6 +80,26 @@ final class DocumentStorageTests: XCTestCase {
         XCTAssertEqual(renamedURL.lastPathComponent, "Lease (2).pdf")
     }
 
+    /// Regression guard for the percent-encoding pitfall (audit finding #12):
+    /// an in-place save of a doc with an accented name, where the `existingURL`
+    /// arrives in the iCloud/NSMetadataQuery percent-encoded form, must overwrite
+    /// in place and NOT spawn a "(2)" duplicate. Especially relevant once es/fr
+    /// users create accented filenames.
+    func test_replace_accentedNameInPlace_withEncodedURL_doesNotDuplicate() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let url = try storage.write(makeSinglePagePDF(), preferredName: "Café Résumé")
+        // Mimic the NSMetadataQuery URL form (percent-encoded absoluteString).
+        let metadataStyleURL = try XCTUnwrap(URL(string: url.absoluteString))
+        let saved = try storage.write(makeSinglePagePDF(),
+                                      replacing: metadataStyleURL, withName: "Café Résumé")
+
+        let pdfs = try FileManager.default
+            .contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
+            .filter { $0.pathExtension == "pdf" }
+        XCTAssertEqual(pdfs.count, 1, "in-place save must not create a (2) duplicate")
+        XCTAssertFalse(saved.lastPathComponent.contains("(2)"))
+    }
+
     func test_delete_removesFile() throws {
         let storage = DocumentStorage(documentsURL: tempDir)
         let url = try storage.write(makeSinglePagePDF(), preferredName: "Receipt")
