@@ -159,12 +159,12 @@ struct NameDocumentSheet: View {
             onSaved()
         } catch {
             alertCenter.present(AppAlert(
-                title: "Couldn't save",
+                title: String(localized: "Couldn't save"),
                 message: error.localizedDescription,
-                primary: AppAlert.Action(title: "Retry", role: .default, handler: {
+                primary: AppAlert.Action(title: String(localized: "Retry"), role: .default, handler: {
                     Task { await save() }
                 }),
-                secondary: AppAlert.Action(title: "Cancel", role: .cancel, handler: {
+                secondary: AppAlert.Action(title: String(localized: "Cancel"), role: .cancel, handler: {
                     onCancel()
                 })
             ))

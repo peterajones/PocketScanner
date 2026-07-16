@@ -11,10 +11,10 @@ enum ImageFilter: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .none: return "Color"
-        case .greyscale: return "Greyscale"
-        case .blackAndWhite: return "B&W"
-        case .photo: return "Photo"
+        case .none: return String(localized: "Color", comment: "Scan filter name")
+        case .greyscale: return String(localized: "Greyscale", comment: "Scan filter name")
+        case .blackAndWhite: return String(localized: "B&W", comment: "Scan filter name: black & white")
+        case .photo: return String(localized: "Photo", comment: "Scan filter name")
         }
     }
 
