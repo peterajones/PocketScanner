@@ -48,6 +48,10 @@ The core signing project is complete — sign a document, multiple signatures, s
 
 **Dropped:** typed / finger-drawn signatures — typed text can't be placed cleanly (stamps are the better path), and finger-drawn signatures always look bad.
 
+### Library / iCloud responsiveness
+
+- **Optimistic delete (and other mutations) on the iCloud build** — on the Release/iCloud build (`MetadataQueryLibraryStore`) a deleted document lingers in the list for ~5s until `NSMetadataQuery` notices the change and fires its update; the Debug build (`InMemoryLibraryStore`, synchronous `refresh()`) is instant. This lag is pre-existing (present in shipped v2.9; confirmed against the App Store build during the 2026-07-16 external-audit smoke test), not a regression. Fix: after the user confirms in the existing **delete confirmation dialog**, optimistically remove the doc from `summaries` immediately (don't wait for the query), then let the `NSMetadataQuery` update reconcile. Same optimistic pattern could extend to import/rename. Keep it gated on the confirmation dialogs so nothing disappears without an explicit confirm. Minor, cosmetic-only (correctness is unaffected — the file is deleted immediately either way).
+
 ### Business / pricing
 
 - **Tip jar IAP** — one-time "Buy the developer a coffee" tiers ($1.99 / $4.99 / $9.99) in Settings. Some users like to support indie devs they like.
