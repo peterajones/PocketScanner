@@ -78,7 +78,15 @@ struct DocumentStorage {
         if let error = coordinatorError ?? (writeError as NSError?) { throw error }
 
         if targetURL != existingURL {
-            try? FileManager.default.removeItem(at: existingURL)
+            // Best-effort cleanup of the old file after a rename. Coordinate the
+            // deletion (as `delete(at:)` does) — an uncoordinated removeItem on
+            // an iCloud-ubiquitous file can desync sync state or race concurrent
+            // readers. Failure here only orphans the old file (the new one is
+            // already written), so we don't fail the save over it.
+            let deleteCoordinator = NSFileCoordinator()
+            deleteCoordinator.coordinate(writingItemAt: existingURL, options: .forDeleting, error: nil) { url in
+                try? FileManager.default.removeItem(at: url)
+            }
         }
         return targetURL
     }
