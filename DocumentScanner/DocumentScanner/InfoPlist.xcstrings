@@ -34,6 +34,18 @@
             "state" : "new",
             "value" : "Document Scanner uses the camera to scan paper documents."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner usa la cámara para escanear documentos en papel."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner utilise l'appareil photo pour numériser des documents papier."
+          }
         }
       }
     },
@@ -45,6 +57,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Document Scanner can lock your library behind Face ID."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner puede bloquear tu biblioteca con Face ID."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner peut verrouiller votre bibliothèque avec Face ID."
           }
         }
       }
