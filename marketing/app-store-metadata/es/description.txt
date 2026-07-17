@@ -1,0 +1,41 @@
+Escanea documentos en papel o en pantalla directamente a tu iCloud Drive.
+
+Pocket Scanner es un escáner de documentos sin complicaciones para iPhone. Escanea un recibo, un contrato, una receta o una página de notas, y aparece en tu biblioteca como un PDF con búsqueda de texto, sincronizado en todos tus dispositivos a través de tu propia cuenta de iCloud.
+
+Eso es todo. Sin suscripción. Sin anuncios. Sin cuentas que crear. Sin ventas adicionales. Paga una vez, escanea para siempre.
+
+QUÉ HACE
+
+- Captura páginas con el escáner de documentos de Apple: detección automática de bordes, corrección de perspectiva y varias páginas de una sola vez
+- Elige un aspecto al escanear: Color, Grises, Blanco y negro o Foto
+- OCR en el dispositivo: cada escaneo se convierte en un PDF totalmente consultable, sin necesidad de internet
+- Busca en toda tu biblioteca, incluso dentro de las carpetas, por nombre de archivo o por el texto del documento; las coincidencias se resaltan en la propia página
+- Mantén el orden: carpetas entre las que mover documentos, ordenación por fecha, nombre o número de páginas, y vista de lista o de cuadrícula de miniaturas
+- Editor por página: recorta, gira y aplica un filtro limpio; o gira una página desde la tira de páginas
+- Separa páginas: extrae las páginas seleccionadas a un documento nuevo
+- Marca tus escaneos: resalta o tacha texto directamente en la página
+- Desliza para eliminar documentos y carpetas
+- Sincronización con iCloud Drive: tus escaneos aparecen en todos los dispositivos de tu cuenta de iCloud, en tu propio almacenamiento, donde puedes verlos y gestionarlos
+- Privacidad de serie: bloqueo opcional con Face ID para la biblioteca, además de un desenfoque en el selector de apps para que las miniaturas no se vean al cambiar de aplicación
+
+QUÉ NO HACE
+
+- No recopila ningún dato sobre ti. Ninguno. Sin analíticas, sin telemetría, sin seguimiento del comportamiento.
+- No tiene una versión "Pro". Todas las funciones están incluidas.
+- No guarda nada en nuestros servidores. Tus documentos van de tu cámara a tu cuenta de iCloud, y punto.
+- No muestra anuncios.
+
+PRIVACIDAD
+
+Pocket Scanner no tiene servidor. Tus escaneos nunca salen de tu dispositivo, salvo para sincronizarse con tu propia cuenta de iCloud (el almacenamiento de Apple que ya pagas, o el plan gratuito). El OCR que hace consultables tus documentos se ejecuta por completo en tu iPhone mediante el framework Vision de Apple. No vemos tus documentos, tus nombres, tus nombres de archivo, tus búsquedas ni tus hábitos de uso.
+
+Política de privacidad completa: https://peterajones.github.io/mobileDocumentScanner/privacy-policy
+
+REQUISITOS
+
+- iOS 17.6 o posterior
+- Se recomienda iCloud Drive (también funciona en modo local si lo prefieres)
+
+ACERCA DE
+
+Creada en solitario por un desarrollador independiente que se cansó de que todas las apps de escaneo exigieran una suscripción. Si te gusta la app, deja una reseña: es lo más valioso que puedes hacer para ayudar.

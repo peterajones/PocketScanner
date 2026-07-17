@@ -25,7 +25,7 @@ struct AppAlert: Identifiable, Equatable {
 
     init(title: String,
          message: String,
-         primary: Action = Action(title: "OK", role: .default, handler: nil),
+         primary: Action = Action(title: String(localized: "OK"), role: .default, handler: nil),
          secondary: Action? = nil) {
         self.title = title
         self.message = message

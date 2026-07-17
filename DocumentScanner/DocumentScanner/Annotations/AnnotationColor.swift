@@ -18,10 +18,10 @@ enum AnnotationColor: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .yellow: return "Yellow"
-        case .green:  return "Green"
-        case .pink:   return "Pink"
-        case .blue:   return "Blue"
+        case .yellow: return String(localized: "Yellow", comment: "Highlight color name")
+        case .green:  return String(localized: "Green", comment: "Highlight color name")
+        case .pink:   return String(localized: "Pink", comment: "Highlight color name")
+        case .blue:   return String(localized: "Blue", comment: "Highlight color name")
         }
     }
 }

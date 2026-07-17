@@ -1,0 +1,9 @@
+shot	line1	line2	top	fs1	fs2	band	color
+1	Firma y fecha documentos	desde tu iPhone	508	70	60		
+2	¿Ya tienes un PDF?	Impórtalo en un toque	2060	70	60		
+3	¿Un contrato por correo?	Fírmalo y féchalo, sin impresora	515	70	60		
+4	¿Sin impresora? No pasa nada.	Escanéalo desde la pantalla	165	66	56	rgba(0,0,0,0.82)	#ffffff
+5	Guarda tu firma	firma en un toque	430	70	60		
+6	Ponle fecha	en el formato que quieras	430	70	60		
+7	Mantén el orden	con carpetas	600	74	62		
+8	Carpetas dentro de carpetas	todo bien ordenado	600	64	56		

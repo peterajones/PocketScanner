@@ -9,9 +9,9 @@ enum SortKey: String, CaseIterable {
     /// Menu label.
     var title: String {
         switch self {
-        case .date:      return "Date"
-        case .name:      return "Name"
-        case .pageCount: return "Page Count"
+        case .date:      return String(localized: "Date", comment: "Document sort option")
+        case .name:      return String(localized: "Name", comment: "Document sort option")
+        case .pageCount: return String(localized: "Page Count", comment: "Document sort option")
         }
     }
 }

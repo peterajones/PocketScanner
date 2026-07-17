@@ -132,8 +132,8 @@ struct DocumentScannerApp: App {
             if iCloudAvailable { metadataStore.refresh() } else { localStore.refresh() }
         } catch {
             alertCenter.present(AppAlert(
-                title: "Couldn't Import",
-                message: "That file isn't a readable PDF."))
+                title: String(localized: "Couldn't Import"),
+                message: String(localized: "That file isn't a readable PDF.")))
         }
     }
 

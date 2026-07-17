@@ -1,0 +1,9 @@
+shot	line1	line2	top	fs1	fs2	band	color
+1	Signez et datez vos documents	depuis votre iPhone	508	64	56		
+2	Vous avez déjà un PDF ?	Importez-le en un geste	2060	64	56		
+3	Un contrat par e-mail ?	Signez et datez, sans imprimante	515	64	56		
+4	Pas d'imprimante ?	Scannez-le depuis l'écran	165	64	56	rgba(0,0,0,0.82)	#ffffff
+5	Enregistrez votre signature	signez en un geste	430	64	56		
+6	Datez-le	dans le format voulu	430	64	56		
+7	Restez organisé	avec des dossiers	600	64	56		
+8	Des dossiers dans les dossiers	tout bien rangé	600	64	56		
