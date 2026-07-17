@@ -1040,13 +1040,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escala de grises"
+            "value" : "Grises"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Niveaux de gris"
+            "value" : "Gris"
           }
         }
       }
@@ -1693,7 +1693,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quitar"
+            "value" : "Eliminar"
           }
         },
         "fr" : {
@@ -1711,7 +1711,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Quitar esta marca?"
+            "value" : "¿Eliminar esta marca?"
           }
         },
         "fr" : {
@@ -2044,7 +2044,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Documentos escaneados"
+            "value" : "Escaneos"
           }
         },
         "fr" : {
