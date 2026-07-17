@@ -1,0 +1,3 @@
+Pocket Scanner now speaks Spanish and French! The whole app - every button, label, and message - is fully localized, and date stamps now format naturally for your language.
+
+As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.
