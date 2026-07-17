@@ -60,5 +60,8 @@ The core signing project is complete — sign a document, multiple signatures, s
 
 ### Internationalization
 
-- **Localizable strings** — currently all UI is English. Likely targets: French, Spanish, German.
+- ~~**Localizable strings**~~ — **Shipped in v3.0: Spanish (es-ES) + French (fr-FR)** — full in-app localization (String Catalog), localized App Store metadata + captioned screenshots. Next language candidate: **German** (over-indexes on paying for utilities).
+- **v3.1 localization polish (deferred from v3.0 on purpose — it's a $4.99 app, not a flawless international product; do these once es/fr install numbers justify the upkeep):**
+  - **Latin-American Spanish (es-MX) + Canadian French (fr-CA) App Store variants** — separate ASC localizations that roughly double localized-market reach (LatAm + Canada). Can largely reuse the es-ES/fr-FR copy (minor regional wording differences); mainly re-uploading metadata + screenshots per variant. Keywords worth a light regional pass.
+  - **Localized App Preview videos (es/fr)** — v3.0 reuses the English-UI v2.9 video across all three locales (accepted, mostly visual). A localized re-record (device capture in each language → CapCut → conform) removes the last English tell for es/fr shoppers.
 - **OCR language detection** — Vision supports many languages but defaults to device locale. Surface a language picker in Settings for users who scan multilingual documents.
