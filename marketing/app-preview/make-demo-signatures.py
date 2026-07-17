@@ -56,11 +56,22 @@ def build():
         print(f"  - {e['name']:14} id={e['id'][:8]}…  png={len(e['pngData'])}B  {e['createdAt'].date()}")
 
 def install():
+    expected = os.path.expanduser(
+        "~/Library/Mobile Documents/iCloud~ca~peter-jones~DocumentScanner")
     matches = sorted(glob.glob(os.path.expanduser(
         "~/Library/Mobile Documents/*DocumentScanner*")))
     if not matches:
-        sys.exit("!! iCloud container not found under ~/Library/Mobile Documents/.\n"
-                 "   Make sure iCloud Drive is on and the app has synced at least once.")
+        sys.exit(
+            "!! Can't reach the iCloud container. `~/Library/Mobile Documents/` is\n"
+            "   TCC-protected, so the terminal gets 'Operation not permitted' and sees\n"
+            "   nothing (the container almost certainly DOES exist).\n\n"
+            "   Fix ONE of:\n"
+            "   A) Finder route: Go > Go to Folder (Cmd-Shift-G), paste\n"
+            f"        {expected}/\n"
+            "      create a 'Signatures' folder if missing, and drag in\n"
+            "        marketing/app-preview/demo-signatures/signatures.dat\n"
+            "   B) Grant your terminal app Full Disk Access (System Settings > Privacy &\n"
+            "      Security > Full Disk Access), then re-run this with --install.")
     container = matches[0]
     sig_dir = os.path.join(container, "Signatures")
     os.makedirs(sig_dir, exist_ok=True)          # create Signatures/ if it doesn't exist
