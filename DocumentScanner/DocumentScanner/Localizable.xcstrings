@@ -1699,7 +1699,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retirer"
+            "value" : "Enlever"
           }
         }
       }
@@ -1717,7 +1717,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retirer cette annotation ?"
+            "value" : "Enlever cette marque ?"
           }
         }
       }
