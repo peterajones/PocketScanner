@@ -2,15 +2,17 @@
 # Composite a 2-line App Store caption onto a framed 1290x2796 screenshot.
 # Navy (#14315C) SF Pro Display — matches the demo docs' letterhead.
 #
-# Usage:  caption.sh <input.png> <output.png> "<line 1>" "<line 2>" [top_px]
+# Usage:  caption.sh <input.png> <output.png> "<line 1>" "<line 2>" [top_px] [fs1] [fs2]
 #   top_px  vertical position of the caption band (default 430 — the viewer's
 #           grey band under the nav bar). Adjust per shot if the layout differs.
+#   fs1/fs2 font sizes for line 1 / line 2 (default 78 / 66). Shrink these when a
+#           longer localized caption (es/fr) would overflow the 1290px width.
 #
 # Requires Google Chrome (headless renderer). No Krita needed.
 set -euo pipefail
 
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-IN="$1"; OUT="$2"; L1="$3"; L2="$4"; TOP="${5:-430}"
+IN="$1"; OUT="$2"; L1="$3"; L2="$4"; TOP="${5:-430}"; FS1="${6:-78}"; FS2="${7:-66}"
 
 ABS="$(cd "$(dirname "$IN")" && pwd)/$(basename "$IN")"
 URL="file://$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$ABS")"
@@ -24,8 +26,8 @@ cat > "$HTML" <<EOF
  .cap{position:absolute;top:${TOP}px;left:0;width:1290px;text-align:center;
       font-family:-apple-system,"SF Pro Display","Helvetica Neue",sans-serif;
       color:#14315C;line-height:1.06;letter-spacing:-0.01em;}
- .cap .l1{font-weight:700;font-size:78px;}
- .cap .l2{font-weight:600;font-size:66px;}
+ .cap .l1{font-weight:700;font-size:${FS1}px;}
+ .cap .l2{font-weight:600;font-size:${FS2}px;}
 </style></head><body>
  <div class="stage"><img src="${URL}">
  <div class="cap"><div class="l1">${L1}</div><div class="l2">${L2}</div></div></div>
