@@ -19,8 +19,9 @@ so media stays consistent and setup is fast. Pairs with the storyboard
 3. **Status bar = 9:41.** On simulator: `xcrun simctl status_bar booted override --time "9:41" …`
    then capture with `xcrun simctl io booted screenshot`. On device, shoot near 9:41
    or clean up in post.
-4. **Print the props** you'll scan live (US Letter, 100%): the docs below plus the
-   three signature PNGs (they print black-on-white and scan like real signatures).
+4. **Print the props** you'll scan live (US Letter, 100%): the docs below. (The three
+   signature PNGs no longer need printing — **seed them** via the tool in §C.3; print
+   them only if you're using the manual scan fallback.)
 5. **Screenshots** can come from a fresh **simulator** (Release, 9:41) to stay isolated
    from real data — but the **video's scan beat needs a device** (no simulator camera).
 
@@ -79,8 +80,22 @@ Do it in this order so docs land in the right folders and nothing needs moving:
    - `Personal`: Offer of Employment, Residential Lease
    - `Receipts`: Costco Receipt
    - root: Travel Itinerary, Banana Bread Recipe
-3. **Signatures.** Settings ▸ Signature ▸ **Add** ▸ scan each printed signature prop
-   ▸ tap the row ▸ **Rename** to the name above. Repeat for all three.
+3. **Signatures — seed the file, don't scan (fast path, added v3.0).** Run, in a
+   Terminal that has **Full Disk Access** (NOT the Claude Code session or its `!`
+   prefix — that process is TCC-blocked and can't reach `~/Library/Mobile Documents/`):
+   ```
+   python3 marketing/app-preview/make-demo-signatures.py --install
+   ```
+   It builds `signatures.dat` (the `SignatureStore` binary-plist archive) from the three
+   demo PNGs, already named, and copies it into `<container>/Signatures/`. iCloud syncs
+   it to the capture simulator/device; the three named signatures appear with **no
+   scanning**. Notes:
+   - `Signatures/` is a **hidden sibling of `Documents/`**, so it never shows in Finder's
+     iCloud Drive view — expected. Verify via the app: **Settings ▸ Signature** lists the
+     three names.
+   - Container path: `~/Library/Mobile Documents/iCloud~ca~peter-jones~DocumentScanner/Signatures/`.
+   - *Fallback (old manual way):* Settings ▸ Signature ▸ **Add** ▸ scan each printed prop
+     ▸ tap the row ▸ **Rename** to the name in §B.
 4. **Leave the docs unsigned/undated in the standing library** — you sign + date
    *live* during the video and for the hero screenshot (below). Don't pre-sign.
 
@@ -108,12 +123,45 @@ Once the library exists, a refresh is fast:
 - [ ] Fresh install on the recording device (Release build)
 - [ ] Create folders (§C.1)
 - [ ] Scan the 7 docs into their folders (§C.2)
-- [ ] Add + name the 3 signatures (§C.3)
+- [ ] Seed the 3 named signatures via `make-demo-signatures.py --install` (§C.3)
 - [ ] Shoot screenshots per the storyboard (9:41, Release)
 - [ ] Record the App Preview arc on device
 - [ ] Sign+date the Consulting Agreement for the hero (§D)
 - [ ] Conform the video (886×1920 / `setsar=1` / silent audio) — Claude can help
 - [ ] Upload to ASC 6.9" slot
+- [ ] **Localized (es/fr):** re-capture 8 base shots per language forced-locale → `caption-all.sh <lang>` → upload per-locale (§F)
+
+---
+
+## F. Localized screenshot sets — es / fr (added v3.0)
+
+For localized App Store listings, capture the **same 8 scenes with the app running in
+each language**, then composite translated captions. The app UI, not just the caption,
+must be in-language — a Spanish caption over an English screenshot looks unfinished.
+
+1. **Same library + signatures** as above (the seeder + DemoLibrary are language-agnostic;
+   only the app UI chrome changes with the locale, and document/signature *names* stay as
+   authored — that's fine, they're proper nouns).
+2. **Force the app language.** Xcode ▸ Edit Scheme ▸ Run ▸ Options ▸ **App Language →
+   Spanish** (then French). Release build, 9:41, simulator is fine (no camera needed for
+   these 8).
+3. **Capture the 8 base (uncaptioned) shots** per language into:
+   ```
+   v3.0/Base-es/1.png … 8.png
+   v3.0/Base-fr/1.png … 8.png
+   ```
+   Shot #4 is the live-scan frame (no camera on simulator): **reuse the uncaptioned
+   `v2.8/Stills/2a. Scanning a Document.png`** for all languages (it has essentially no
+   app-UI text — only the caption differs).
+4. **Render captions in one command** (Claude does this):
+   ```
+   ./caption-all.sh es      # reads captions/es.tsv, writes v3.0/Stills-es/
+   ./caption-all.sh fr
+   ```
+   Captions live in `captions/{en,es,fr}.tsv` (shot, line1, line2, top_px, fs1, fs2);
+   `caption.sh` takes optional font sizes so longer es/fr captions don't overflow. Tune
+   `fs1/fs2` per row if a caption wraps.
+5. **Upload** each language's `Stills-<lang>/` set to that locale's 6.9" slot in ASC.
 
 ---
 
