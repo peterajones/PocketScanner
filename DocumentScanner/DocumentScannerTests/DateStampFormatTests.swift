@@ -15,20 +15,47 @@ final class DateStampFormatTests: XCTestCase {
         XCTAssertEqual(DateStampFormat.iso.string(for: d), "2026-07-09")
         XCTAssertEqual(DateStampFormat.numericUS.string(for: d), "07/09/2026")
         XCTAssertEqual(DateStampFormat.numericIntl.string(for: d), "09/07/2026")
-        XCTAssertEqual(DateStampFormat.longUS.string(for: d), "July 9, 2026")
-        XCTAssertEqual(DateStampFormat.longIntl.string(for: d), "9 July 2026")
+        // Long format is locale-natural; pin English explicitly.
+        XCTAssertEqual(DateStampFormat.long.string(for: d, locale: Locale(identifier: "en_US")),
+                       "July 9, 2026")
     }
 
     func test_singleDigitDayAndMonth_padding() {
         let d = date(2026, 3, 5)
         XCTAssertEqual(DateStampFormat.iso.string(for: d), "2026-03-05")       // zero-padded
         XCTAssertEqual(DateStampFormat.numericUS.string(for: d), "03/05/2026") // zero-padded
-        XCTAssertEqual(DateStampFormat.longUS.string(for: d), "March 5, 2026") // day NOT padded
-        XCTAssertEqual(DateStampFormat.longIntl.string(for: d), "5 March 2026")
+        XCTAssertEqual(DateStampFormat.long.string(for: d, locale: Locale(identifier: "en_US")),
+                       "March 5, 2026")                                        // day NOT padded
     }
 
-    func test_caseIterable_hasFiveStableOrder() {
+    func test_caseIterable_hasFourStableOrder() {
         XCTAssertEqual(DateStampFormat.allCases,
-                       [.iso, .numericUS, .numericIntl, .longUS, .longIntl])
+                       [.iso, .numericUS, .numericIntl, .long])
+    }
+
+    func test_long_rawValueBackCompat() {
+        // Old saved preference "longUS" must still resolve to the long format.
+        XCTAssertEqual(DateStampFormat(rawValue: "longUS"), .long)
+    }
+
+    // Long formats localize month names to the given locale (v3.0); numeric/ISO
+    // stay region-neutral regardless of locale.
+
+    func test_longFormat_usesLocaleMonthNameAndParticles() {
+        let d = date(2026, 7, 9)
+        let es = DateStampFormat.long.string(for: d, locale: Locale(identifier: "es_ES"))
+        XCTAssertTrue(es.localizedCaseInsensitiveContains("julio"),
+                      "es long format should use the Spanish month, got \(es)")
+        XCTAssertTrue(es.contains(" de "),
+                      "es long format should include the natural 'de' particles, got \(es)")
+        let fr = DateStampFormat.long.string(for: d, locale: Locale(identifier: "fr_FR"))
+        XCTAssertTrue(fr.localizedCaseInsensitiveContains("juillet"),
+                      "fr long format should use the French month, got \(fr)")
+    }
+
+    func test_isoAndNumeric_stayRegionNeutral_regardlessOfLocale() {
+        let d = date(2026, 7, 9)
+        XCTAssertEqual(DateStampFormat.iso.string(for: d, locale: Locale(identifier: "es_ES")), "2026-07-09")
+        XCTAssertEqual(DateStampFormat.numericUS.string(for: d, locale: Locale(identifier: "fr_FR")), "07/09/2026")
     }
 }
