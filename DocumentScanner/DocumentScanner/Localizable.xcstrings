@@ -1803,7 +1803,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Renumériser"
+            "value" : "Rescanner"
           }
         }
       }
@@ -1999,7 +1999,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Numériser un document"
+            "value" : "Scanner un document"
           }
         }
       }
@@ -2017,7 +2017,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Numérisez votre signature sur papier, puis réutilisez-la pour signer n'importe quel document. Ajoutez-en plusieurs — vous choisirez laquelle placer."
+            "value" : "Scanner votre signature sur papier, puis réutilisez-la pour signer n'importe quel document. Ajoutez-en plusieurs — vous choisirez laquelle placer."
           }
         }
       }
@@ -2034,7 +2034,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Numérisez votre signature une fois dans les Réglages, puis touchez Signer pour la placer sur n'importe quelle page — déplacez-la ou redimensionnez-la pour l'ajuster. Pour un détourage plus net, signez sur une feuille unie avec un stylo épais ; si l'appareil photo ne trouve pas les bords de la feuille de près, prenez plutôt une photo et recadrez-la."
+            "value" : "Scannez votre signature une fois dans les Réglages, puis touchez Signer pour la placer sur n'importe quelle page — déplacez-la ou redimensionnez-la pour l'ajuster. Pour un détourage plus net, signez sur une feuille unie avec un stylo épais ; si l'appareil photo ne trouve pas les bords de la feuille de près, prenez plutôt une photo et recadrez-la."
           }
         }
       }
@@ -2349,7 +2349,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Touchez + pour numériser un document dans ce dossier, ou déplacez-y des documents existants depuis la bibliothèque principale."
+            "value" : "Touchez + pour scanner un document dans ce dossier, ou déplacez-y des documents existants depuis la bibliothèque principale."
           }
         }
       }
@@ -2365,7 +2365,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Touchez + pour numériser un document ou créer un dossier."
+            "value" : "Touchez + pour scanner un document ou créer un dossier."
           }
         }
       }
@@ -2381,7 +2381,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Touchez + pour numériser un document."
+            "value" : "Touchez + pour scanner un document."
           }
         }
       }
