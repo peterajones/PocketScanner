@@ -14,7 +14,7 @@
 set -euo pipefail
 
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-IN="$1"; OUT="$2"; L1="$3"; L2="$4"; TOP="${5:-430}"; FS1="${6:-78}"; FS2="${7:-66}"; BAND="${8:-}"
+IN="$1"; OUT="$2"; L1="$3"; L2="$4"; TOP="${5:-430}"; FS1="${6:-78}"; FS2="${7:-66}"; BAND="${8:-}"; COLOR="${9:-#14315C}"
 BANDCSS=""; [ -n "$BAND" ] && BANDCSS="background:${BAND};padding:44px 0 48px;"
 
 ABS="$(cd "$(dirname "$IN")" && pwd)/$(basename "$IN")"
@@ -29,7 +29,7 @@ cat > "$HTML" <<EOF
  .cap{position:absolute;top:${TOP}px;left:0;width:1290px;text-align:center;
       ${BANDCSS}
       font-family:-apple-system,"SF Pro Display","Helvetica Neue",sans-serif;
-      color:#14315C;line-height:1.06;letter-spacing:-0.01em;}
+      color:${COLOR};line-height:1.06;letter-spacing:-0.01em;}
  .cap .l1{font-weight:700;font-size:${FS1}px;}
  .cap .l2{font-weight:600;font-size:${FS2}px;}
 </style></head><body>
