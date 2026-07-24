@@ -1,0 +1,1 @@
+escáner,escanear,documentos,pdf,digitalizar,recibos,firma,ocr,sin suscripción,escáner pdf

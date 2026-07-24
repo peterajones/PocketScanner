@@ -18,16 +18,24 @@ V3 = f"{APP}/v3.0/Stills"
 SCAN2A = f"{APP}/v2.8/Stills/2a. Scanning a Document.png"
 CAPTION = f"{APP}/caption.sh"
 
+# Regional variants reuse their parent locale's device captures — the app UI is
+# identical (iOS serves es-ES to es-MX and fr-FR to fr-CA via locale fallback);
+# only the caption text differs, so the bases come from the parent's Stills dir.
+BASE_LANG = {"es-MX": "es", "fr-CA": "fr"}
+
 def base_for(lang, shot):
     if shot == 4 and lang != "en":
         return SCAN2A
-    pat = f"{V3}/en/{shot}. *.png" if lang == "en" else f"{V3}/{lang}/{lang}{shot}*.png"
+    blang = BASE_LANG.get(lang, lang)
+    pat = f"{V3}/en/{shot}. *.png" if lang == "en" else f"{V3}/{blang}/{blang}{shot}*.png"
     hits = sorted(glob.glob(pat))
     return hits[0] if hits else None
 
 def manifest(lang):
     with open(f"{APP}/captions/{lang}.tsv") as f:
-        return {int(r["shot"]): r for r in csv.DictReader(f, delimiter="\t")}
+        # restval="" so rows that omit the trailing band/color columns yield
+        # "" rather than None (which caption.sh can't accept as an argument).
+        return {int(r["shot"]): r for r in csv.DictReader(f, delimiter="\t", restval="")}
 
 for lang in (sys.argv[1:] or ["es"]):
     caps = manifest(lang)
