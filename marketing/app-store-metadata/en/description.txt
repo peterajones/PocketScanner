@@ -29,7 +29,7 @@ PRIVACY
 
 Pocket Scanner doesn't have a server. Your scans never leave your device except to sync to your own iCloud account (Apple's storage you already pay for, or the free tier). The OCR that makes your documents searchable runs entirely on your iPhone using Apple's Vision framework. We don't see your documents, your names, your filenames, your search queries, or your usage patterns.
 
-Full privacy policy: https://peterajones.github.io/mobileDocumentScanner/privacy-policy
+Full privacy policy: https://peterajones.github.io/PocketScanner/privacy-policy
 
 REQUIREMENTS
 
