@@ -129,11 +129,20 @@ Once the library exists, a refresh is fast:
 - [ ] Sign+date the Consulting Agreement for the hero (§D)
 - [ ] Conform the video (886×1920 / `setsar=1` / silent audio) — Claude can help
 - [ ] Upload to ASC 6.9" slot
-- [ ] **Localized (es/fr):** re-capture 8 base shots per language forced-locale → `caption-all.sh <lang>` → upload per-locale (§F)
+- [ ] **Localized (es/fr/…):** re-capture 8 base shots per language forced-locale → caption each shot with `caption.sh` (or restore the retired batch renderer from git history) → upload per-locale (§F)
 
 ---
 
 ## F. Localized screenshot sets — es / fr (added v3.0)
+
+> **Pipeline status (post-v3.1):** the batch renderers (`render-captions.py`, `caption-all.sh`)
+> and the `captions/*.tsv` manifests were **retired** once the captioned sets became final and the
+> base captures were deleted. Only `caption.sh` (the per-shot compositor) remains. To build a
+> **new** multi-locale set, either caption each shot with `caption.sh` directly, or restore
+> `render-captions.py` + the manifests from git history. Final captioned sets now live **flat** at
+> `v3.0/Stills/<lang>/1.png … 8.png` (es/fr) and `v3.1/Stills/<lang>/…` (es-MX/fr-CA) — no
+> `captioned/` subdir, no `Stills-<lang>/`. The steps below are the original v3.0 workflow, kept
+> for reference.
 
 For localized App Store listings, capture the **same 8 scenes with the app running in
 each language**, then composite translated captions. The app UI, not just the caption,
