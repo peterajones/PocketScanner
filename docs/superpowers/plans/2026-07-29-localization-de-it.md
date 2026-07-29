@@ -794,17 +794,25 @@ Format-specifier drift is mechanically checkable — do that separately rather t
 ```bash
 python3 - <<'EOF'
 import json, re
-SPEC = re.compile(r'%(?:lld|@|\d+\$[a-z@]+)')
+# Match both bare (%@, %lld) and positional (%1$@, %2$lld) specifiers, and
+# normalize to the bare TYPE so the two forms compare equal. Translations are
+# expected — and often required — to switch to positional form when the target
+# language reorders arguments; 4 keys already do this in es/fr. Comparing raw
+# tokens would flag those as mismatches. What must hold is that the multiset of
+# argument TYPES is unchanged.
+SPEC = re.compile(r'%(?:(\d+)\$)?(lld|@)')
+def types(s):
+    return sorted(m.group(2) for m in SPEC.finditer(s))
 for p in ["DocumentScanner/DocumentScanner/Localizable.xcstrings",
           "DocumentScanner/DocumentScanner/InfoPlist.xcstrings"]:
     d = json.load(open(p))
     for key, entry in d["strings"].items():
-        want = sorted(SPEC.findall(key))
+        want = types(key)
         for lang in ("de", "it"):
             loc = entry.get("localizations", {}).get(lang)
             if not loc or "variations" in loc:
                 continue
-            got = sorted(SPEC.findall(loc["stringUnit"]["value"]))
+            got = types(loc["stringUnit"]["value"])
             if got != want:
                 print(f"[{lang}] SPECIFIER MISMATCH {key!r}: want {want}, got {got}")
 print("specifier check done")
@@ -812,6 +820,15 @@ EOF
 ```
 
 Expected: `specifier check done` with no mismatch lines. Any mismatch is a bug — fix it in the catalog before continuing.
+
+**Positional-form rule.** If a key has **two or more** specifiers, the translation must use positional form (`%1$@`, `%2$@`) even when the order happens to match English — otherwise a later wording change silently swaps the arguments. The four keys affected, with the es rendering as the model:
+
+| Key | es (model) |
+|---|---|
+| `"%@"'s pages will be added to the end of "%@", and "%@" will be deleted.` | `Las páginas de "%1$@" se añadirán al final de "%2$@" y se eliminará "%3$@".` |
+| `%@  %@` | `%1$@  %2$@` |
+| `Merge "%@" into "%@"?` | `¿Combinar "%1$@" en "%2$@"?` |
+| `Processing page %lld of %lld` | `Procesando la página %1$lld de %2$lld` |
 
 - [ ] **Step 3: Write the QA record**
 
