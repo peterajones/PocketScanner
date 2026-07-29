@@ -41,18 +41,18 @@ struct EditModeView: View {
         }
         .background(.thinMaterial)
         .animation(.easeInOut(duration: 0.2), value: isMultiSelectMode)
-        .confirmationDialog(
+        // .alert rather than .confirmationDialog: a confirmationDialog attached
+        // here rendered its title and Delete button but dropped Cancel entirely,
+        // leaving no way out of a destructive prompt. .alert with a derived
+        // optional binding is the pattern DocumentViewerView already uses for
+        // pendingExtraction, and PageEditorView for discarding markup.
+        .alert(
             "Delete \(pendingPageDeletion?.count ?? 0) pages?",
             isPresented: Binding(
                 get: { pendingPageDeletion != nil },
                 set: { if !$0 { pendingPageDeletion = nil } }
             )
         ) {
-            // Keep these as bare Buttons. Attaching a modifier (e.g.
-            // .accessibilityIdentifier) wraps them in ModifiedContent, which
-            // interferes with how SwiftUI extracts buttons and roles from this
-            // builder — doing so made the Cancel button disappear entirely.
-            // UI tests target these by label, like the rest of EditModeTests.
             Button("Delete", role: .destructive) {
                 if let indices = pendingPageDeletion { performDelete(indices) }
                 pendingPageDeletion = nil
