@@ -208,7 +208,7 @@ EOF
 - Consumes: `knownRegions` from Task 1.
 - Produces: `scripts/verify-localization.py`, invoked as `python3 scripts/verify-localization.py [lang ...]` (defaults to all required languages), exit code 0 = pass / 1 = fail. Tasks 3 and 4 reuse it unchanged.
 
-- [ ] **Step 1: Verify the glossary against a real German simulator**
+- [x] **Step 1: Verify the glossary against a real German simulator**
 
 Do not trust the glossary table from memory. Boot a German-locale simulator and read Apple's own terms:
 
@@ -226,7 +226,7 @@ Open **Files** and **Notes** in the booted simulator and confirm: Settings=`Eins
 
 If any term differs from the Global Constraints glossary, **the simulator wins**: update the glossary table in this plan file and say so in the Step 8 commit message. If the simulator is unavailable, proceed with the table as written and note in the commit message that the anchors are unverified.
 
-- [ ] **Step 2: Write the verification script**
+- [x] **Step 2: Write the verification script**
 
 Create `scripts/verify-localization.py`:
 
@@ -330,7 +330,7 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Step 3: Run it to confirm it fails for German**
+- [x] **Step 3: Run it to confirm it fails for German**
 
 ```bash
 python3 scripts/verify-localization.py de
@@ -350,7 +350,7 @@ Both expectations were **verified against the working tree on 2026-07-29** by ru
 
 If the es/fr run fails, fix the script (likely the `IDENTICAL_OK` allowlist) before writing any translations.
 
-- [ ] **Step 4: Write the German translations**
+- [x] **Step 4: Write the German translations**
 
 Translate all 150 keys in `Localizable.xcstrings` into German, applying the Global Constraints glossary and the `du` register. Apply them by script (a scratchpad Python file editing the catalog JSON directly) — this is how v3.0 did it, and hand-editing 150 JSON entries is error-prone.
 
@@ -405,7 +405,7 @@ Hard rules while translating:
 - Keys that are pure format strings (`'%lld'`, `'%@  %@'`) stay identical.
 - If a German value comes out identical to the English key, add it to `IDENTICAL_OK["de"]` in `scripts/verify-localization.py` **and** justify it in the commit message. Expect `Format` and `Version` to land here.
 
-- [ ] **Step 5: Verify German completeness**
+- [x] **Step 5: Verify German completeness**
 
 ```bash
 python3 scripts/verify-localization.py de
@@ -421,7 +421,7 @@ FAIL — 2 problem(s):
 
 Confirm `Localizable.xcstrings` contributes **zero** failures.
 
-- [ ] **Step 6: Confirm the catalog is still valid JSON and counts are right**
+- [x] **Step 6: Confirm the catalog is still valid JSON and counts are right**
 
 ```bash
 python3 -c "
@@ -438,7 +438,7 @@ print('total keys:', len(d['strings']))
 
 Expected: `{'es': 150, 'fr': 150, 'en': 5, 'de': 150}` and `total keys: 150`. If `total keys` is not 150, the script deleted or added a key — revert and retry.
 
-- [ ] **Step 7: Build and run the full suite**
+- [x] **Step 7: Build and run the full suite**
 
 ```bash
 ./scripts/test.sh
@@ -446,7 +446,7 @@ Expected: `{'es': 150, 'fr': 150, 'en': 5, 'de': 150}` and `total keys: 150`. If
 
 Expected: PASS with the same count as the Task 1 baseline. Translations don't change logic, so a failure means malformed catalog JSON broke the build.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScanner/Localizable.xcstrings scripts/verify-localization.py
