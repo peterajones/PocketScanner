@@ -976,7 +976,7 @@ Adding two localizations means **every** localization on the v3.2 version needs 
 - Consumes: the glossary; the final shortened German wording from Task 7.
 - Produces: `scripts/verify-metadata.py`, run as `python3 scripts/verify-metadata.py`, exit 0/1. Task 9's captions should echo this copy.
 
-- [ ] **Step 1: Write the character-limit verifier**
+- [x] **Step 1: Write the character-limit verifier**
 
 Create `scripts/verify-metadata.py`:
 
@@ -1037,7 +1037,7 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Step 2: Run it to see the current gaps**
+- [x] **Step 2: Run it to see the current gaps**
 
 ```bash
 python3 scripts/verify-metadata.py
@@ -1058,7 +1058,7 @@ Two problems, not twelve — the script reports the missing directory and moves 
 
 All five existing locales currently pass, with `fr/promotional_text.txt` the tightest at **168/170**. If any existing locale reports over-limit, stop and fix that first — it means something shipped over the line.
 
-- [ ] **Step 3: Write the German metadata**
+- [x] **Step 3: Write the German metadata**
 
 Create the five files under `marketing/app-store-metadata/de/`.
 
@@ -1068,11 +1068,11 @@ Create the five files under `marketing/app-store-metadata/de/`.
 - `promotional_text.txt` — ≤170. This field is editable without an app release, so it is the safest place for the most idiomatic copy.
 - `whats_new.txt` — leads with the German launch, e.g. *"Pocket Scanner spricht jetzt Deutsch und Italienisch…"*, then the no-subscriptions/no-ads/no-tracking line.
 
-- [ ] **Step 4: Write the Italian metadata**
+- [x] **Step 4: Write the Italian metadata**
 
 Same five files under `marketing/app-store-metadata/it/`, `tu` register. Italian subtitles fit more comfortably than German, but still verify. Keywords in in-market Italian: `scanner,documenti,pdf,scansione,firma,ocr,ufficio`. Same privacy URL rule.
 
-- [ ] **Step 5: Refresh What's New for the five existing locales**
+- [x] **Step 5: Refresh What's New for the five existing locales**
 
 Rewrite `whats_new.txt` for `en`, `es`, `es-MX`, `fr`, `fr-CA` to describe v3.2. The v3.1 files currently carry a generic maintenance note — replace it.
 
@@ -1086,7 +1086,7 @@ As always: no subscriptions, no ads, no tracking. Your documents stay on your de
 
 Then translate that for `es`, `fr`, `de`, `it`. `es-MX` takes the `es` text verbatim (established in v3.1 — the Spanish copy is already region-neutral). `fr-CA` takes the `fr` text with the Quebec terminology pass: **numériser** not *scanner*, **application** not *app*, **courriel** not *e-mail*.
 
-- [ ] **Step 6: Verify all seven locales**
+- [x] **Step 6: Verify all seven locales**
 
 ```bash
 python3 scripts/verify-metadata.py
@@ -1094,7 +1094,7 @@ python3 scripts/verify-metadata.py
 
 Expected: `PASS — 7 locales within ASC limits`, with every file's count printed. Read the `subtitle.txt` counts specifically — German is the one at risk.
 
-- [ ] **Step 7: Verify the privacy URL in every description**
+- [x] **Step 7: Verify the privacy URL in every description**
 
 ```bash
 grep -rn "mobileDocumentScanner" marketing/app-store-metadata/ && echo "FOUND DEAD URL — fix it" || echo "ok: no dead privacy URLs"
@@ -1103,7 +1103,7 @@ grep -rlc "peterajones.github.io/PocketScanner/privacy-policy" marketing/app-sto
 
 Expected: `ok: no dead privacy URLs`, and all 7 description files listed by the second grep.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add scripts/verify-metadata.py marketing/app-store-metadata/
