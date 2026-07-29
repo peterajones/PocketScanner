@@ -86,9 +86,23 @@ Same problem as #3 and worse — Italian uses the identical word *firma* for bot
 
 ## Corrected during QA
 
-**Nothing.** No outright errors were found, so I made no unilateral changes to the translations. Every item above is a judgment call and is waiting on Peter's answer rather than being silently "fixed".
+No outright errors were found, so nothing was changed unilaterally. The changes below were each applied **after Peter ruled on the flag**, on 2026-07-29.
 
-Items #6 and #7 are pure improvements with no trade-off; I'd apply those on a one-word go-ahead. The rest genuinely change tone or wording and are Peter's call.
+| Flag | Key | Lang | Was | Now |
+|---|---|---|---|---|
+| #3 | `Sign with your signature` | de | Mit deiner Unterschrift unterschreiben | **Dokumente unterschreiben** |
+| #3 | `Sign with your signature` | it | Firma con la tua firma | **Firma i tuoi documenti** |
+| #4 | `Couldn't read that` | de | Konnte nicht gelesen werden | **Unterschrift nicht erkannt** |
+| #5 | `Remove this mark?` | it | Rimuovere questo segno? | **Rimuovere questa annotazione?** |
+
+Verified after applying: exactly 4 values changed, 0 added, 0 removed (semantic diff against the previous commit); `verify-localization.py` passes; unit suite 239/0.
+
+**Note on #4:** only German changed. Italian keeps "Lettura non riuscita" ("Reading failed"), which is closer to the English source and was not stilted the way the German passive was. So the two languages now word this heading differently — deliberately. If that asymmetry is unwanted, the Italian equivalent would be "Firma non riconosciuta".
+
+### Still open
+
+- **#1 and #2** (the *auseinanderhalten* wording and the document/folder pronoun agreement) were recommended as pure improvements but have not been ruled on, so they are **not applied**. They remain as written in the flag list above.
+- **#5's other half:** `Discard this page's markup?` already used "annotazioni" and needed no change — only `Remove this mark?` moved, which is what aligned them.
 
 ---
 

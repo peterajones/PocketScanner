@@ -870,7 +870,7 @@ EOF
 )"
 ```
 
-- [ ] **Step 6: HUMAN GATE — hand Peter the flag list**
+- [x] **Step 6: HUMAN GATE — hand Peter the flag list**
 
 Present the "Flagged for Peter" table in chat. He does not read German or Italian, so frame each flag as a **decision he can actually make** — a meaning question ("should this say *delete* or *remove*?"), not a language question. Wait for his calls before Task 7.
 

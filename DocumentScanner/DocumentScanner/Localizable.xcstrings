@@ -965,7 +965,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konnte nicht gelesen werden"
+            "value" : "Unterschrift nicht erkannt"
           }
         },
         "es" : {
@@ -2881,7 +2881,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rimuovere questo segno?"
+            "value" : "Rimuovere questa annotazione?"
           }
         }
       }
@@ -3780,7 +3780,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mit deiner Unterschrift unterschreiben"
+            "value" : "Dokumente unterschreiben"
           }
         },
         "es" : {
@@ -3798,7 +3798,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Firma con la tua firma"
+            "value" : "Firma i tuoi documenti"
           }
         }
       }
