@@ -587,7 +587,7 @@ The camera and Face ID strings are what iOS shows in the system permission alert
 - Consumes: `scripts/verify-localization.py` from Task 2.
 - Produces: full de/it coverage across both catalogs — after this task, `python3 scripts/verify-localization.py` with no arguments passes.
 
-- [ ] **Step 1: Confirm the remaining failures are exactly these two keys, in both languages**
+- [x] **Step 1: Confirm the remaining failures are exactly these two keys, in both languages**
 
 ```bash
 python3 scripts/verify-localization.py
@@ -603,7 +603,7 @@ FAIL — 4 problem(s):
   InfoPlist.xcstrings: [it] MISSING  'NSFaceIDUsageDescription'
 ```
 
-- [ ] **Step 2: Add the four translations**
+- [x] **Step 2: Add the four translations**
 
 Edit `DocumentScanner/DocumentScanner/InfoPlist.xcstrings`. Add `de` and `it` siblings inside each key's `localizations` object, alongside the existing `en`/`es`/`fr`.
 
@@ -616,7 +616,7 @@ English source and the translations to add:
 
 Use `"state": "translated"` for each new `stringUnit`. Do **not** touch `CFBundleDisplayName` or `CFBundleName` — the brand name stays English, and their `state: "new"` is pre-existing and harmless.
 
-- [ ] **Step 3: Verify everything passes**
+- [x] **Step 3: Verify everything passes**
 
 ```bash
 python3 scripts/verify-localization.py
@@ -624,7 +624,7 @@ python3 scripts/verify-localization.py
 
 Expected: `PASS — es, fr, de, it complete across 2 catalog(s)`
 
-- [ ] **Step 4: Build and run the full suite**
+- [x] **Step 4: Build and run the full suite**
 
 ```bash
 ./scripts/test.sh
@@ -632,7 +632,7 @@ Expected: `PASS — es, fr, de, it complete across 2 catalog(s)`
 
 Expected: PASS, same count as baseline.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScanner/InfoPlist.xcstrings
