@@ -480,7 +480,7 @@ Same shape as Task 2. Kept separate so a reviewer can reject one language while 
 - Consumes: `scripts/verify-localization.py` from Task 2; `knownRegions` from Task 1.
 - Produces: `it` coverage in `Localizable.xcstrings`.
 
-- [ ] **Step 1: Verify the Italian glossary against a simulator**
+- [x] **Step 1: Verify the Italian glossary against a simulator**
 
 As in Task 2 Step 1, but with `it` / `it_IT`:
 
@@ -492,7 +492,7 @@ xcrun simctl shutdown <UDID> && xcrun simctl boot <UDID>
 
 Confirm: Settings=`Impostazioni`, Folder=`Cartella`, Move=`Sposta`, Save=`Salva`, Delete=`Elimina`, Done=`Fine`, Cancel=`Annulla`. Simulator wins over the glossary table.
 
-- [ ] **Step 2: Run the verifier to confirm it fails for Italian**
+- [x] **Step 2: Run the verifier to confirm it fails for Italian**
 
 ```bash
 python3 scripts/verify-localization.py it
@@ -500,7 +500,7 @@ python3 scripts/verify-localization.py it
 
 Expected: `FAIL — 152 problem(s):` all reading `[it] MISSING`.
 
-- [ ] **Step 3: Write the Italian translations**
+- [x] **Step 3: Write the Italian translations**
 
 Translate all 150 keys into Italian, `tu` register, per the glossary. Same scripted-edit approach and same JSON shapes as Task 2 Step 4.
 
@@ -524,7 +524,7 @@ Italian-specific hard rules, in addition to Task 2's:
 - Articles elide before vowels (`l'originale`, `dell'ordine`) — write them correctly rather than leaving `lo`/`la`.
 - Same format-specifier and brand-name rules as German.
 
-- [ ] **Step 4: Verify Italian completeness**
+- [x] **Step 4: Verify Italian completeness**
 
 ```bash
 python3 scripts/verify-localization.py it
@@ -532,7 +532,7 @@ python3 scripts/verify-localization.py it
 
 Expected: only the two `InfoPlist.xcstrings` failures remain (Task 4). Zero failures from `Localizable.xcstrings`.
 
-- [ ] **Step 5: Verify counts and that German did not regress**
+- [x] **Step 5: Verify counts and that German did not regress**
 
 ```bash
 python3 -c "
@@ -549,7 +549,7 @@ python3 scripts/verify-localization.py es fr de
 
 Expected: `{'es': 150, 'fr': 150, 'en': 5, 'de': 150, 'it': 150}`, `total keys: 150`, and the es/fr/de run showing only the known InfoPlist gaps.
 
-- [ ] **Step 6: Build and run the full suite**
+- [x] **Step 6: Build and run the full suite**
 
 ```bash
 ./scripts/test.sh
@@ -557,7 +557,7 @@ Expected: `{'es': 150, 'fr': 150, 'en': 5, 'de': 150, 'it': 150}`, `total keys: 
 
 Expected: PASS, same count as baseline.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScanner/Localizable.xcstrings scripts/verify-localization.py
