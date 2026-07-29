@@ -754,7 +754,7 @@ The spec's core risk mitigation: there is no native reviewer, so accuracy is est
 - Consumes: completed `de` + `it` localizations from Tasks 2–4.
 - Produces: a flag list. Task 7 applies any string changes Peter's review triggers.
 
-- [ ] **Step 1: Extract every de/it string paired with its English source**
+- [x] **Step 1: Extract every de/it string paired with its English source**
 
 ```bash
 python3 - <<'EOF' > /private/tmp/claude-501/-Users-pjones-Desktop-PocketScanner/54fe95e3-e798-4975-8cf4-98720c0f9268/scratchpad/de-it-pairs.tsv
@@ -777,9 +777,9 @@ EOF
 wc -l /private/tmp/claude-501/-Users-pjones-Desktop-PocketScanner/54fe95e3-e798-4975-8cf4-98720c0f9268/scratchpad/de-it-pairs.tsv
 ```
 
-Expected: 304 lines (150 keys × 2 languages, +2 extra rows per language for the plural `one`/`other` split on two keys, +2 InfoPlist keys × 2 languages).
+Expected: **308** lines. Derivation, since an off-by-a-few here means a key was missed: `Localizable` has 148 flat keys × 2 languages = 296, plus 2 plural keys × 2 forms × 2 languages = 8, giving 304; `InfoPlist` adds 2 keys × 2 languages = 4. Total 308.
 
-- [ ] **Step 2: Back-translate**
+- [x] **Step 2: Back-translate**
 
 Working from the TSV, translate each German and Italian value **back into English without looking at the original English key**, then compare to the key. Flag a row when:
 - the back-translation changes the meaning (not just the wording),
@@ -830,7 +830,7 @@ Expected: `specifier check done` with no mismatch lines. Any mismatch is a bug �
 | `Merge "%@" into "%@"?` | `¿Combinar "%1$@" en "%2$@"?` |
 | `Processing page %lld of %lld` | `Procesando la página %1$lld de %2$lld` |
 
-- [ ] **Step 3: Write the QA record**
+- [x] **Step 3: Write the QA record**
 
 Create `docs/superpowers/qa/2026-07-29-de-it-back-translation.md` with:
 - a one-paragraph method statement (what was checked, and that no native reviewer was involved — this is the honest record of an accepted risk),
@@ -838,7 +838,7 @@ Create `docs/superpowers/qa/2026-07-29-de-it-back-translation.md` with:
 - a **"Flagged for Peter"** section: only genuinely low-confidence strings, each as a table row of *key · translation · back-translation · why it's flagged · suggested alternative*. Aim for under 15 rows across both languages; if it runs much longer, the translation quality is the problem, not the review.
 - a **"Corrected during QA"** section listing anything already fixed, so the fix is on the record.
 
-- [ ] **Step 4: Apply any corrections found**
+- [x] **Step 4: Apply any corrections found**
 
 If Step 2 or 3 surfaced outright errors (not judgment calls), fix them in the catalog now and re-run:
 
@@ -848,7 +848,7 @@ python3 scripts/verify-localization.py && ./scripts/test.sh
 
 Expected: PASS on both.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/superpowers/qa/2026-07-29-de-it-back-translation.md \
