@@ -94,15 +94,22 @@ No outright errors were found, so nothing was changed unilaterally. The changes 
 | #3 | `Sign with your signature` | it | Firma con la tua firma | **Firma i tuoi documenti** |
 | #4 | `Couldn't read that` | de | Konnte nicht gelesen werden | **Unterschrift nicht erkannt** |
 | #5 | `Remove this mark?` | it | Rimuovere questo segno? | **Rimuovere questa annotazione?** |
+| #1 | `Give this signature a name…` | de | …unterscheiden kannst. | **…auseinanderhalten kannst.** |
+| #2 | `Swipe left on any document or folder…` | de | …um **es** zu entfernen. | **…um den Eintrag zu entfernen.** |
 
-Verified after applying: exactly 4 values changed, 0 added, 0 removed (semantic diff against the previous commit); `verify-localization.py` passes; unit suite 239/0.
+Applied in two passes (#3/#4/#5 first, then #1/#2), each after Peter's ruling. Verified both times by semantic diff against the previous commit — only the intended values changed, 0 added, 0 removed. `verify-localization.py` passes; unit suite 239/0.
+
+Every write asserted the expected current value first, so a string that had drifted would abort rather than be silently overwritten.
 
 **Note on #4:** only German changed. Italian keeps "Lettura non riuscita" ("Reading failed"), which is closer to the English source and was not stilted the way the German passive was. So the two languages now word this heading differently — deliberately. If that asymmetry is unwanted, the Italian equivalent would be "Firma non riconosciuta".
 
 ### Still open
 
-- **#1 and #2** (the *auseinanderhalten* wording and the document/folder pronoun agreement) were recommended as pure improvements but have not been ruled on, so they are **not applied**. They remain as written in the flag list above.
+**Nothing.** All nine flags are resolved: #1–#5 were applied as above; #6, #7, #8 and #9 were the same items renumbered in the flag list and are covered by those changes, with the exception noted below.
+
 - **#5's other half:** `Discard this page's markup?` already used "annotazioni" and needed no change — only `Remove this mark?` moved, which is what aligned them.
+- **The German `Sign` button** ("Unterschreiben", 14 chars) was not a decision — it is a length risk handed to Task 7's forced-locale pass. "Signieren" (9) is the drop-in if it clips.
+- **"Darstellungstaste"** was left as-is: low-stakes Tips body text, grammatically well-formed, flagged only for the record.
 
 ---
 
