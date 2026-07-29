@@ -39,8 +39,9 @@ IDENTICAL_OK = {
     # identical. None of these are untranslated oversights.
     "de": {" ", "%lld", "%@  %@", "OK", "Filter", "Format", "Name", "Version",
            "in %@"},
-    # Populate as the Italian translations are written (Task 3).
-    "it": {" ", "%lld", "%@  %@", "OK"},
+    # Italian: "Privacy" is the word Apple uses in Italian too, and "in %@"
+    # is the preposition "in" — identical, not untranslated.
+    "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@"},
 }
 
 

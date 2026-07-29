@@ -22,6 +22,12 @@
             "state" : "translated",
             "value" : " "
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " "
+          }
         }
       }
     },
@@ -51,6 +57,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les pages de « %1$@ » seront ajoutées à la fin de « %2$@ », et « %3$@ » sera supprimé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pagine di \"%1$@\" verranno aggiunte alla fine di \"%2$@\" e \"%3$@\" verrà eliminato."
           }
         }
       }
@@ -82,6 +94,12 @@
             "state" : "translated",
             "value" : "%1$@  %2$@"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@  %2$@"
+          }
         }
       }
     },
@@ -102,6 +120,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
@@ -182,6 +206,24 @@
               }
             }
           }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pagina"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pagine"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -242,6 +284,24 @@
               }
             }
           }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld selezionata"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld selezionate"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -265,6 +325,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "À propos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
           }
         }
       }
@@ -290,6 +356,12 @@
             "state" : "translated",
             "value" : "Ajouter"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi"
+          }
         }
       }
     },
@@ -313,6 +385,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter une date"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi data"
           }
         }
       }
@@ -338,6 +416,12 @@
             "state" : "translated",
             "value" : "Ajouter une signature"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi firma"
+          }
         }
       }
     },
@@ -361,6 +445,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un nom"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un nome"
           }
         }
       }
@@ -386,6 +476,12 @@
             "state" : "translated",
             "value" : "Ajoutez d'abord une signature dans les Réglages."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi prima una firma in Impostazioni."
+          }
         }
       }
     },
@@ -407,6 +503,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajoute à ce dossier un nouveau document avec les pages sélectionnées. L'original reste inchangé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiunge a questa cartella un nuovo documento con le pagine selezionate. L'originale resta invariato."
           }
         }
       }
@@ -432,6 +534,12 @@
             "state" : "translated",
             "value" : "Verrouillage de l'app"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocco app"
+          }
         }
       }
     },
@@ -455,6 +563,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appliquer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applica"
           }
         }
       }
@@ -480,6 +594,12 @@
             "state" : "translated",
             "value" : "Appliquer %@ à toutes les pages"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applica %@ a tutte le pagine"
+          }
         }
       }
     },
@@ -504,6 +624,12 @@
             "state" : "translated",
             "value" : "Appliquer %@ à toutes les pages ?"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applicare %@ a tutte le pagine?"
+          }
         }
       }
     },
@@ -527,6 +653,12 @@
             "state" : "translated",
             "value" : "N&B"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B/N"
+          }
         }
       }
     },
@@ -549,6 +681,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bleu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blu"
           }
         }
       }
@@ -574,6 +712,12 @@
             "state" : "translated",
             "value" : "Accès à l'appareil photo requis"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesso alla fotocamera necessario"
+          }
         }
       }
     },
@@ -597,6 +741,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulla"
           }
         }
       }
@@ -622,6 +772,12 @@
             "state" : "translated",
             "value" : "Choisir une signature"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli una firma"
+          }
         }
       }
     },
@@ -646,6 +802,12 @@
             "state" : "translated",
             "value" : "Choisissez un nouveau nom pour ce dossier."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli un nuovo nome per questa cartella."
+          }
         }
       }
     },
@@ -668,6 +830,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Couleur"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colore"
           }
         }
       }
@@ -693,6 +861,12 @@
             "state" : "translated",
             "value" : "Importation impossible"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importazione non riuscita"
+          }
         }
       }
     },
@@ -714,6 +888,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrement impossible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvataggio non riuscito"
           }
         }
       }
@@ -739,6 +919,12 @@
             "state" : "translated",
             "value" : "Fusion impossible"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unione non riuscita"
+          }
         }
       }
     },
@@ -762,6 +948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible d'ouvrir le document"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile aprire il documento"
           }
         }
       }
@@ -787,6 +979,12 @@
             "state" : "translated",
             "value" : "Lecture impossible"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lettura non riuscita"
+          }
         }
       }
     },
@@ -808,6 +1006,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de lire ce fichier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile leggere questo file"
           }
         }
       }
@@ -833,6 +1037,12 @@
             "state" : "translated",
             "value" : "Enregistrement impossible"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvataggio non riuscito"
+          }
         }
       }
     },
@@ -856,6 +1066,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible de mettre à jour le dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile aggiornare la cartella"
           }
         }
       }
@@ -881,6 +1097,12 @@
             "state" : "translated",
             "value" : "Créer"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea"
+          }
         }
       }
     },
@@ -903,6 +1125,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
           }
         }
       }
@@ -928,6 +1156,12 @@
             "state" : "translated",
             "value" : "Filtre par défaut"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro predefinito"
+          }
         }
       }
     },
@@ -951,6 +1185,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina"
           }
         }
       }
@@ -976,6 +1216,12 @@
             "state" : "translated",
             "value" : "Supprimer le dossier ?"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare la cartella?"
+          }
         }
       }
     },
@@ -999,6 +1245,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer la page"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina pagina"
           }
         }
       }
@@ -1024,6 +1276,12 @@
             "state" : "translated",
             "value" : "Supprimer ce document ?"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare questo documento?"
+          }
         }
       }
     },
@@ -1047,6 +1305,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer les annotations de cette page ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scartare le annotazioni di questa pagina?"
           }
         }
       }
@@ -1072,6 +1336,12 @@
             "state" : "translated",
             "value" : "Terminé"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fine"
+          }
         }
       }
     },
@@ -1095,6 +1365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier quand même"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifica comunque"
           }
         }
       }
@@ -1120,6 +1396,12 @@
             "state" : "translated",
             "value" : "Modifier la page %lld"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifica pagina %lld"
+          }
         }
       }
     },
@@ -1143,6 +1425,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier les pages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifica pagine"
           }
         }
       }
@@ -1168,6 +1456,12 @@
             "state" : "translated",
             "value" : "Modifier la page %lld supprime les annotations que vous y avez ajoutées. Le reste du document n'est pas affecté."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modificando la pagina %lld verranno rimosse le annotazioni che hai aggiunto. Il resto del documento non viene modificato."
+          }
         }
       }
     },
@@ -1192,6 +1486,12 @@
             "state" : "translated",
             "value" : "Dossier vide"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartella vuota"
+          }
         }
       }
     },
@@ -1213,6 +1513,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saisissez un nom pour le nouveau dossier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci un nome per la nuova cartella."
           }
         }
       }
@@ -1238,6 +1544,12 @@
             "state" : "translated",
             "value" : "Saisissez un nom pour le nouveau sous-dossier."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inserisci un nome per la nuova sottocartella."
+          }
         }
       }
     },
@@ -1262,6 +1574,12 @@
             "state" : "translated",
             "value" : "Filtre"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro"
+          }
         }
       }
     },
@@ -1283,6 +1601,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartella"
           }
         }
       }
@@ -1308,6 +1632,12 @@
             "state" : "translated",
             "value" : "Nom du dossier"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome cartella"
+          }
         }
       }
     },
@@ -1331,6 +1661,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Format"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato"
           }
         }
       }
@@ -1356,6 +1692,12 @@
             "state" : "translated",
             "value" : "Donnez un nom à cette signature pour la reconnaître au moment de signer."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assegna un nome a questa firma per distinguerla al momento di firmare."
+          }
         }
       }
     },
@@ -1378,6 +1720,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vert"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verde"
           }
         }
       }
@@ -1402,6 +1750,12 @@
             "state" : "translated",
             "value" : "Gris"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grigio"
+          }
         }
       }
     },
@@ -1423,6 +1777,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vue en grille"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista griglia"
           }
         }
       }
@@ -1447,6 +1807,12 @@
             "state" : "translated",
             "value" : "Surlignages et écriture manuscrite"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evidenziazioni e scrittura a mano"
+          }
         }
       }
     },
@@ -1469,6 +1835,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les surlignages s'ajustent au texte que Pocket Scanner détecte dans votre numérisation. Sur les pages imprimées, c'est précis ; sur l'écriture manuscrite ou les numérisations approximatives, la détection est moins exacte — un surlignage peut donc être un peu haut ou ne pas s'aligner parfaitement. Votre numérisation elle-même n'est jamais modifiée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le evidenziazioni si adattano al testo che Pocket Scanner rileva nella tua scansione. Sulle pagine stampate è preciso; con la scrittura a mano o scansioni approssimative il rilevamento del testo è meno accurato, quindi un'evidenziazione può risultare un po' alta o non allinearsi esattamente. La tua scansione non viene mai alterata."
           }
         }
       }
@@ -1494,6 +1866,12 @@
             "state" : "translated",
             "value" : "Importer un PDF"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa PDF"
+          }
         }
       }
     },
@@ -1516,6 +1894,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dans le mode d'édition d'un document, sélectionnez des pages et touchez Enregistrer comme nouveau pour les extraire dans leur propre document."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nella modalità di modifica di un documento, seleziona le pagine e tocca \"Salva come nuovo\" per estrarle in una scansione a parte."
           }
         }
       }
@@ -1541,6 +1925,12 @@
             "state" : "translated",
             "value" : "Conserver cette version"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantieni questa versione"
+          }
         }
       }
     },
@@ -1565,6 +1955,12 @@
             "state" : "translated",
             "value" : "Bibliothèque"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libreria"
+          }
         }
       }
     },
@@ -1587,6 +1983,12 @@
             "state" : "translated",
             "value" : "Vue en liste"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista elenco"
+          }
         }
       }
     },
@@ -1608,6 +2010,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fusionner"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unisci"
           }
         }
       }
@@ -1639,6 +2047,12 @@
             "state" : "translated",
             "value" : "Fusionner « %1$@ » dans « %2$@ » ?"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unire \"%1$@\" in \"%2$@\"?"
+          }
         }
       }
     },
@@ -1660,6 +2074,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fusionner dans…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unisci in…"
           }
         }
       }
@@ -1685,6 +2105,12 @@
             "state" : "translated",
             "value" : "Déplacer"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta"
+          }
         }
       }
     },
@@ -1706,6 +2132,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Déplacer vers…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sposta in…"
           }
         }
       }
@@ -1730,6 +2162,12 @@
             "state" : "translated",
             "value" : "Nom"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nome"
+          }
         }
       }
     },
@@ -1751,6 +2189,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nouveau dossier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova cartella"
           }
         }
       }
@@ -1776,6 +2220,12 @@
             "state" : "translated",
             "value" : "Nouveau sous-dossier"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova sottocartella"
+          }
         }
       }
     },
@@ -1799,6 +2249,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les nouvelles numérisations démarrent avec ce filtre. Vous pouvez toujours le changer pour chaque numérisation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nuove scansioni iniziano con questo filtro. Puoi comunque cambiarlo per ogni scansione."
           }
         }
       }
@@ -1824,6 +2280,12 @@
             "state" : "translated",
             "value" : "Correspondance suivante"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risultato successivo"
+          }
         }
       }
     },
@@ -1845,6 +2307,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun document pour l'instant"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ancora nessun documento"
           }
         }
       }
@@ -1870,6 +2338,12 @@
             "state" : "translated",
             "value" : "Aucune signature"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna firma"
+          }
         }
       }
     },
@@ -1890,6 +2364,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -1917,6 +2397,12 @@
             "state" : "translated",
             "value" : "Une seule liste"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un unico elenco"
+          }
         }
       }
     },
@@ -1940,6 +2426,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir les Réglages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri Impostazioni"
           }
         }
       }
@@ -1965,6 +2457,12 @@
             "state" : "translated",
             "value" : "Autres appareils"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altri dispositivi"
+          }
         }
       }
     },
@@ -1987,6 +2485,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nombre de pages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numero di pagine"
           }
         }
       }
@@ -2011,6 +2515,12 @@
             "state" : "translated",
             "value" : "Photo"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto"
+          }
         }
       }
     },
@@ -2033,6 +2543,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rose"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosa"
           }
         }
       }
@@ -2058,6 +2574,12 @@
             "state" : "translated",
             "value" : "Pocket Scanner est verrouillé"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner è bloccato"
+          }
         }
       }
     },
@@ -2081,6 +2603,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pocket Scanner synchronise vos documents entre vos appareils via iCloud Drive. Vous pouvez utiliser l'app sans cela — les numérisations resteront uniquement sur cet appareil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner sincronizza i tuoi documenti tra i dispositivi tramite iCloud Drive. Puoi usare l'app anche senza — le scansioni resteranno solo su questo dispositivo."
           }
         }
       }
@@ -2106,6 +2634,12 @@
             "state" : "translated",
             "value" : "Pocket Scanner utilise l'appareil photo pour capturer des documents. Activez l'accès dans les Réglages."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner usa la fotocamera per acquisire documenti. Attiva l'accesso in Impostazioni."
+          }
         }
       }
     },
@@ -2128,6 +2662,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous préférez tout au même endroit ? Désactivez Afficher les dossiers dans les Réglages et toutes vos numérisations apparaîtront dans une seule liste."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preferisci avere tutto in un unico posto? Disattiva \"Mostra cartelle\" in Impostazioni e tutte le scansioni saranno in un solo elenco."
           }
         }
       }
@@ -2153,6 +2693,12 @@
             "state" : "translated",
             "value" : "Préparation de la page…"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparazione pagina…"
+          }
         }
       }
     },
@@ -2177,6 +2723,12 @@
             "state" : "translated",
             "value" : "Préparation…"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparazione…"
+          }
         }
       }
     },
@@ -2198,6 +2750,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Correspondance précédente"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risultato precedente"
           }
         }
       }
@@ -2222,6 +2780,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confidentialité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
           }
         }
       }
@@ -2253,6 +2817,12 @@
             "state" : "translated",
             "value" : "Traitement de la page %1$lld sur %2$lld"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elaborazione pagina %1$lld di %2$lld"
+          }
         }
       }
     },
@@ -2276,6 +2846,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enlever"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi"
           }
         }
       }
@@ -2301,6 +2877,12 @@
             "state" : "translated",
             "value" : "Enlever cette marque ?"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovere questo segno?"
+          }
         }
       }
     },
@@ -2325,6 +2907,12 @@
             "state" : "translated",
             "value" : "Renommer"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinomina"
+          }
         }
       }
     },
@@ -2346,6 +2934,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Renommer le document"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinomina documento"
           }
         }
       }
@@ -2371,6 +2965,12 @@
             "state" : "translated",
             "value" : "Renommer le dossier"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinomina cartella"
+          }
         }
       }
     },
@@ -2395,6 +2995,12 @@
             "state" : "translated",
             "value" : "Renommer la signature"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinomina firma"
+          }
         }
       }
     },
@@ -2416,6 +3022,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rescanner"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona di nuovo"
           }
         }
       }
@@ -2441,6 +3053,12 @@
             "state" : "translated",
             "value" : "Réessayer"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova"
+          }
         }
       }
     },
@@ -2464,6 +3082,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pivoter à gauche"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruota a sinistra"
           }
         }
       }
@@ -2489,6 +3113,12 @@
             "state" : "translated",
             "value" : "Pivoter à droite"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruota a destra"
+          }
         }
       }
     },
@@ -2512,6 +3142,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rotation : %lld°"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotazione: %lld°"
           }
         }
       }
@@ -2537,6 +3173,12 @@
             "state" : "translated",
             "value" : "Enregistrer"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva"
+          }
         }
       }
     },
@@ -2560,6 +3202,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer la numérisation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva scansione"
           }
         }
       }
@@ -2585,6 +3233,12 @@
             "state" : "translated",
             "value" : "Enregistrer comme nouveau"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva come nuovo"
+          }
         }
       }
     },
@@ -2606,6 +3260,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer comme nouveau document"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva come nuovo documento"
           }
         }
       }
@@ -2631,6 +3291,12 @@
             "state" : "translated",
             "value" : "Enregistrer la page comme nouvelle"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva pagina come nuova"
+          }
         }
       }
     },
@@ -2654,6 +3320,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer dans"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva in"
           }
         }
       }
@@ -2679,6 +3351,12 @@
             "state" : "translated",
             "value" : "Scanner un document"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona documento"
+          }
         }
       }
     },
@@ -2703,6 +3381,12 @@
             "state" : "translated",
             "value" : "Scanner votre signature sur papier, puis réutilisez-la pour signer n'importe quel document. Ajoutez-en plusieurs — vous choisirez laquelle placer."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona la tua firma su carta, poi riutilizzala per firmare qualsiasi documento. Aggiungine più di una: sceglierai quale inserire."
+          }
         }
       }
     },
@@ -2726,6 +3410,12 @@
             "state" : "translated",
             "value" : "Scannez votre signature une fois dans les Réglages, puis touchez Signer pour la placer sur n'importe quelle page — déplacez-la ou redimensionnez-la pour l'ajuster. Pour un détourage plus net, signez sur une feuille unie avec un stylo épais ; si l'appareil photo ne trouve pas les bords de la feuille de près, prenez plutôt une photo et recadrez-la."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansiona la tua firma una volta in Impostazioni, poi tocca \"Firma\" per inserirla su qualsiasi pagina: spostala o ridimensionala per adattarla. Per un ritaglio più pulito, firma su un foglio bianco con una penna spessa; se la fotocamera non riesce a rilevare i bordi del foglio da vicino, scatta invece una foto e ritagliala."
+          }
         }
       }
     },
@@ -2747,6 +3437,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Documents numérisés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansioni"
           }
         }
       }
@@ -2772,6 +3468,12 @@
             "state" : "translated",
             "value" : "Numérisation"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scansione"
+          }
         }
       }
     },
@@ -2796,6 +3498,12 @@
             "state" : "translated",
             "value" : "Rechercher des documents"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca documenti"
+          }
         }
       }
     },
@@ -2819,6 +3527,12 @@
             "state" : "translated",
             "value" : "Rechercher dans vos numérisations"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca nelle tue scansioni"
+          }
         }
       }
     },
@@ -2841,6 +3555,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La recherche lit le texte de chaque numérisation, même celles rangées dans des dossiers. Touchez un résultat pour accéder directement à la correspondance surlignée."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La ricerca legge il testo di ogni scansione, anche di quelle archiviate nelle cartelle. Tocca un risultato per andare direttamente alla corrispondenza evidenziata."
           }
         }
       }
@@ -2866,6 +3586,12 @@
             "state" : "translated",
             "value" : "Rechercher dans ce dossier"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca in questa cartella"
+          }
         }
       }
     },
@@ -2888,6 +3614,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voir vos numérisations en miniatures"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda le tue scansioni come miniature"
           }
         }
       }
@@ -2913,6 +3645,12 @@
             "state" : "translated",
             "value" : "Sélectionner plusieurs"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleziona più elementi"
+          }
         }
       }
     },
@@ -2936,6 +3674,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyer un commentaire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia feedback"
           }
         }
       }
@@ -2961,6 +3705,12 @@
             "state" : "translated",
             "value" : "Réglages"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impostazioni"
+          }
         }
       }
     },
@@ -2984,6 +3734,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afficher les dossiers"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra cartelle"
           }
         }
       }
@@ -3009,6 +3765,12 @@
             "state" : "translated",
             "value" : "Signer"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firma"
+          }
         }
       }
     },
@@ -3031,6 +3793,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Signez avec votre signature"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firma con la tua firma"
           }
         }
       }
@@ -3056,6 +3824,12 @@
             "state" : "translated",
             "value" : "Signature"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firma"
+          }
         }
       }
     },
@@ -3078,6 +3852,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Extraire des pages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estrai pagine"
           }
         }
       }
@@ -3102,6 +3882,12 @@
             "state" : "translated",
             "value" : "Balayez vers la gauche n'importe quel document ou dossier pour le supprimer."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorri verso sinistra su un documento o una cartella per rimuoverlo."
+          }
         }
       }
     },
@@ -3124,6 +3910,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Balayer pour supprimer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scorri per eliminare"
           }
         }
       }
@@ -3149,6 +3941,12 @@
             "state" : "translated",
             "value" : "Touchez + pour scanner un document dans ce dossier, ou déplacez-y des documents existants depuis la bibliothèque principale."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca + per scansionare un documento in questa cartella, oppure spostaci quelli esistenti dalla libreria principale."
+          }
         }
       }
     },
@@ -3170,6 +3968,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touchez + pour scanner un document ou créer un dossier."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca + per scansionare un documento o creare una cartella."
           }
         }
       }
@@ -3193,6 +3997,12 @@
             "state" : "translated",
             "value" : "Touchez + pour scanner un document."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca + per scansionare un documento."
+          }
         }
       }
     },
@@ -3215,6 +4025,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Touchez le bouton de disposition dans la barre d'outils pour basculer entre une liste et une grille de miniatures de votre bibliothèque."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca il pulsante di disposizione nella barra degli strumenti per passare da un elenco a una griglia di miniature della tua libreria."
           }
         }
       }
@@ -3240,6 +4056,12 @@
             "state" : "translated",
             "value" : "Ce fichier n'est pas un PDF lisible."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo file non è un PDF leggibile."
+          }
         }
       }
     },
@@ -3263,6 +4085,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La version de cet appareil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La versione di questo dispositivo"
           }
         }
       }
@@ -3288,6 +4116,12 @@
             "state" : "translated",
             "value" : "Ce dossier et tous les documents qu'il contient seront supprimés."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa cartella e tutti i documenti al suo interno verranno eliminati."
+          }
         }
       }
     },
@@ -3312,6 +4146,12 @@
             "state" : "translated",
             "value" : "Ce dossier sera supprimé."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa cartella verrà eliminata."
+          }
         }
       }
     },
@@ -3333,6 +4173,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cela supprimera définitivement « %@.pdf » d'iCloud."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo rimuoverà definitivamente \"%@.pdf\" da iCloud."
           }
         }
       }
@@ -3358,6 +4204,12 @@
             "state" : "translated",
             "value" : "Cela supprimera définitivement « %@.pdf »."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo rimuoverà definitivamente \"%@.pdf\"."
+          }
         }
       }
     },
@@ -3381,6 +4233,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Astuce : un stylo épais sur une feuille unie donne les résultats les plus nets."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consiglio: una penna spessa su un foglio bianco dà i risultati più puliti."
           }
         }
       }
@@ -3406,6 +4264,12 @@
             "state" : "translated",
             "value" : "Astuces"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consigli"
+          }
         }
       }
     },
@@ -3427,6 +4291,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réessayez sur une feuille unie et bien éclairée avec un stylo foncé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova su un foglio bianco ben illuminato con una penna scura."
           }
         }
       }
@@ -3452,6 +4322,12 @@
             "state" : "translated",
             "value" : "Essayer quand même (local uniquement)"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prova comunque (solo in locale)"
+          }
         }
       }
     },
@@ -3475,6 +4351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deux versions existent"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esistono due versioni"
           }
         }
       }
@@ -3500,6 +4382,12 @@
             "state" : "translated",
             "value" : "Déverrouiller avec Face ID"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sblocca con Face ID"
+          }
         }
       }
     },
@@ -3523,6 +4411,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versione"
           }
         }
       }
@@ -3548,6 +4442,12 @@
             "state" : "translated",
             "value" : "Lorsque désactivé, tous les documents apparaissent dans une seule liste."
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando è disattivato, tutti i documenti appaiono in un unico elenco."
+          }
         }
       }
     },
@@ -3570,6 +4470,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jaune"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giallo"
           }
         }
       }
@@ -3595,6 +4501,12 @@
             "state" : "translated",
             "value" : "Votre signature"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua firma"
+          }
         }
       }
     },
@@ -3619,6 +4531,12 @@
             "state" : "translated",
             "value" : "iCloud Drive recommandé"
           }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Drive consigliato"
+          }
         }
       }
     },
@@ -3642,6 +4560,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "dans %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "in %@"
           }
         }
       }
