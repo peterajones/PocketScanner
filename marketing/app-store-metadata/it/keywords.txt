@@ -1,0 +1,1 @@
+scanner,documenti,pdf,scansione,firma,ocr,scontrini,senza abbonamento,digitalizzare

@@ -1,3 +1,3 @@
-This update brings small refinements and behind-the-scenes polish.
+Pocket Scanner now speaks German and Italian, joining Spanish and French. Every button, label and message is fully localized, and dates appear in your language's own format.
 
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.
