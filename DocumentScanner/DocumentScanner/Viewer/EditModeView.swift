@@ -10,6 +10,10 @@ struct EditModeView: View {
 
     @State private var isMultiSelectMode = false
     @State private var selectedIndices: Set<Int> = []
+    /// Pages awaiting delete confirmation. Non-nil drives the confirmation
+    /// dialog; deleting a page rewrites the PDF on disk and cannot be undone,
+    /// so it is confirmed like every other destructive action in the app.
+    @State private var pendingPageDeletion: Set<Int>?
 
     var body: some View {
         // Read session.revision so SwiftUI subscribes to it; the body
@@ -37,6 +41,24 @@ struct EditModeView: View {
         }
         .background(.thinMaterial)
         .animation(.easeInOut(duration: 0.2), value: isMultiSelectMode)
+        .confirmationDialog(
+            "Delete \(pendingPageDeletion?.count ?? 0) pages?",
+            isPresented: Binding(
+                get: { pendingPageDeletion != nil },
+                set: { if !$0 { pendingPageDeletion = nil } }
+            )
+        ) {
+            // Keep these as bare Buttons. Attaching a modifier (e.g.
+            // .accessibilityIdentifier) wraps them in ModifiedContent, which
+            // interferes with how SwiftUI extracts buttons and roles from this
+            // builder — doing so made the Cancel button disappear entirely.
+            // UI tests target these by label, like the rest of EditModeTests.
+            Button("Delete", role: .destructive) {
+                if let indices = pendingPageDeletion { performDelete(indices) }
+                pendingPageDeletion = nil
+            }
+            Button("Cancel", role: .cancel) { pendingPageDeletion = nil }
+        }
     }
 
     private var multiSelectHeader: some View {
@@ -187,14 +209,21 @@ struct EditModeView: View {
 
     private func deleteSelected() {
         // If the user has selected every page, fall back to the
-        // delete-whole-document flow that the single-page path uses.
+        // delete-whole-document flow that the single-page path uses. That flow
+        // has its own confirmation, so don't stack a second one on top.
         if selectedIndices.count >= session.pdf.pageCount {
             NotificationCenter.default.post(name: .requestDeleteDocument, object: nil)
             return
         }
-        DocumentMutations.deletePages(in: session.pdf, at: selectedIndices)
+        pendingPageDeletion = selectedIndices
+    }
+
+    /// The actual mutation, run only once the user confirms.
+    private func performDelete(_ indices: Set<Int>) {
+        guard !indices.isEmpty else { return }
+        DocumentMutations.deletePages(in: session.pdf, at: indices)
         _ = try? session.save()
-        exitMultiSelect()
+        if isMultiSelectMode { exitMultiSelect() }
     }
 
     private func rotatePage(at index: Int, clockwise: Bool) {
@@ -206,11 +235,11 @@ struct EditModeView: View {
         guard session.pdf.pageCount > 1 else {
             // Last page — surface delete-whole-document via notification so
             // EditModeView doesn't need direct access to storage/onDeleted.
+            // That flow confirms separately, so no confirmation here.
             NotificationCenter.default.post(name: .requestDeleteDocument, object: nil)
             return
         }
-        DocumentMutations.deletePage(in: session.pdf, at: index)
-        _ = try? session.save()
+        pendingPageDeletion = [index]
     }
 
     private struct IndexPayload: Codable, Transferable {
