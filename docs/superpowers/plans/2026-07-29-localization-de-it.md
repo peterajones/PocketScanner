@@ -108,7 +108,7 @@ Without `de`/`it` in `knownRegions`, Xcode will not treat the new catalog column
 - Consumes: nothing.
 - Produces: a project that recognizes `de` and `it` as build regions. Tasks 2–4 depend on this.
 
-- [ ] **Step 1: Read the current `knownRegions` block**
+- [x] **Step 1: Read the current `knownRegions` block**
 
 ```bash
 grep -n -A8 "knownRegions" DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj
@@ -125,7 +125,7 @@ Expected output — note the exact indentation is **tabs**:
 210:			);
 ```
 
-- [ ] **Step 2: Add `de` and `it`**
+- [x] **Step 2: Add `de` and `it`**
 
 Use the Edit tool (not `sed` — the pbxproj is tab-indented and easy to corrupt). Replace:
 
@@ -153,7 +153,7 @@ with:
 
 Keep `developmentRegion = en` on line 203 unchanged.
 
-- [ ] **Step 3: Verify the project file still parses**
+- [x] **Step 3: Verify the project file still parses**
 
 ```bash
 plutil -lint DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj
@@ -163,7 +163,7 @@ Expected: `... OK`
 
 If this fails, the edit corrupted the file — `git checkout DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj` and redo the edit by hand.
 
-- [ ] **Step 4: Verify Xcode agrees the regions are registered**
+- [x] **Step 4: Verify Xcode agrees the regions are registered**
 
 ```bash
 xcodebuild -project DocumentScanner/DocumentScanner.xcodeproj -list 2>/dev/null | head -20
@@ -172,7 +172,7 @@ grep -A8 "knownRegions" DocumentScanner/DocumentScanner.xcodeproj/project.pbxpro
 
 Expected: `xcodebuild -list` completes without a parse error, and the grep shows all six regions.
 
-- [ ] **Step 5: Run the full unit suite**
+- [x] **Step 5: Run the full unit suite**
 
 ```bash
 ./scripts/test.sh
@@ -180,7 +180,7 @@ Expected: `xcodebuild -list` completes without a parse error, and the grep shows
 
 Expected: PASS, with the same test count as before this task (record the number in the commit message — it is the baseline the rest of the plan is measured against). No behavior changed, so any failure here means the pbxproj edit broke the build.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj
