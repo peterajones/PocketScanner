@@ -663,7 +663,7 @@ EOF
 - Consumes: `DateStampFormat.long.string(for:locale:)` from `DocumentScanner/DocumentScanner/DateStamp/DateStampFormat.swift:31`.
 - Produces: nothing other tasks depend on.
 
-- [ ] **Step 1: Check what German and Italian actually produce**
+- [x] **Step 1: Check what German and Italian actually produce**
 
 ```bash
 python3 - <<'EOF'
@@ -686,7 +686,7 @@ EOF
 
 Expected roughly: `de_DE -> 9. Juli 2026` and `it_IT -> 9 luglio 2026`. If `swift -e` is unavailable, skip this step and let Step 2's test discover the values — assert on the month name only (which is stable) rather than the full string.
 
-- [ ] **Step 2: Add the test**
+- [x] **Step 2: Add the test**
 
 In `DocumentScanner/DocumentScannerTests/DateStampFormatTests.swift`, insert after `test_longFormat_usesLocaleMonthNameAndParticles` (line 54):
 
@@ -716,7 +716,7 @@ In `DocumentScanner/DocumentScannerTests/DateStampFormatTests.swift`, insert aft
 
 Assert on the month name substring, not the full formatted string — CLDR occasionally adjusts separators between OS releases, and a substring assertion tests the thing that matters (correct localized month) without being brittle.
 
-- [ ] **Step 3: Run the suite**
+- [x] **Step 3: Run the suite**
 
 ```bash
 ./scripts/test.sh
@@ -724,7 +724,7 @@ Assert on the month name substring, not the full formatted string — CLDR occas
 
 Expected: PASS, with the count **2 higher** than the Task 1 baseline. If either new test fails, read the assertion message — it prints the actual formatted string, which tells you whether the locale is being ignored or CLDR simply formats differently than expected.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScannerTests/DateStampFormatTests.swift
