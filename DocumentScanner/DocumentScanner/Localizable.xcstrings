@@ -2061,7 +2061,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zusammenführen in…"
+            "value" : "Zusammenführen"
           }
         },
         "es" : {
@@ -3277,7 +3277,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seite als neues sichern"
+            "value" : "Seite extrahieren"
           }
         },
         "es" : {
