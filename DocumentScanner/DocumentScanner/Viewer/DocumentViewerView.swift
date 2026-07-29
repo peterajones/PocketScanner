@@ -247,7 +247,12 @@ struct DocumentViewerView: View {
         .alert("Rename Document", isPresented: $isRenaming) {
             renameAlertActions(session: session)
         }
-        .confirmationDialog("Delete this document?", isPresented: $showDeleteConfirm) {
+        // .alert, not .confirmationDialog: on this iOS version a
+        // confirmationDialog renders its destructive button but drops the
+        // explicit .cancel one, leaving a delete prompt with no labelled way
+        // out. Verified on the simulator. The Library's "Delete Folder?"
+        // confirms have always used .alert and show both buttons correctly.
+        .alert("Delete this document?", isPresented: $showDeleteConfirm) {
             Button("Delete", role: .destructive) {
                 try? storage.delete(at: session.url)
                 onDeleted()
@@ -508,7 +513,8 @@ struct DocumentViewerView: View {
                 currentPageIndex: $currentVisiblePageIndex
             )
             .ignoresSafeArea(edges: editMode ? [] : .bottom)
-            .confirmationDialog(
+            // .alert for the same reason as the delete-document confirm above.
+            .alert(
                 "Remove this mark?",
                 isPresented: Binding(
                     get: { pendingDeletion != nil },
