@@ -3389,7 +3389,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salva pagina come nuova"
+            "value" : "Estrai pagina"
           }
         }
       }
@@ -3743,7 +3743,7 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seleziona più elementi"
+            "value" : "Selezione multipla"
           }
         }
       }
