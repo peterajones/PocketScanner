@@ -888,7 +888,7 @@ The spec's named implementation-side risk. German compounds run long and can cli
 - Consumes: German localizations from Task 2; Peter's decisions from Task 6 Step 6.
 - Produces: a German UI with no clipped text. Task 9's captions reuse any shortened wording.
 
-- [ ] **Step 1: Build and launch in forced German**
+- [x] **Step 1: Build and launch in forced German**
 
 In Xcode: Edit Scheme ▸ Run ▸ Options ▸ **App Language → German**. Build and run on the simulator.
 
@@ -898,7 +898,7 @@ Alternatively from the command line, launch an already-installed build with the 
 xcrun simctl launch booted ca.peter-jones.DocumentScanner.dev -AppleLanguages '(de)' -AppleLocale de_DE
 ```
 
-- [ ] **Step 2: HUMAN GATE — Peter walks every screen looking for clipped text**
+- [x] **Step 2: HUMAN GATE — Peter walks every screen looking for clipped text**
 
 Screens to cover, in order — these are where v3.0's es/fr overflow actually appeared:
 1. Library root (empty state, list view, grid view)
@@ -914,7 +914,7 @@ Screens to cover, in order — these are where v3.0's es/fr overflow actually ap
 
 He is looking for **clipped text, "…" truncation, or a label wrapping to an ugly third line** — not for translation quality. A screenshot of each offender is the most useful output.
 
-- [ ] **Step 3: Shorten the offending strings**
+- [x] **Step 3: Shorten the offending strings**
 
 For each reported overflow, prefer a shorter German string over a layout change — the layout is shared with four other languages that currently fit, and changing it risks regressing them.
 
@@ -930,7 +930,7 @@ This is exactly what v3.0 did for es/fr: `Escala de grises`→`Grises`, `Documen
 
 Treat this table as the likely candidates, not the answer — shorten what Peter actually reports, and leave the rest alone.
 
-- [ ] **Step 4: Re-verify and re-check**
+- [x] **Step 4: Re-verify and re-check**
 
 ```bash
 python3 scripts/verify-localization.py
@@ -939,11 +939,11 @@ python3 scripts/verify-localization.py
 
 Expected: PASS on both. Then relaunch in German and confirm the reported screens are clean.
 
-- [ ] **Step 5: Quick Italian pass**
+- [x] **Step 5: Quick Italian pass**
 
 Repeat Steps 1–2 with `-AppleLanguages '(it)' -AppleLocale it_IT`. Italian runs closer to English in length, so expect few or no findings — but check the same 10 screens rather than assuming.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScanner/Localizable.xcstrings
