@@ -247,7 +247,12 @@ struct DocumentViewerView: View {
         .alert("Rename Document", isPresented: $isRenaming) {
             renameAlertActions(session: session)
         }
-        .confirmationDialog("Delete this document?", isPresented: $showDeleteConfirm) {
+        // .alert, not .confirmationDialog: on this iOS version a
+        // confirmationDialog renders its destructive button but drops the
+        // explicit .cancel one, leaving a delete prompt with no labelled way
+        // out. Verified on the simulator. The Library's "Delete Folder?"
+        // confirms have always used .alert and show both buttons correctly.
+        .alert("Delete this document?", isPresented: $showDeleteConfirm) {
             Button("Delete", role: .destructive) {
                 try? storage.delete(at: session.url)
                 onDeleted()
@@ -508,7 +513,8 @@ struct DocumentViewerView: View {
                 currentPageIndex: $currentVisiblePageIndex
             )
             .ignoresSafeArea(edges: editMode ? [] : .bottom)
-            .confirmationDialog(
+            // .alert for the same reason as the delete-document confirm above.
+            .alert(
                 "Remove this mark?",
                 isPresented: Binding(
                     get: { pendingDeletion != nil },
@@ -746,7 +752,17 @@ private struct PDFKitView: UIViewRepresentable {
             guard let view = note.object as? PDFView,
                   let doc = view.document, let page = view.currentPage else { return }
             let idx = doc.index(for: page)
-            if idx != parent.currentPageIndex { parent.currentPageIndex = idx }
+            guard idx != parent.currentPageIndex else { return }
+            // PDFKit posts this notification synchronously from `go(to:)`, and
+            // `updateUIView` calls `go(to:)` — so writing the binding here would
+            // mutate SwiftUI state during the view update ("this will cause
+            // undefined behavior"). Hop to the next runloop turn so the write
+            // lands outside the update pass. Re-read `parent` there rather than
+            // capturing it, since updateUIView reassigns it.
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.parent.currentPageIndex != idx else { return }
+                self.parent.currentPageIndex = idx
+            }
         }
     }
 

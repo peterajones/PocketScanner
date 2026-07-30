@@ -135,22 +135,105 @@ Once the library exists, a refresh is fast:
 
 ## F. Localized screenshot sets — es / fr (added v3.0)
 
-> **Pipeline status (post-v3.1):** the batch renderers (`render-captions.py`, `caption-all.sh`)
-> and the `captions/*.tsv` manifests were **retired** once the captioned sets became final and the
-> base captures were deleted. Only `caption.sh` (the per-shot compositor) remains. To build a
-> **new** multi-locale set, either caption each shot with `caption.sh` directly, or restore
-> `render-captions.py` + the manifests from git history. Final captioned sets now live **flat** at
-> `v3.0/Stills/<lang>/1.png … 8.png` (es/fr) and `v3.1/Stills/<lang>/…` (es-MX/fr-CA) — no
-> `captioned/` subdir, no `Stills-<lang>/`. The steps below are the original v3.0 workflow, kept
-> for reference.
+> **Pipeline status (v3.2 onward) — this is the current workflow.** `render-captions.py` is
+> **restored and live**. It reads uncaptioned captures from `v<ver>/Base/<lang>/<shot>.png`,
+> overlays `captions/<lang>.tsv`, and writes the finished set **flat** to
+> `v<ver>/Stills/<lang>/<shot>.png`. Run it from the repo root:
+>
+> ```
+> python3 marketing/app-preview/render-captions.py de it
+> python3 marketing/app-preview/render-captions.py --version 3.3 xx    # a later release
+> ```
+>
+> **`Base/` is gitignored** (`marketing/app-preview/*/Base/`). Captions are baked into the pixels
+> permanently, so keeping the raw captures locally means retuning a caption is one TSV edit plus
+> one command instead of re-shooting eight screens. They're language-specific and worthless once
+> that language's set is approved, so they don't belong in the repo. (v3.1 *deleted* its bases,
+> which is precisely what forced the renderer to be retired — ignoring rather than deleting keeps
+> the fast loop without the ~25 MB.)
+>
+> **Device framing is automated (v3.2 onward) — no Krita step.** `caption.sh` takes an optional
+> 10th argument, the bezel PNG, and `render-captions.py` passes
+> `templates/PocketScannerAppPreviewChrome1290x2796.png` automatically. The raw capture is placed
+> in the bezel's screen cutout (`left=69 top=70 1152×2656`, measured from the PNG's alpha channel)
+> with `object-fit:cover` — which is what Krita's "fit to fill the viewport" did by hand. **Shot #4
+> is deliberately excluded**: the shared v2.8 scan frame is already framed and would be
+> double-framed. The manual Krita workflow in `templates/README.md` still works and remains the
+> reference; it just isn't needed per-shot any more.
+>
+> **Capture resolution doesn't matter.** The capture is scaled into the cutout, so shoot on
+> whatever simulator you normally use (iPhone 17 → 1206×2622 is the house default). Its aspect is
+> slightly wider than the cutout, so cover-and-crop trims a few px each side rather than
+> distorting.
+>
+> **Shots #7 and #8 need a caption gap opened by hand.** The app doesn't naturally leave room under
+> the large title, so those two captures are manually edited to push content down — this has always
+> been freehand, not a scroll position. Target: keep **`y ≈ 500 → 700` clear of content in the raw
+> 1206×2622 capture**, which maps to the caption band at `y ≈ 580–760` in the finished image.
+>
+> Historical: v3.0 (`en/es/fr`) and v3.1 (`es-MX/fr-CA`) sets live at `v3.0/Stills/<lang>/` and
+> `v3.1/Stills/<lang>/`; their bases were deleted. The numbered steps below are the original v3.0
+> workflow, kept for reference.
 
 For localized App Store listings, capture the **same 8 scenes with the app running in
 each language**, then composite translated captions. The app UI, not just the caption,
 must be in-language — a Spanish caption over an English screenshot looks unfinished.
 
-1. **Same library + signatures** as above (the seeder + DemoLibrary are language-agnostic;
-   only the app UI chrome changes with the locale, and document/signature *names* stay as
-   authored — that's fine, they're proper nouns).
+1. **Localize the folder and document names too (new in v3.2).** v3.0/v3.1 left them in English
+   on the reasoning that they're proper nouns. That was a shortcut: a German shopper seeing
+   "Banana Bread Recipe" in the library reads the app as an English shell with translated chrome.
+   Rename the canonical library (§B) before each language's shoot, then rename for the next one —
+   it's sequential, one language at a time.
+
+   **Keep every name ≤ ~20 characters** (§B explains why: the viewer title bar truncates and the
+   back chevron eats the left edge). German is the tight one.
+
+   | English | German (`de`) | Italian (`it`) |
+   |---|---|---|
+   | Work | Arbeit | Lavoro |
+   | Contracts | Verträge | Contratti |
+   | Consulting Agreement | Beratervertrag | Consulenza |
+   | Services Agreement | Dienstvertrag | Contratto servizi |
+   | Personal | Persönlich | Personale |
+   | Offer of Employment | Stellenangebot | Offerta di lavoro |
+   | Residential Lease | Mietvertrag | Contratto affitto |
+   | Receipts | Belege | Scontrini |
+   | Costco Receipt | Costco Beleg | Scontrino Costco |
+   | Travel Itinerary | Reiseplan | Itinerario |
+   | Banana Bread Recipe | Bananenbrot | Pane alla banana |
+
+   Signature *names* (Jordan Avery, Taylor Morgan, Morgan Ellis) stay as authored — those really
+   are proper nouns.
+
+   **Seeding a Release build (v3.2 onward).** `-SeedDemoData` is `#if DEBUG` gated
+   (`DemoSeeder.swift:1`) so it does nothing in a Release build — and screenshots require Release
+   to hide the Settings ▸ Developer row. But the app's local-mode fallback is *not* DEBUG-gated
+   (`DocumentScannerApp.swift:39-45`): with no iCloud account, the library lists the app's **local**
+   Documents directory. So copy the PDFs straight into the simulator's app container:
+
+   ```
+   SIM=$(xcrun simctl list devices booted | grep -oE '[0-9A-F-]{36}' | head -1)
+   DATA=$(xcrun simctl get_app_container $SIM ca.peter-jones.DocumentScanner data)
+   rm -rf "$DATA/Documents" && mkdir -p "$DATA/Documents"
+   cp -R ~/Desktop/"Document Scanner DE"/. "$DATA/Documents"/
+   find "$DATA/Documents" -name .DS_Store -delete
+   # signatures live at the local fallback path when there's no iCloud:
+   mkdir -p "$DATA/Library/Application Support/Signature"
+   cp marketing/app-preview/demo-signatures/signatures.dat \
+      "$DATA/Library/Application Support/Signature/"
+   ```
+
+   Then **relaunch the app** — `InMemoryLibraryStore` reads the filesystem at launch and doesn't
+   watch it (`LibraryView.swift:220`), so a running app won't notice. Replace `Documents` wholesale
+   between languages so no folder from the previous language survives into the shots. Note the app
+   container UUID changes on each rebuild, so re-seed *after* ⌘R, not before.
+
+   **The simulator must NOT be signed into iCloud.** If it is, the app uses
+   `MetadataQueryLibraryStore` against a real account: local seeding is ignored, Settings can hang
+   on `forUbiquityContainerIdentifier`, and — worst — your real documents can sync in and end up in
+   App Store screenshots. `xcrun simctl erase <UDID>` gives a guaranteed-clean, signed-out device.
+   Unlike `make-demo-signatures.py --install`, this route touches only
+   `~/Library/Developer/CoreSimulator`, so there's no TCC prompt.
 2. **Force the app language.** Xcode ▸ Edit Scheme ▸ Run ▸ Options ▸ **App Language →
    Spanish** (then French). Release build, 9:41, simulator is fine (no camera needed for
    these 8).

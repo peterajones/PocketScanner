@@ -32,3 +32,13 @@ marketing/app-preview/v1.7/PocketScanner-v1.7.mp4
 # Krita backups / autosaves
 *.kra~
 *-autosave.kra
+
+# Uncaptioned screenshot captures. Base/<lang>/<shot>.png is the raw simulator
+# capture that render-captions.py composites captions onto; only the finished
+# Stills/ sets are deliverables. Kept locally so a caption can be retuned and
+# re-rendered in one command instead of re-shooting all 8 screens — but they're
+# language-specific and worthless once that language's set is approved, so they
+# don't belong in the repo (~25MB a release). v3.1 deleted its bases outright,
+# which is what forced the batch renderer to be retired; ignoring rather than
+# deleting keeps the fast loop without the bloat.
+marketing/app-preview/*/Base/

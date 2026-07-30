@@ -1,0 +1,9 @@
+shot	line1	line2	top	fs1	fs2	band	color
+1	Firma e data i documenti	direttamente da iPhone	508	66	58		
+2	Hai già un PDF?	Importalo con un tocco	2060	70	60		
+3	Contratto via email?	Firmalo senza stampante	515	68	58		
+4	Niente stampante?	Scansiona dallo schermo	165	68	56	rgba(0,0,0,0.82)	#ffffff
+5	Salva la tua firma	firma con un tocco	430	70	60		
+6	Aggiungi la data	nel formato che vuoi	430	72	60		
+7	Tieni tutto in ordine	con le cartelle	600	68	60		
+8	Cartelle dentro cartelle	tutto ordinato	600	64	58		

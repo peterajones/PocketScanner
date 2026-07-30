@@ -1,0 +1,1 @@
+scanner,dokumente,pdf,scannen,unterschrift,ocr,texterkennung,belege,ohne abo,papierlos

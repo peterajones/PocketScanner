@@ -84,6 +84,18 @@ final class EditModeTests: XCTestCase {
             deleteButton.tap()
         }
 
+        // --- 6b. Deleting a page rewrites the PDF and can't be undone, so it
+        // is confirmed. The page must still be present until we confirm.
+        let confirm = app.buttons["Delete"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 4),
+                      "expected a delete confirmation before the page is removed")
+        XCTAssertTrue(app.buttons["Cancel"].exists,
+                      "confirmation must offer a way out, not just Delete")
+        XCTAssertTrue(app.descendants(matching: .any)
+            .matching(identifier: "EditMode.Thumbnail.1").firstMatch.exists,
+                      "page must NOT be deleted until the user confirms")
+        confirm.tap()
+
         // --- 7. Second thumbnail is gone.
         // After delete, the second thumbnail should no longer exist; the first
         // still does.
