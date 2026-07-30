@@ -25,6 +25,10 @@ import sys
 APP = "marketing/app-preview"
 SCAN2A = f"{APP}/v2.8/Stills/2a. Scanning a Document.png"
 CAPTION = f"{APP}/caption.sh"
+# Apple's iPhone bezel with a transparent screen cutout. caption.sh drops the raw
+# capture into the cutout and composites this over it, which is what
+# marketing/templates/README.md previously described as a manual Krita step.
+CHROME = "marketing/templates/PocketScannerAppPreviewChrome1290x2796.png"
 
 # Retired after v3.1, restored for v3.2. Two things changed with the v3.1 asset
 # restructure and are baked in here:
@@ -75,11 +79,16 @@ def main():
                 missing += 1
                 continue
             c = caps[shot]
+            # Shot #4 reuses the shared 2a frame, which is ALREADY framed — passing
+            # the bezel again would double-frame it. Every other shot is a raw
+            # simulator capture and needs the chrome.
+            chrome = "" if shot == 4 else CHROME
             subprocess.run(
                 [CAPTION, base, f"{outdir}/{shot}.png", c["line1"], c["line2"],
-                 c["top"], c["fs1"], c["fs2"], c.get("band", ""), c.get("color", "")],
+                 c["top"], c["fs1"], c["fs2"], c.get("band", ""), c.get("color", ""),
+                 chrome],
                 check=True, stdout=subprocess.DEVNULL)
-            print(f"  #{shot}: {os.path.basename(base)}")
+            print(f"  #{shot}: {os.path.basename(base)}{'' if shot == 4 else '  [framed]'}")
 
     if missing:
         print(f"\n{missing} shot(s) had no base capture — the set is INCOMPLETE.")
