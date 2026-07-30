@@ -1137,7 +1137,7 @@ EOF
 - Consumes: `marketing/app-preview/caption.sh` (unchanged; signature `caption.sh <in> <out> <line1> <line2> [top_px] [fs1] [fs2] [band] [color]`).
 - Produces: the two 8-shot captioned sets for ASC upload in Task 10.
 
-- [ ] **Step 1: Restore the retired renderer**
+- [x] **Step 1: Restore the retired renderer**
 
 ```bash
 git show 335da59^:marketing/app-preview/render-captions.py > marketing/app-preview/render-captions.py
@@ -1145,7 +1145,7 @@ chmod +x marketing/app-preview/render-captions.py
 git show 335da59^:marketing/app-preview/captions/en.tsv > /dev/null && echo "en.tsv recoverable"
 ```
 
-- [ ] **Step 2: Retarget it at the v3.2 flat layout**
+- [x] **Step 2: Retarget it at the v3.2 flat layout**
 
 The restored script hardcodes `V3 = "marketing/app-preview/v3.0/Stills"`, writes to a `captioned/` subdirectory that no longer exists in the current layout, and expects base files named `<lang><shot>*.png`. Update it:
 
@@ -1188,7 +1188,7 @@ with:
 
 Drop the now-unused `BASE_LANG` dict — v3.2 adds two *full* languages with their own captures, not regional variants riding a parent's screenshots. Keep the `restval=""` on the `csv.DictReader`; it exists because a hand-authored TSV that omits the trailing `band`/`color` columns otherwise yields `None`, which `caption.sh` cannot take as an argument. That bug already cost a debugging cycle in v3.1.
 
-- [ ] **Step 3: HUMAN GATE — Peter captures the base screenshots**
+- [x] **Step 3: HUMAN GATE — Peter captures the base screenshots**
 
 Per `marketing/app-preview/demo-library-recipe.md` §F. For each of German and Italian:
 - Release build, simulator, status bar forced to 9:41
@@ -1210,7 +1210,7 @@ done
 
 Expected: every file `pixelWidth: 1290  pixelHeight: 2796`.
 
-- [ ] **Step 4: Author the caption manifests**
+- [x] **Step 4: Author the caption manifests**
 
 Create `marketing/app-preview/captions/de.tsv`. Tab-separated, with this exact header, and keep the per-shot geometry from the en/es manifests (it is tuned to the app's layout and must not drift):
 
@@ -1244,7 +1244,7 @@ shot	line1	line2	top	fs1	fs2	band	color
 
 Both manifests must use the Task 8 glossary and match the metadata's wording — a caption saying `scannen` while the description says something else reads as sloppy.
 
-- [ ] **Step 5: Render**
+- [x] **Step 5: Render**
 
 ```bash
 python3 marketing/app-preview/render-captions.py de it
@@ -1252,7 +1252,7 @@ python3 marketing/app-preview/render-captions.py de it
 
 Expected: two `== de ==` / `== it ==` blocks, each listing shots #1–#8 with the base filename used, and no `NO BASE (skipped)` lines.
 
-- [ ] **Step 6: Verify the output**
+- [x] **Step 6: Verify the output**
 
 ```bash
 for lang in de it; do
@@ -1266,15 +1266,15 @@ done
 
 Expected: `1.png … 8.png` in each directory, every one 1290×2796.
 
-- [ ] **Step 7: HUMAN GATE — Peter eyeballs all 16 for caption overflow**
+- [x] **Step 7: HUMAN GATE — Peter eyeballs all 16 for caption overflow**
 
 He is checking that no caption runs past the 1290px width or collides with app chrome — language-independent, exactly like the Task 7 overflow pass. Where a caption overflows, lower that row's `fs1`/`fs2` in the TSV and re-run Step 5 for that language.
 
-- [ ] **Step 8: Update the pipeline status note**
+- [x] **Step 8: Update the pipeline status note**
 
 In `marketing/app-preview/demo-library-recipe.md`, replace the "Pipeline status (post-v3.1)" block at the top of §F with a post-v3.2 note: the renderer is **restored and live** at `render-captions.py`, it reads bases from `v<version>/Base/<lang>/` and writes captioned sets to `v<version>/Stills/<lang>/`, and `captions/{de,it}.tsv` are the current manifests. Say plainly that the v3.0/v3.1 sets predate this layout so their historical paths differ.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add marketing/app-preview/render-captions.py \
