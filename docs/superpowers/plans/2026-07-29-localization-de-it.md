@@ -1310,7 +1310,7 @@ EOF
 - Consumes: everything above.
 - Produces: a repo ready for Peter to archive and submit.
 
-- [ ] **Step 1: Confirm the current version values**
+- [x] **Step 1: Confirm the current version values**
 
 ```bash
 grep -n "MARKETING_VERSION\|CURRENT_PROJECT_VERSION" DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj
@@ -1318,11 +1318,11 @@ grep -n "MARKETING_VERSION\|CURRENT_PROJECT_VERSION" DocumentScanner/DocumentSca
 
 Expected: **two** app-target lines at `MARKETING_VERSION = 3.1;` and two at `CURRENT_PROJECT_VERSION = 30;`, plus test-target lines at `1.0` / `1`. Identify which lines belong to the app target before editing — the test targets must not change.
 
-- [ ] **Step 2: Bump to 3.2 / 31**
+- [x] **Step 2: Bump to 3.2 / 31**
 
 Edit only the app-target occurrences: `MARKETING_VERSION = 3.1;` → `= 3.2;` (2 lines), `CURRENT_PROJECT_VERSION = 30;` → `= 31;` (2 lines).
 
-- [ ] **Step 3: Verify the bump landed and nothing else moved**
+- [x] **Step 3: Verify the bump landed and nothing else moved**
 
 ```bash
 plutil -lint DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj
@@ -1334,7 +1334,7 @@ Expected: lint OK; two `3.2` lines, two `31` lines, test targets still `1.0` / `
 
 This check exists because v2.9 was nearly archived without its bump — verify the pbxproj *before* archiving, every time.
 
-- [ ] **Step 4: Full green run**
+- [x] **Step 4: Full green run**
 
 ```bash
 python3 scripts/verify-localization.py
@@ -1344,11 +1344,11 @@ python3 scripts/verify-metadata.py
 
 Expected: PASS on all three. The suite count should be the Task 1 baseline **+2** (from Task 5). State the actual number rather than "all pass".
 
-- [ ] **Step 5: Update the roadmap doc**
+- [x] **Step 5: Update the roadmap doc**
 
 In `docs/FutureEnhancements.md`, change the Internationalization bullet from "v3.2 (planned): German (de) + Italian (it)…" to record it as shipped in v3.2 alongside the es/fr line, keeping the pointer to the design spec. Leave the "localized App Preview videos" item open — it is deferred again, not done.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj docs/FutureEnhancements.md
