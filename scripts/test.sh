@@ -49,6 +49,14 @@ PASSED="$( { grep -Eo "Test case '[^']+' passed" "$LOG" || true; } | sort -u | w
 FAILED="$( { grep -Eo "Test case '[^']+' failed" "$LOG" || true; } | sort -u | wc -l | tr -d ' ')"
 rm -f "$LOG"
 
+# Reap Xcode's test clones. Parallel testing clones the target simulator once
+# per worker and never cleans up: the clones are left BOOTED and on disk, in a
+# device set that `simctl list devices` doesn't show — so they accumulate
+# invisibly. By 2026-07-30 there were 36 of them, three still running, holding
+# ~13GB. Apple doesn't reap them, so we do.
+# `|| true` and a discarded exit code so cleanup can never mask a test result.
+xcrun simctl --set ~/Library/Developer/XCTestDevices delete all >/dev/null 2>&1 || true
+
 echo ""
 echo "──────────────────────────────────────────"
 echo "  Passed: $PASSED   Failed: $FAILED"

@@ -54,6 +54,20 @@ The core signing project is complete — sign a document, multiple signatures, s
 
 - **iCloud Drive folder shows "Document Scanner", not "Pocket Scanner"** — the app's iCloud Drive folder (and the container path) display the app's *original* name instead of the brand "Pocket Scanner", which could confuse users. `Info.plist` correctly sets `NSUbiquitousContainerName = "Pocket Scanner"`, but **iCloud caches a container's display name from first creation and does not reliably re-read it** for existing containers — a well-known, undocumented Apple limitation. Status: cosmetic, pre-existing (not from any recent work; not touched by v3.0 localization). Workarounds, all imperfect: (1) **new users** who create a fresh container should pick up "Pocket Scanner" automatically, so it self-corrects for new installs; (2) for **existing users** the cached name persists and there is no public API to force a refresh; (3) reportedly a delete-app + reinstall (or toggling iCloud Drive off/on) *sometimes* refreshes it per-device, but it's unreliable; (4) the only guaranteed fix is changing the iCloud **container identifier**, which creates a brand-new empty container and **orphans all existing user data** — not viable. Recommendation: leave it; revisit only if it generates real support complaints. If ever addressed, do it as a deliberate migration, not a silent container swap.
 
+### Test suite
+
+- **Split `test_editMode_addAndDeletePage` into its constituent behaviours.** The UI suite is two
+  tests of roughly 190 seconds each, and each covers a long arc — this one does scan → save → enter
+  edit mode → add a page → delete a page → confirm the deletion. When it fails you get a wall of
+  UI-automation output and no indication of *which* behaviour broke; you're reduced to reading the
+  log and guessing. Xcode compounds this by reporting `Executed 1 test, with N failures`, where N
+  counts assertion failures rather than tests, so a run that exercised six behaviours and broke
+  three of them still reads as "1 test". Splitting into focused tests (`test_addPage`,
+  `test_deletePage_requiresConfirmation`, `test_deletePage_cancelKeepsPage`, …) would make a failure
+  name the broken behaviour directly. Cost: UI tests are slow, so more of them means a longer suite
+  — worth measuring before committing to it. Surfaced 2026-07-30 while verifying the v3.2
+  delete-confirmation fix, where the single fat test was the only guard on a destructive path.
+
 ### Business / pricing
 
 - **Tip jar IAP** — one-time "Buy the developer a coffee" tiers ($1.99 / $4.99 / $9.99) in Settings. Some users like to support indie devs they like.
