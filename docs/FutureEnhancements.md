@@ -54,6 +54,20 @@ The core signing project is complete — sign a document, multiple signatures, s
 
 - **iCloud Drive folder shows "Document Scanner", not "Pocket Scanner"** — the app's iCloud Drive folder (and the container path) display the app's *original* name instead of the brand "Pocket Scanner", which could confuse users. `Info.plist` correctly sets `NSUbiquitousContainerName = "Pocket Scanner"`, but **iCloud caches a container's display name from first creation and does not reliably re-read it** for existing containers — a well-known, undocumented Apple limitation. Status: cosmetic, pre-existing (not from any recent work; not touched by v3.0 localization). Workarounds, all imperfect: (1) **new users** who create a fresh container should pick up "Pocket Scanner" automatically, so it self-corrects for new installs; (2) for **existing users** the cached name persists and there is no public API to force a refresh; (3) reportedly a delete-app + reinstall (or toggling iCloud Drive off/on) *sometimes* refreshes it per-device, but it's unreliable; (4) the only guaranteed fix is changing the iCloud **container identifier**, which creates a brand-new empty container and **orphans all existing user data** — not viable. Recommendation: leave it; revisit only if it generates real support complaints. If ever addressed, do it as a deliberate migration, not a silent container swap.
 
+### Release tooling
+
+- **Push App Store metadata via the App Store Connect API instead of by hand.** Every release,
+  every localization's subtitle, keywords, description, promotional text and What's New has to be
+  retyped into ASC. At seven locales that's ~35 fields per submission, across a UI whose language
+  selector silently resets on every page navigation — which has already caused one shipped mistake
+  (the EN/ES subtitles swapped in v3.0). We already keep the canonical copy in
+  `marketing/app-store-metadata/<locale>/`, so those files can be the input: a script authenticates
+  with an ASC API key and PATCHes `appStoreVersionLocalizations` for all locales in one command.
+  `scripts/verify-metadata.py` already validates the character limits, so the push would be the
+  only missing piece. Worth noting the API is *not* worth it for reading review status — it returns
+  exactly what the web UI shows — but writing metadata is the opposite case: real, repeated,
+  error-prone work removed. Raised 2026-07-31 after hand-entering seven locales for v3.2.
+
 ### Test suite
 
 - **Split `test_editMode_addAndDeletePage` into its constituent behaviours.** The UI suite is two

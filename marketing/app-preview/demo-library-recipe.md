@@ -128,7 +128,7 @@ Once the library exists, a refresh is fast:
 - [ ] Record the App Preview arc on device
 - [ ] Sign+date the Consulting Agreement for the hero (§D)
 - [ ] Conform the video (886×1920 / `setsar=1` / silent audio) — Claude can help
-- [ ] Upload to ASC 6.9" slot
+- [ ] Upload to ASC **6.9"** slot — see the slot warning below
 - [ ] **Localized (es/fr/…):** re-capture 8 base shots per language forced-locale → caption each shot with `caption.sh` (or restore the retired batch renderer from git history) → upload per-locale (§F)
 
 ---
@@ -253,7 +253,17 @@ must be in-language — a Spanish caption over an English screenshot looks unfin
    Captions live in `captions/{en,es,fr}.tsv` (shot, line1, line2, top_px, fs1, fs2);
    `caption.sh` takes optional font sizes so longer es/fr captions don't overflow. Tune
    `fs1/fs2` per row if a caption wraps.
-5. **Upload** each language's `Stills-<lang>/` set to that locale's 6.9" slot in ASC.
+5. **Upload** each language's set to that locale's **6.9" Display** slot in ASC.
+
+> **The 6.5"/6.9" slot trap — hit on v2.9 and again on v3.2.** If ASC rejects the upload with
+> *"Screenshots dimensions should be: 1242 × 2688px, 2688 × 1242px, 1284 × 2778px or 2778 ×
+> 1284px"*, **nothing is wrong with the files** — those are the **6.5"** slot's accepted sizes and
+> the upload is targeting the wrong slot. Our sets are 1290×2796, which belongs in **6.9"**. The
+> error names the *slot's* expectations rather than what it wanted from you, so it reads as though
+> your images are bad. Switch the display-size selector to 6.9" and re-drop the same files.
+>
+> **Media Manager also resets the language selector**, like every other ASC page. Confirm the
+> language *before* dropping files, or you'll silently replace another locale's screenshots.
 
 ---
 
