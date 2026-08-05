@@ -42,3 +42,8 @@ marketing/app-preview/v1.7/PocketScanner-v1.7.mp4
 # which is what forced the batch renderer to be retired; ignoring rather than
 # deleting keeps the fast loop without the bloat.
 marketing/app-preview/*/Base/
+
+# Legacy Files for reference
+marketing/icloud-dumps/*
+marketing/translations/*
+scripts/legacy/*
