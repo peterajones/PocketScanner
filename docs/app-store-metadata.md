@@ -21,16 +21,48 @@ Test availability by searching the App Store from your phone before settling.
 
 ## Subtitle (30 chars max)
 
-**Shipped:** `No subscriptions or ads ever!` (29 chars)
+**Shipped through v3.1:** `No subscriptions or ads ever!` (29 chars) — **rejected in v3.2 review, see below.**
+
+Live per-locale values are in `marketing/app-store-metadata/<locale>/subtitle.txt`, not here. All 7 carry the same claim: de `Keine Abos, keine Werbung`, es/es-MX `Sin suscripciones ni anuncios`, fr/fr-CA `Sans abonnement ni publicité`, it `Senza abbonamenti né annunci`.
 
 Alternates considered:
 
-- `Scan to PDF. No subscription.` (29)
+- `Scan to PDF. No subscription.` (29) — ⚠️ same 2.3.7 exposure as the shipped line
 - `Scan documents. No ads.` (23)
 - `Private document scanner` (24)
-- `One-time price. No accounts.` (28)
+- `One-time price. No accounts.` (28) — ⚠️ states a price term outright; don't reach for this
+- `Scan, sign, search — offline` (28) — clean under 2.3.7; carries the privacy angle without commerce
 
 The subtitle is the second-most-read piece of copy after the icon — make it about the differentiator, not the feature.
+
+### 2026-08-07 — v3.2 (31) rejected on the subtitle
+
+Rejection text: *"The app subtitle include references to the price of the app or the service it provides, which is not considered an appropriate part of these metadata items."*
+
+Guideline 2.3.7, verbatim: *"Metadata such as app names, subtitles, screenshots, and previews should not include **prices, terms, or descriptions that are not specific to the metadata type**. […] App subtitles […] should not include inappropriate content, reference other apps, or **make unverifiable product claims**."*
+
+The rejection letter says "price," but the guideline says "prices, **terms**" — subscription-vs-one-time is a term of sale, and that's the grip. Second grip in the same sentence: "or ads **ever**" is a forward-looking promise, i.e. an unverifiable product claim. Arguing "no price appears in the string" is a losing move; it invites them to quote "terms" back.
+
+Timeline (submission dates from ASC; **approval dates are not recorded in ASC or git** — the v3.1 approval below comes from session notes taken the day it happened):
+
+| Version | Submitted | Outcome | Days |
+|---|---|---|---|
+| v3.1 (30) | 2026-07-24 | Approved 2026-07-31 *(session notes, not confirmable in ASC)* | 7 |
+| v3.2 (31) | 2026-07-31 | **Rejected 2026-08-07** | 7 |
+
+The v3.1 turnaround is corroborated by App Review status inquiry case `20000124075803`, filed 2026-07-30 because the review was dragging; it approved the next day. **Two consecutive 7-day reviews — treat a week as the current normal when planning submission windows**, not the 1–4 days v2.8–v3.0 saw.
+
+Do **not** put the v3.1 approval date in a Resolution Center reply — it can't be substantiated from ASC. Use "it is the live subtitle on the App Store today" instead, which is present-tense and verifiable on Apple's side.
+
+**The subtitle was unchanged since v1.0 and passed review on every release through v3.1 — it is the live subtitle on the App Store right now.** This is reviewer-to-reviewer variance, not a rule change. That present-tense inconsistency is the only argument with real weight, and it's what the Resolution Center reply leans on: it asks them to name the specific offending token rather than guessing at a rewrite.
+
+**Resolution Center reply sent 2026-08-07. Awaiting response.** Given two consecutive 7-day reviews, budget a week; if it goes quiet longer, an App Review status inquiry is the precedent (case `20000124075803` worked for v3.1 — approved the next day).
+
+**Record submitted/approved dates in this file at release time.** ASC does not surface an approval date after the fact, so turnaround claims become unverifiable within days of the event. The table above is the place for them.
+
+Subtitle is version metadata — this is an edit-and-resubmit on build 31, no new build and no version bump, whichever way it lands.
+
+**What's clean and doesn't need touching:** the description (2.3.7 lists only names, subtitles, screenshots, previews — business-model copy is fine there), the promotional text, and the screenshot captions in `marketing/app-preview/captions/`. **What's still exposed:** keywords — see below.
 
 ---
 
@@ -96,7 +128,9 @@ Built solo by an indie developer who got tired of every scanner app demanding a 
 
 ## Keywords (100 chars max, comma-separated, no spaces between)
 
-**Recommendation:**
+**Source of truth is `marketing/app-store-metadata/<locale>/keywords.txt`, not this section.** The original v1.0 recommendation below has drifted from what ships (it proposed `nosubscription` as one word plus `ocr`/`notes`; shipped en is `no subscription` and drops those). Kept for the strategy notes only — read the files for current values.
+
+Original v1.0 recommendation:
 
 ```
 scanner,pdf,document,ocr,scan,receipts,searchable,icloud,paperless,notes,nosubscription,scanner pro
@@ -104,12 +138,25 @@ scanner,pdf,document,ocr,scan,receipts,searchable,icloud,paperless,notes,nosubsc
 
 (99 chars including commas)
 
+### ⚠️ Open 2.3.7 exposure in keywords (as of 2026-08-07)
+
+**All 7 locales currently carry a pricing term in keywords**, and 2.3.7 names pricing information in keywords explicitly. This was *not* flagged in the v3.2 rejection — the reviewer only cited the subtitle — but it's the same class of claim sitting in a field they didn't look at:
+
+| Locale | Term | Field length |
+|---|---|---|
+| en | `no subscription` | 90 |
+| es, es-MX | `sin suscripción` | 89 |
+| fr, fr-CA | `sans abonnement` | 92 |
+| de | `ohne abo` | 86 |
+| it | `senza abbonamento` | 83 |
+
+Every locale has headroom under the 100-char cap, so dropping the term costs nothing but the search coverage itself. Decide deliberately: leaving it is a live risk if enforcement stays strict, removing it forfeits real search traffic from people hunting for exactly this.
+
 App Store keyword strategy:
 
 - Words already in the app name + subtitle don't count — don't waste characters on `mobile` or `scanner`.
 - Singular forms generally cover plural (`receipt` covers `receipts`) but Apple's ranking is imperfect — when in doubt, use the more common one.
 - Avoid competitor names that you don't own (don't use `camscanner`, `adobescan`, etc. — possible rejection).
-- Include `nosubscription` as one word — Apple matches on substrings.
 
 ---
 
