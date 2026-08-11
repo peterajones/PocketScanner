@@ -56,7 +56,29 @@ Do **not** put the v3.1 approval date in a Resolution Center reply — it can't 
 
 **The subtitle was unchanged since v1.0 and passed review on every release through v3.1 — it is the live subtitle on the App Store right now.** This is reviewer-to-reviewer variance, not a rule change. That present-tense inconsistency is the only argument with real weight, and it's what the Resolution Center reply leans on: it asks them to name the specific offending token rather than guessing at a rewrite.
 
-**Resolution Center reply sent 2026-08-07. Awaiting response.** Given two consecutive 7-day reviews, budget a week; if it goes quiet longer, an App Review status inquiry is the precedent (case `20000124075803` worked for v3.1 — approved the next day).
+**Reply sent 2026-08-07. OUTCOME: rejection withdrawn 2026-08-11.** App Review responded:
+
+> Thank you for providing this information. We will continue the review, and we will notify you if there are any further issues.
+
+**v3.2 (31) then went to Ready for Distribution the same day, 2026-08-11 — APPROVED with the subtitle unchanged.** No token was ever named, no metadata edit, no new build, no version bump. Total cost of the dispute: one Resolution Center reply and four days.
+
+Note what this is *not*: **precedent**. Apple conceded nothing and explained nothing, so a different reviewer can raise the identical objection on v3.3. Expect it to recur rather than treating the subtitle as cleared.
+
+### LESSON — contest a metadata rejection before rewording
+
+When the flagged metadata was **previously approved and unchanged**, contesting is the correct first move:
+
+- It is **reversible and forecloses nothing**. If they hold, you reword and resubmit, arriving where you'd have been anyway — days later, having risked nothing.
+- Rewording immediately **concedes copy you may not have had to give up**, and there's no undo once the field is changed and approved.
+- The winning argument is **present-tense inconsistency** ("this is the live subtitle on the App Store today"), not semantics. Never argue "no price appears in the string" — 2.3.7 says "prices, **terms**," and they will quote it back.
+- Asking them to **name the specific offending token** gives a reviewer something concrete to either produce or drop. Here they dropped it.
+- Never include a date you cannot substantiate from ASC.
+
+The initial instinct in-session was to reword for speed; Peter overruled it and contested. That was right. Default to contesting.
+
+### Keywords decision (2026-08-11)
+
+**Deliberately left unchanged** for this submission. Changing keywords mid-dispute would have muddied what was being argued, and the subtitle came through untouched. The exposure below is still open and should be decided before the *next* submission, not carried forward unexamined.
 
 **Record submitted/approved dates in this file at release time.** ASC does not surface an approval date after the fact, so turnaround claims become unverifiable within days of the event. The table above is the place for them.
 
