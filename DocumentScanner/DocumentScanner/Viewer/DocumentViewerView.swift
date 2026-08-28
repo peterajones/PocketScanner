@@ -693,10 +693,15 @@ private final class MarkupPDFView: PDFView {
                 self.clearSelection()
             }
         }
-        let highlightMenu = UIMenu(title: "Highlight",
+        // String(localized:) rather than a bare literal: this is UIKit menu-building,
+        // so nothing localizes these for us the way SwiftUI's Text does. They shipped
+        // untranslated in v3.0–v3.2 while their colour children were localized.
+        let highlightMenu = UIMenu(title: String(localized: "Highlight",
+                                                 comment: "Text-selection menu: submenu holding the highlight colors"),
                                    image: UIImage(systemName: "highlighter"),
                                    children: highlightActions)
-        let strikeAction = UIAction(title: "Strikethrough",
+        let strikeAction = UIAction(title: String(localized: "Strikethrough",
+                                                  comment: "Text-selection menu action"),
                                     image: UIImage(systemName: "strikethrough")) { [weak self] _ in
             guard let self, let selection = self.currentSelection else { return }
             self.onMark?(.strikethrough, selection)
