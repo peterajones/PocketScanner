@@ -1,6 +1,6 @@
 A clean-up release, focused on the moments just before something gets deleted.
 
-Deleting pages now asks first. It used to happen the moment you tapped, with nothing to undo it. The confirmation counts the pages, so you always know exactly what is about to go.
+Deleting pages now asks first. It used to happen the moment you tapped, with nothing to undo it. The confirmation tells you how many pages, so you always know exactly what is about to go.
 
 Cancel is back on two prompts that had lost it. "Delete this document?" and "Remove this mark?" were showing the delete option on its own, which made an ordinary question look like a one-way door.
 

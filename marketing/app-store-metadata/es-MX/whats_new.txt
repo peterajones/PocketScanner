@@ -1,6 +1,6 @@
 Una versión de limpieza, centrada en los momentos justo antes de borrar algo.
 
-Ahora se te pregunta antes de eliminar páginas. Antes ocurría en cuanto tocabas el botón, sin forma de deshacerlo. La confirmación cuenta las páginas, así que siempre sabes exactamente qué va a desaparecer.
+Ahora se te pregunta antes de eliminar páginas. Antes ocurría en cuanto tocabas el botón, sin forma de deshacerlo. La confirmación te dice cuántas páginas son, así que siempre sabes exactamente qué va a desaparecer.
 
 Cancelar ha vuelto a dos avisos que lo habían perdido. «¿Eliminar este documento?» y «¿Eliminar esta marca?» mostraban solo la opción de eliminar, lo que hacía que una pregunta normal pareciera un camino sin retorno.
 

@@ -1,9 +1,9 @@
-Una versione di pulizia, dedicata ai momenti che precedono un'eliminazione.
+Una versione di manutenzione, dedicata ai momenti che precedono un'eliminazione.
 
-L'eliminazione delle pagine ora chiede conferma. Prima era immediata e non si poteva annullare. La conferma conta le pagine, così sai sempre con esattezza che cosa sta per sparire.
+L'eliminazione delle pagine ora chiede conferma. Prima era immediata e non si poteva annullare. La conferma indica il numero di pagine, così sai sempre con esattezza che cosa sta per sparire.
 
-Annulla è tornato in due richieste in cui era sparito. «Eliminare questo documento?» e «Rimuovere questa annotazione?» mostravano solo l'opzione di eliminazione, facendo sembrare una domanda normale una strada senza ritorno.
+Annulla è tornato in due richieste di conferma in cui era sparito. «Eliminare questo documento?» e «Rimuovere questa annotazione?» mostravano solo l'opzione di eliminazione: una domanda normale sembrava così un punto di non ritorno.
 
-Si aggiunge una correzione interna al tracciamento delle pagine nel visualizzatore di documenti.
+C'è anche una correzione interna nel visualizzatore di documenti.
 
 Come sempre: nessun abbonamento, nessuna pubblicità, nessun tracciamento e niente salvato sui nostri server. Paghi una volta, scansioni per sempre. Grazie per aver scelto Pocket Scanner.

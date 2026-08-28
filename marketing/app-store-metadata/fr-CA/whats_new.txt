@@ -1,6 +1,6 @@
 Une version de nettoyage, consacrée aux instants qui précèdent une suppression.
 
-La suppression de pages demande désormais confirmation. Elle était immédiate, sans aucun retour possible. La confirmation compte les pages, pour que vous sachiez toujours exactement ce qui va disparaître.
+La suppression de pages demande désormais confirmation. Elle était immédiate, sans aucun retour possible. La confirmation indique le nombre de pages, pour que vous sachiez toujours exactement ce qui va disparaître.
 
 Annuler est de retour dans deux messages qui l'avaient perdu. « Supprimer ce document ? » et « Enlever cette marque ? » n'affichaient que l'option de suppression, ce qui donnait à une question ordinaire des allures de point de non-retour.
 
