@@ -84,7 +84,7 @@ The initial instinct in-session was to reword for speed; Peter overruled it and 
 
 Subtitle is version metadata — this is an edit-and-resubmit on build 31, no new build and no version bump, whichever way it lands.
 
-**What's clean and doesn't need touching:** the description (2.3.7 lists only names, subtitles, screenshots, previews — business-model copy is fine there), the promotional text, and the screenshot captions in `marketing/app-preview/captions/`. **What's still exposed:** keywords — see below.
+**What's clean and doesn't need touching:** the description (2.3.7 lists only names, subtitles, screenshots, previews — business-model copy is fine there), the promotional text, and the screenshot captions in `marketing/app-preview/captions/`. **Keywords** were settled separately on 2026-08-28 — see the Keywords section below.
 
 ---
 
@@ -160,25 +160,36 @@ scanner,pdf,document,ocr,scan,receipts,searchable,icloud,paperless,notes,nosubsc
 
 (99 chars including commas)
 
-### ⚠️ Open 2.3.7 exposure in keywords (as of 2026-08-07)
+### 2026-08-28 — resolved: competitor name removed, pricing terms kept
 
-**All 7 locales currently carry a pricing term in keywords**, and 2.3.7 names pricing information in keywords explicitly. This was *not* flagged in the v3.2 rejection — the reviewer only cited the subtitle — but it's the same class of claim sitting in a field they didn't look at:
+Two separate 2.3.7 exposures were sitting in keywords. They were settled differently.
+
+**Removed — `scanner pro` (en only).** That is Readdle's app name, and using a competitor's name you don't own is a straightforward rejection risk with no defence available. Replaced with `ocr,signature`, both of which every *other* locale already carried and en was missing. en went 90 → 92 chars.
+
+```text
+- scanner,pdf,document,scan,receipts,searchable,icloud,paperless,no subscription,scanner pro
++ scanner,pdf,document,scan,receipts,searchable,icloud,paperless,no subscription,ocr,signature
+```
+
+**Kept — the pricing terms, all 7 locales.** 2.3.7's keyword clause is qualified by "just to game the system," and these terms accurately describe the app's business model rather than gaming anything. It is also the app's strongest differentiator keyword — people hunting a one-time-purchase scanner search exactly this phrase. And v3.2 established that a metadata rejection here is contestable and winnable.
 
 | Locale | Term | Field length |
 |---|---|---|
-| en | `no subscription` | 90 |
+| en | `no subscription` | 92 |
 | es, es-MX | `sin suscripción` | 89 |
 | fr, fr-CA | `sans abonnement` | 92 |
 | de | `ohne abo` | 86 |
 | it | `senza abbonamento` | 83 |
 
-Every locale has headroom under the 100-char cap, so dropping the term costs nothing but the search coverage itself. Decide deliberately: leaving it is a live risk if enforcement stays strict, removing it forfeits real search traffic from people hunting for exactly this.
+Ships with **v3.3**. Keywords are version metadata and are locked once a version is live, so this cannot be pushed to the store on its own — it goes in when v3.3's version record is created in ASC, and must be typed in by hand for the affected locale. There is no fastlane/deliver setup in this repo; these `.txt` files are the source of truth for humans, nothing uploads them.
+
+⚠️ **Count characters, not bytes.** `wc -c` overstates the accented locales (`escáner`, `numériser`, `reçus`). ASC counts characters — use `scripts/verify-metadata.py`, which does too.
 
 App Store keyword strategy:
 
 - Words already in the app name + subtitle don't count — don't waste characters on `mobile` or `scanner`.
 - Singular forms generally cover plural (`receipt` covers `receipts`) but Apple's ranking is imperfect — when in doubt, use the more common one.
-- Avoid competitor names that you don't own (don't use `camscanner`, `adobescan`, etc. — possible rejection).
+- Avoid competitor names that you don't own (don't use `camscanner`, `adobescan`, etc. — possible rejection). The v1.0 recommendation violated this with `scanner pro` and it shipped that way until 2026-08-28.
 
 ---
 
