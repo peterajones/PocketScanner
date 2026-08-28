@@ -1,3 +1,9 @@
-Pocket Scanner now speaks German and Italian, joining Spanish and French. Every button, label and message is fully localized, and dates appear in your language's own format.
+A clean-up release, focused on the moments just before something gets deleted.
+
+Deleting pages now asks first. It used to happen the moment you tapped, with nothing to undo it. The confirmation counts the pages, so you always know exactly what is about to go.
+
+Cancel is back on two prompts that had lost it. "Delete this document?" and "Remove this mark?" were showing the delete option on its own, which made an ordinary question look like a one-way door.
+
+There is also an under-the-hood fix to page tracking in the document viewer.
 
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.

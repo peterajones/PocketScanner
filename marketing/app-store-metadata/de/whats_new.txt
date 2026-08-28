@@ -1,3 +1,9 @@
-Pocket Scanner spricht jetzt Deutsch und Italienisch – zusätzlich zu Spanisch und Französisch. Jede Taste, jede Beschriftung und jede Meldung ist vollständig übersetzt, und Datumsangaben erscheinen im Format deiner Sprache.
+Eine Aufräum-Version, ganz auf die Momente kurz vor dem Löschen ausgerichtet.
+
+Das Löschen von Seiten fragt jetzt nach. Bisher geschah es sofort und ließ sich nicht rückgängig machen. Die Rückfrage zählt die Seiten mit, damit du immer genau weißt, was verschwindet.
+
+Abbrechen ist in zwei Rückfragen zurück, in denen es gefehlt hat. „Dieses Dokument löschen?“ und „Diese Markierung entfernen?“ zeigten nur die Löschoption – eine harmlose Frage sah damit aus wie eine Einbahnstraße.
+
+Dazu kommt eine interne Korrektur der Seitenverfolgung in der Dokumentanzeige.
 
 Wie immer: keine Abos, keine Werbung, kein Tracking und nichts auf unseren Servern. Einmal zahlen, für immer scannen. Danke, dass du mit Pocket Scanner scannst.

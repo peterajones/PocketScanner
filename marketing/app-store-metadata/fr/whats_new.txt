@@ -1,3 +1,9 @@
-Pocket Scanner parle désormais allemand et italien, en plus de l'espagnol et du français. Chaque bouton, chaque libellé et chaque message est entièrement traduit, et les dates s'affichent au format de votre langue.
+Une version de nettoyage, consacrée aux instants qui précèdent une suppression.
+
+La suppression de pages demande désormais confirmation. Elle était immédiate, sans aucun retour possible. La confirmation compte les pages, pour que vous sachiez toujours exactement ce qui va disparaître.
+
+Annuler est de retour dans deux messages qui l'avaient perdu. « Supprimer ce document ? » et « Enlever cette marque ? » n'affichaient que l'option de suppression, ce qui donnait à une question ordinaire des allures de point de non-retour.
+
+S'y ajoute une correction interne du suivi des pages dans la visionneuse de documents.
 
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, scannez pour toujours. Merci d'utiliser Pocket Scanner.

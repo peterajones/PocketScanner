@@ -1,3 +1,9 @@
-Pocket Scanner ora parla tedesco e italiano, oltre a spagnolo e francese. Ogni pulsante, etichetta e messaggio è completamente tradotto, e le date compaiono nel formato della tua lingua.
+Una versione di pulizia, dedicata ai momenti che precedono un'eliminazione.
+
+L'eliminazione delle pagine ora chiede conferma. Prima era immediata e non si poteva annullare. La conferma conta le pagine, così sai sempre con esattezza che cosa sta per sparire.
+
+Annulla è tornato in due richieste in cui era sparito. «Eliminare questo documento?» e «Rimuovere questa annotazione?» mostravano solo l'opzione di eliminazione, facendo sembrare una domanda normale una strada senza ritorno.
+
+Si aggiunge una correzione interna al tracciamento delle pagine nel visualizzatore di documenti.
 
 Come sempre: nessun abbonamento, nessuna pubblicità, nessun tracciamento e niente salvato sui nostri server. Paghi una volta, scansioni per sempre. Grazie per aver scelto Pocket Scanner.
