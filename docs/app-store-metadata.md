@@ -48,7 +48,8 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 | Version | Submitted | Outcome | Days |
 |---|---|---|---|
 | v3.1 (30) | 2026-07-24 | Approved 2026-07-31 *(session notes, not confirmable in ASC)* | 7 |
-| v3.2 (31) | 2026-07-31 | **Rejected 2026-08-07** | 7 |
+| v3.2 (31) | 2026-07-31 | **Rejected 2026-08-07**; contested, withdrawn, Ready for Distribution 2026-08-11 | 7 to rejection, 11 total |
+| v3.3 (32) | 2026-08-29 | *Waiting for Review* | — |
 
 The v3.1 turnaround is corroborated by App Review status inquiry case `20000124075803`, filed 2026-07-30 because the review was dragging; it approved the next day. **Two consecutive 7-day reviews — treat a week as the current normal when planning submission windows**, not the 1–4 days v2.8–v3.0 saw.
 
