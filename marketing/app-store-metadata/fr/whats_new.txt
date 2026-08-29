@@ -4,6 +4,8 @@ La suppression de pages demande désormais confirmation. Elle était immédiate,
 
 Annuler est de retour dans deux messages qui l'avaient perdu. « Supprimer ce document ? » et « Enlever cette marque ? » n'affichaient que l'option de suppression, ce qui donnait à une question ordinaire des allures de point de non-retour.
 
+Les commandes Surligner et Barrer s'affichent désormais en français : elles étaient les seules restées en anglais.
+
 S'y ajoute une correction interne du suivi des pages dans la visionneuse de documents.
 
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, scannez pour toujours. Merci d'utiliser Pocket Scanner.

@@ -4,6 +4,8 @@ Ahora se te pregunta antes de eliminar páginas. Antes ocurría en cuanto tocaba
 
 Cancelar ha vuelto a dos avisos que lo habían perdido. «¿Eliminar este documento?» y «¿Eliminar esta marca?» mostraban solo la opción de eliminar, lo que hacía que una pregunta normal pareciera un camino sin retorno.
 
+Las opciones Resaltar y Tachar ahora aparecen en español: eran las únicas que seguían en inglés.
+
 También se ha corregido internamente el seguimiento de páginas en el visor de documentos.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.

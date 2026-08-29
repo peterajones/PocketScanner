@@ -4,6 +4,8 @@ Das Löschen von Seiten fragt jetzt nach. Bisher geschah es sofort und ließ sic
 
 Abbrechen ist in zwei Rückfragen zurück, in denen es gefehlt hat. „Dieses Dokument löschen?“ und „Diese Markierung entfernen?“ zeigten nur die Löschoption – eine harmlose Frage sah damit aus wie eine Einbahnstraße.
 
+Die Befehle zum Hervorheben und Durchstreichen erscheinen jetzt auf Deutsch – bisher waren sie als Einzige englisch geblieben.
+
 Dazu kommt eine interne Korrektur in der Dokumentanzeige.
 
 Wie immer: keine Abos, keine Werbung, kein Tracking und nichts auf unseren Servern. Einmal zahlen, für immer scannen. Danke, dass du mit Pocket Scanner scannst.

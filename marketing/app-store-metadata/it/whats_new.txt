@@ -4,6 +4,8 @@ L'eliminazione delle pagine ora chiede conferma. Prima era immediata e non si po
 
 Annulla è tornato in due richieste di conferma in cui era sparito. «Eliminare questo documento?» e «Rimuovere questa annotazione?» mostravano solo l'opzione di eliminazione: una domanda normale sembrava così un punto di non ritorno.
 
+I comandi Evidenzia e Barrato ora compaiono in italiano: erano rimasti gli unici in inglese.
+
 C'è anche una correzione interna nel visualizzatore di documenti.
 
 Come sempre: nessun abbonamento, nessuna pubblicità, nessun tracciamento e niente salvato sui nostri server. Paghi una volta, scansioni per sempre. Grazie per aver scelto Pocket Scanner.

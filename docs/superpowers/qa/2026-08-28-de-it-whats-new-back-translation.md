@@ -128,8 +128,35 @@ But the drift starts in the English: **"The confirmation counts the pages"** is 
 | All 6 quoted prompts still match `Localizable.xcstrings` | **PASS** |
 | Sign-off paragraph still byte-identical to approved v3.2 text | **PASS** — all 7 locales |
 
+## Addendum — 2026-08-29: the markup-menu line
+
+After this record was written, the markup menu's `Highlight` / `Strikethrough` titles were localized (see `2026-08-28-de-it-tips-back-translation.md`, F-1). That is user-visible in four languages, so one sentence was added to the release notes.
+
+**English was deliberately left untouched.** The bug never affected English users — they always saw correct English labels — so an English note would describe something the reader never experienced. What's New is per-locale metadata; there is no requirement that the seven read alike, and Apple's own notes routinely diverge.
+
+| Locale | Added paragraph |
+|---|---|
+| de | Die Befehle zum Hervorheben und Durchstreichen erscheinen jetzt auf Deutsch – bisher waren sie als Einzige englisch geblieben. |
+| it | I comandi Evidenzia e Barrato ora compaiono in italiano: erano rimasti gli unici in inglese. |
+| es, es-MX | Las opciones Resaltar y Tachar ahora aparecen en español: eran las únicas que seguían en inglés. |
+| fr, fr-CA | Les commandes Surligner et Barrer s'affichent désormais en français : elles étaient les seules restées en anglais. |
+
+Back-translation of the de line: *"The commands for highlighting and striking through now appear in German — until now they were the only ones that had stayed English."* Italian: *"The Evidenzia and Barrato commands now appear in Italian: they were the only ones left in English."* Both are one sentence and mildly self-deprecating, which is the honest framing for a bug fix and reads better than dressing it as a feature.
+
+**Checks:**
+
+| Check | Result |
+|---|---|
+| Cross-reference — every quoted label matches its shipped catalog value | **PASS** — 12/12 across the 6 locales |
+| Character limits | **PASS** — de 847, it 856, fr-CA 912 of 4000 |
+| Apostrophe convention | **PASS** — see below |
+
+**Apostrophe note, worth recording.** The insertion aborted on the first attempt for `fr`: the anchor paragraph did not match because the draft used a curly apostrophe (`’`) where these files use straight (`'`) throughout — fr had 5 straight and 0 curly before the edit. Had the script matched loosely instead of asserting the anchor, it would have written the set's only mixed-convention file. Note this differs from `Localizable.xcstrings`, where the tip bodies legitimately use curly apostrophes; the convention is per-file, not global.
+
+---
+
 ## Still open
 
-**Nothing.** All seven flags applied and verified.
+**Nothing.** All seven flags applied and verified, and the 2026-08-29 addendum is complete.
 
 The residual risk stated under *Method* is unchanged and does not close: these notes have had no native-speaker review, and back-translation catches idiom poorly. Flags #2 and #5 in particular replaced constructions that back-translated *cleanly* — they were caught because the compounds looked invented, not because the meaning was wrong. There may be others of that kind still in the text. What's New is editable without an app release, which is why that risk is acceptable rather than blocking.
