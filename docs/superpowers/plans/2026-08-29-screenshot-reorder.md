@@ -80,6 +80,20 @@ match."* Library-wide search of scan *contents* plus in-document match navigatio
 matches surfacing from inside several documents is the clearer proof of OCR than a single
 highlight.
 
+**6. Drop old shot 8 (nested folders).** Unlike 1 and 3 this is not literal duplication — shot 7
+is the library root in grid view with three folders and two documents; shot 8 is inside the Work
+folder showing one sub-folder and one document. But **roughly two-thirds of shot 8 is empty white
+space**, its entire payload is two rows, and it currently ends the gallery on a near-empty
+screen. What it sells — folders can contain folders — is an organisational nicety, not a reason
+anyone picks a scanner.
+
+Re-capturing it with a fuller Work folder was considered and rejected: a third capture across
+five languages for the least compelling feature in the set. Apple permits ten shots and imposes
+no penalty for fewer; **seven strong shots beat eight with a weak one**, and it is one less shot
+to caption, render, QA and upload across seven locales.
+
+(Incidental: shot 7 is grid view and shot 8 is list view, which was unintentional. Moot now.)
+
 ---
 
 ## Proposed order
@@ -95,11 +109,9 @@ Renumbered to match display order — the file name is the slot.
 | 5 | Save a signature once, reuse it | old 5 |
 | 6 | Add a date in any format | old 6 |
 | 7 | Keep everything in folders | old 7 |
-| 8 | Folders inside folders | old 8 |
 
-**Open question:** shots 7 and 8 are both folders, which is the same duplication problem as 1
-and 3. Dropping one would give a tighter seven-shot gallery. Left in for now pending a look at
-both images.
+**Seven shots, down from eight** — old 3 merges into old 1 (decision 4), and old 8 is dropped
+(decision 6).
 
 ---
 
@@ -137,7 +149,7 @@ the v3.2 layout. `Base/` is gitignored; `Stills/` is committed.
 
 ## ⚠️ ASC upload is real work, not a footnote
 
-**56 images** — 7 locales × 8 shots — uploaded by hand into the 6.9" slot, one locale at a time,
+**49 images** — 7 locales × 7 shots — uploaded by hand into the 6.9" slot, one locale at a time,
 through a UI whose **language selector resets on every page navigation**. This is the same toil
 recorded against the metadata fields, and it has already caused one shipped mistake (the EN/ES
 subtitles swapped in v3.0).
