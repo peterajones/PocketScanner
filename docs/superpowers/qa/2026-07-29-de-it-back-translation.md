@@ -108,7 +108,7 @@ Every write asserted the expected current value first, so a string that had drif
 **Nothing.** All nine flags are resolved: #1–#5 were applied as above; #6, #7, #8 and #9 were the same items renumbered in the flag list and are covered by those changes, with the exception noted below.
 
 - **#5's other half:** `Discard this page's markup?` already used "annotazioni" and needed no change — only `Remove this mark?` moved, which is what aligned them.
-- **The German `Sign` button** ("Unterschreiben", 14 chars) was not a decision — it is a length risk handed to Task 7's forced-locale pass. "Signieren" (9) is the drop-in if it clips.
+- **The German `Sign` button** ("Unterschreiben", 14 chars) was not a decision — it is a length risk handed to Task 7's forced-locale pass. "Signieren" (9) is the drop-in if it clips. **RESOLVED 2026-08-29: confirmed on the simulator in German during the v3.3 pre-archive check — it fits, no clipping. No change needed; "Signieren" not used.**
 - **"Darstellungstaste"** was left as-is: low-stakes Tips body text, grammatically well-formed, flagged only for the record.
 
 ---
