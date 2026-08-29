@@ -94,8 +94,8 @@ final class ReviewPromptTrackerTests: XCTestCase {
 
     func test_recordingScansPersistsAcrossInstances() {
         let first = makeTracker()
-        first.recordSuccessfulScan()
-        first.recordSuccessfulScan()
+        first.recordSuccess()
+        first.recordSuccess()
 
         XCTAssertEqual(makeTracker().scanCount, 2, "scan count did not survive a fresh read")
     }
@@ -111,19 +111,19 @@ final class ReviewPromptTrackerTests: XCTestCase {
 
     func test_doesNotRequestUntilEnoughScans() {
         let tracker = makeTracker()
-        tracker.recordSuccessfulScan()
+        tracker.recordSuccess()
         XCTAssertFalse(tracker.shouldRequest(currentVersion: "3.4"))
     }
 
     func test_requestsOnceEnoughScansRecorded() {
         let tracker = makeTracker()
-        for _ in 0..<ReviewPromptPolicy.minimumScans { tracker.recordSuccessfulScan() }
+        for _ in 0..<ReviewPromptPolicy.minimumScans { tracker.recordSuccess() }
         XCTAssertTrue(tracker.shouldRequest(currentVersion: "3.4"))
     }
 
     func test_doesNotRequestAgainAfterRecording() {
         let tracker = makeTracker()
-        for _ in 0..<ReviewPromptPolicy.minimumScans { tracker.recordSuccessfulScan() }
+        for _ in 0..<ReviewPromptPolicy.minimumScans { tracker.recordSuccess() }
         tracker.recordRequested(currentVersion: "3.4")
 
         XCTAssertFalse(tracker.shouldRequest(currentVersion: "3.4"),
@@ -134,7 +134,7 @@ final class ReviewPromptTrackerTests: XCTestCase {
     /// suite mid-scan. In Debug, `requestReview()` ignores StoreKit throttling.
     func test_disabledTrackerNeverRequests() {
         let tracker = makeTracker(isEnabled: false)
-        for _ in 0..<50 { tracker.recordSuccessfulScan() }
+        for _ in 0..<50 { tracker.recordSuccess() }
         XCTAssertFalse(tracker.shouldRequest(currentVersion: "3.4"))
     }
 
@@ -142,7 +142,7 @@ final class ReviewPromptTrackerTests: XCTestCase {
         // Counting continues so that a user who happens to run a UI-test build isn't
         // permanently reset; only the asking is suppressed.
         let tracker = makeTracker(isEnabled: false)
-        tracker.recordSuccessfulScan()
+        tracker.recordSuccess()
         XCTAssertEqual(tracker.scanCount, 1)
     }
 }

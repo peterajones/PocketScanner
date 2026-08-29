@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import StoreKit
 
 /// When it is appropriate to ask iOS to consider showing the App Store rating prompt.
 ///
@@ -12,8 +13,8 @@ import SwiftUI
 /// answers only "is now a reasonable moment to ask", never "was the user asked".
 enum ReviewPromptPolicy {
 
-    /// Don't ask a stranger. Three saved scans means the app has actually done its job
-    /// for this person, not just been installed.
+    /// Don't ask a stranger. Three completed jobs — a scan saved, a document signed —
+    /// means the app has actually worked for this person, not just been installed.
     static let minimumScans = 3
 
     /// Never ask twice inside this window, even across app versions. StoreKit throttles
@@ -72,9 +73,9 @@ struct ReviewPromptTracker {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
     }
 
-    /// Call after a scan is successfully written to disk — not when capture ends, and
-    /// never after a failure.
-    func recordSuccessfulScan() {
+    /// Call after a piece of work is successfully written to disk — a scan saved, a
+    /// signature placed. Not when capture ends, and never after a failure.
+    func recordSuccess() {
         defaults.set(scanCount + 1, forKey: Self.scanCountKey)
     }
 
@@ -94,6 +95,25 @@ struct ReviewPromptTracker {
                          now: Date = Date()) {
         defaults.set(now, forKey: Self.lastDateKey)
         defaults.set(currentVersion, forKey: Self.lastVersionKey)
+    }
+}
+
+extension ReviewPromptTracker {
+
+    /// Record a completed job and, if the policy allows it, ask StoreKit to consider the
+    /// rating prompt. This is the whole sequence every call site needs, kept in one place
+    /// so the three of them cannot drift apart.
+    ///
+    /// Call this from the view that *presented* the work, not from a sheet that is being
+    /// dismissed — a system dialog raised by a disappearing view silently never appears.
+    ///
+    /// `@MainActor` because `RequestReviewAction` is; every call site is a SwiftUI view.
+    @MainActor
+    func recordSuccessAndMaybeRequest(using requestReview: RequestReviewAction) {
+        recordSuccess()
+        guard shouldRequest() else { return }
+        recordRequested()
+        requestReview()
     }
 }
 

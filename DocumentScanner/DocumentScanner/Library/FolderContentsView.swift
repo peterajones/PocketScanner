@@ -190,7 +190,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 onSaved: {
                     nameSheet = nil
                     store.refresh()
-                    considerAskingForReview()
+                    reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview)
                 },
                 onCancel: { nameSheet = nil }
             )
@@ -433,15 +433,6 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         do { try storage.deleteFolder(at: folder); store.refresh(); refreshFolders() }
         catch { folderActionError = error.localizedDescription }
         subfolderBeingDeleted = nil
-    }
-
-    /// Ask iOS to consider the rating prompt after a scan is safely on disk.
-    /// Mirrors `LibraryView.considerAskingForReview()`; both scan flows reach this.
-    private func considerAskingForReview() {
-        reviewPrompt.recordSuccessfulScan()
-        guard reviewPrompt.shouldRequest() else { return }
-        reviewPrompt.recordRequested()
-        requestReview()
     }
 
     private func triggerScan() {

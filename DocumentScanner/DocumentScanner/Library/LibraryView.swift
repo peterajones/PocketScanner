@@ -149,7 +149,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     onSaved: {
                         nameSheet = nil
                         store.refresh()
-                        considerAskingForReview()
+                        // Fired here rather than inside NameDocumentSheet: that sheet is
+                        // being dismissed right now, and a dialog raised by a view on its
+                        // way out never appears.
+                        reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview)
                     },
                     onCancel: { nameSheet = nil }
                 )
@@ -491,19 +494,6 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         for folder in top { all += (try? storage.listFolders(in: folder)) ?? [] }
         // Byte-sort by full path keeps each sub-folder adjacent to its parent.
         moveTargets = all.sorted { $0.path < $1.path }   // Move menu: all folders
-    }
-
-    /// Ask iOS to consider the rating prompt after a scan is safely on disk.
-    ///
-    /// Deliberately here rather than inside `NameDocumentSheet`: the sheet is being
-    /// dismissed at this moment, and presenting a system dialog from a view on its way
-    /// out is how you get a prompt that never appears. The policy lives in
-    /// `ReviewPromptTracker`; this only fires it.
-    private func considerAskingForReview() {
-        reviewPrompt.recordSuccessfulScan()
-        guard reviewPrompt.shouldRequest() else { return }
-        reviewPrompt.recordRequested()
-        requestReview()
     }
 
     private func createFolder() {
