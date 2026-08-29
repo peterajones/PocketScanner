@@ -82,9 +82,57 @@ The core signing project is complete — sign a document, multiple signatures, s
   — worth measuring before committing to it. Surfaced 2026-07-30 while verifying the v3.2
   delete-confirmation fix, where the single fat test was the only guard on a destructive path.
 
+### App Store presence (ASO) — raised for v3.4, 2026-08-29
+
+Both items below surfaced from an unsolicited email by an ASO consultant. His *first* email was
+content-free — a withheld "common issue" used as a reply hook — and worth ignoring. His second,
+after being asked to be specific, named these two. **Both were then verified independently against
+this repo, and both are real.** Recording the provenance because the source does not make the
+findings wrong, and the verification is what makes them actionable.
+
+- **Screenshot order buries the core proposition.** From `marketing/app-preview/captions/*.tsv`,
+  the eight shots run: 1 signing, 2 importing a PDF, 3 signing, 4 scanning *off a screen*,
+  5 signing, 6 date stamp, 7–8 folders. **Five of eight are about signing, and scanning a paper
+  document — the thing the app is named for — never appears at all.** Shot 4 is the niche
+  scan-from-a-monitor case, not the core one. There is also **no shot for searchable PDFs or
+  on-device OCR**, which is the actual technical differentiator, and none for the privacy/iCloud
+  story. Someone landing cold sees a signing app. The first three shots are what render in search
+  results, so they carry most of the weight. Proposed order: (1) scan a paper document,
+  (2) searchable PDF via on-device OCR, (3) private, synced through iCloud — then signing,
+  importing and organisation after. Cost is not trivial: re-shooting means new base captures per
+  language plus a caption re-render through `render-captions.py`, across 5 languages. Screenshots
+  are version metadata, so this ships with a release, not on its own.
+
+- **No rating prompt exists — that is why there are no ratings.** Confirmed by grep: no
+  `requestReview`, no `SKStoreReviewController`, no StoreKit import anywhere in the codebase. The
+  app has never asked. For a paid app this is a real conversion drag, since social proof matters
+  more when there is a price gate. Apple caps the prompt at **three per user per year** and may
+  suppress it entirely, so *when* it fires is the whole design: after a **completed, successful**
+  action (a scan saved, a document exported), never on launch, never after an error, and not on
+  first run. Needs a small amount of state — don't ask again for N days, don't ask a user who has
+  scanned once. Worth checking whether this conflicts with the "focused scanning utility"
+  principle; it probably doesn't, but a badly-timed prompt is exactly the kind of thing that
+  earns a one-star review from someone who was otherwise happy.
+
+**Also raised and deliberately not logged as a task:** the subtitle spends all 29 characters on a
+business-model claim with no category search intent. That analysis is already in
+`docs/app-store-metadata.md` under the Subtitle section, with the 2.3.7 history that complicates
+it — Peter contested a rejection over that exact line and won, so changing it now would be his
+call, not Apple's. Any change belongs there, not here.
+
 ### Business / pricing
 
 - **Tip jar IAP** — one-time "Buy the developer a coffee" tiers ($1.99 / $4.99 / $9.99) in Settings. Some users like to support indie devs they like.
+
+- **Free download + lifetime IAP** — raised by the same ASO email and **explicitly withdrawn by him**
+  once he saw the positioning; recorded so it is not re-proposed from scratch. The argument for:
+  removes the price gate, more installs, better ranking momentum. Against: Apple's cut is identical
+  either way so there is no revenue gain in the switch itself; it needs real StoreKit 2 work
+  (purchase state, restore, Family Sharing, refunds, sandbox testing) with failure modes users
+  report as "I paid and lost everything"; and it forces a product decision deliberately avoided so
+  far — *what is free?* — which collides with the focused-utility principle. Correct sequencing if
+  ever revisited: establish a baseline from impressions-vs-downloads first, and only test this if
+  the listing gets impressions but the price appears to be the blocker.
 
 ### Internationalization
 
