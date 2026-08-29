@@ -1,5 +1,6 @@
 import SwiftUI
 import PDFKit
+import StoreKit
 
 struct LibraryView<Store: LibraryStoring & Observable>: View {
     @Bindable var store: Store
@@ -8,6 +9,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     let storage: DocumentStorage
     let pipeline: ScanPipeline
     let lockSettings: AppLockSettings
+
+    @Environment(\.reviewPrompt) private var reviewPrompt
+    @Environment(\.requestReview) private var requestReview
 
     @State private var searchText = ""
     @State private var showingCapture = false
@@ -145,6 +149,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     onSaved: {
                         nameSheet = nil
                         store.refresh()
+                        considerAskingForReview()
                     },
                     onCancel: { nameSheet = nil }
                 )
@@ -486,6 +491,19 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         for folder in top { all += (try? storage.listFolders(in: folder)) ?? [] }
         // Byte-sort by full path keeps each sub-folder adjacent to its parent.
         moveTargets = all.sorted { $0.path < $1.path }   // Move menu: all folders
+    }
+
+    /// Ask iOS to consider the rating prompt after a scan is safely on disk.
+    ///
+    /// Deliberately here rather than inside `NameDocumentSheet`: the sheet is being
+    /// dismissed at this moment, and presenting a system dialog from a view on its way
+    /// out is how you get a prompt that never appears. The policy lives in
+    /// `ReviewPromptTracker`; this only fires it.
+    private func considerAskingForReview() {
+        reviewPrompt.recordSuccessfulScan()
+        guard reviewPrompt.shouldRequest() else { return }
+        reviewPrompt.recordRequested()
+        requestReview()
     }
 
     private func createFolder() {

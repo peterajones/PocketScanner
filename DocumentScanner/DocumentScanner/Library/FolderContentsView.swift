@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 /// Shows the documents inside a single folder. Pushed onto the root
 /// LibraryView's NavigationStack when the user taps a folder row.
@@ -14,6 +15,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     let storage: DocumentStorage
     let scannerPresenter: DocumentScannerPresenting
     let pipeline: ScanPipeline
+
+    @Environment(\.reviewPrompt) private var reviewPrompt
+    @Environment(\.requestReview) private var requestReview
 
     @State private var searchText = ""
     @State private var showingCapture = false
@@ -186,6 +190,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 onSaved: {
                     nameSheet = nil
                     store.refresh()
+                    considerAskingForReview()
                 },
                 onCancel: { nameSheet = nil }
             )
@@ -428,6 +433,15 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
         do { try storage.deleteFolder(at: folder); store.refresh(); refreshFolders() }
         catch { folderActionError = error.localizedDescription }
         subfolderBeingDeleted = nil
+    }
+
+    /// Ask iOS to consider the rating prompt after a scan is safely on disk.
+    /// Mirrors `LibraryView.considerAskingForReview()`; both scan flows reach this.
+    private func considerAskingForReview() {
+        reviewPrompt.recordSuccessfulScan()
+        guard reviewPrompt.shouldRequest() else { return }
+        reviewPrompt.recordRequested()
+        requestReview()
     }
 
     private func triggerScan() {
