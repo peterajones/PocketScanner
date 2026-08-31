@@ -22,8 +22,15 @@ set -euo pipefail
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 IN="$1"; OUT="$2"; L1="$3"; L2="$4"; TOP="${5:-430}"; FS1="${6:-78}"; FS2="${7:-66}"; BAND="${8:-}"; COLOR="${9:-#14315C}"
 CHROME_PNG="${10:-}"
-BANDCSS=""; [ -n "$BAND" ] && BANDCSS="background:${BAND};padding:44px 0 48px;"
+# Padding sets the band's height. Raised from 44/48 for v3.4: at the old values the
+# two caption lines sat hard against the strip's edges and looked cramped.
+BANDCSS=""; [ -n "$BAND" ] && BANDCSS="background:${BAND};padding:72px 0 76px;"
 
+# The caption box is constrained to these same bounds (not the full 1290 canvas), so a
+# banded caption stops at the bezel instead of running off the sides of the phone. Text
+# position is unaffected: the cutout is symmetrical, so centring in 1152 offset by 69
+# lands on the same pixel as centring in 1290.
+#
 # Screen cutout inside PocketScannerAppPreviewChrome1290x2796.png, measured from
 # the PNG's alpha channel (the fully-transparent region): the bezel's glass.
 # `object-fit:cover` reproduces Krita's "fit to fill the viewport" — the capture
@@ -57,7 +64,7 @@ cat > "$HTML" <<EOF
  html,body{margin:0;padding:0;}
  .stage{position:relative;width:1290px;height:2796px;}
  ${SHOT_CSS}
- .cap{position:absolute;top:${TOP}px;left:0;width:1290px;text-align:center;
+ .cap{position:absolute;top:${TOP}px;left:${SCREEN_L}px;width:${SCREEN_W}px;text-align:center;
       ${BANDCSS}
       font-family:-apple-system,"SF Pro Display","Helvetica Neue",sans-serif;
       color:${COLOR};line-height:1.06;letter-spacing:-0.01em;}
