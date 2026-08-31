@@ -44,6 +44,12 @@ marketing/app-preview/v1.7/PocketScanner-v1.7.mp4
 marketing/app-preview/*/Base/
 
 # Legacy Files for reference
+# icloud-dumps holds REAL scanned documents — it must never be committed.
 marketing/icloud-dumps/*
-marketing/translations/*
 scripts/legacy/*
+
+# marketing/translations/ was in the list above until 2026-08-31, filed as "legacy
+# reference". It is not: the per-language demo libraries there are a build INPUT that
+# seed-simulator.sh reads every release. Ignoring them is how the ES and FR libraries
+# vanished — they were used for the v3.0 shoot, never committed, and could not be
+# recovered when v3.4 needed them. All four are synthetic props, ~3MB total.
