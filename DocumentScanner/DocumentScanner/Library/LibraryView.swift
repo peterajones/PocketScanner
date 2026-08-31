@@ -1,5 +1,6 @@
 import SwiftUI
 import PDFKit
+import StoreKit
 
 struct LibraryView<Store: LibraryStoring & Observable>: View {
     @Bindable var store: Store
@@ -8,6 +9,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     let storage: DocumentStorage
     let pipeline: ScanPipeline
     let lockSettings: AppLockSettings
+
+    @Environment(\.reviewPrompt) private var reviewPrompt
+    @Environment(\.requestReview) private var requestReview
 
     @State private var searchText = ""
     @State private var showingCapture = false
@@ -145,6 +149,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     onSaved: {
                         nameSheet = nil
                         store.refresh()
+                        // Fired here rather than inside NameDocumentSheet: that sheet is
+                        // being dismissed right now, and a dialog raised by a view on its
+                        // way out never appears.
+                        reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview)
                     },
                     onCancel: { nameSheet = nil }
                 )

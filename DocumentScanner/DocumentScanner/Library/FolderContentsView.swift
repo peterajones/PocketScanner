@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 /// Shows the documents inside a single folder. Pushed onto the root
 /// LibraryView's NavigationStack when the user taps a folder row.
@@ -14,6 +15,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     let storage: DocumentStorage
     let scannerPresenter: DocumentScannerPresenting
     let pipeline: ScanPipeline
+
+    @Environment(\.reviewPrompt) private var reviewPrompt
+    @Environment(\.requestReview) private var requestReview
 
     @State private var searchText = ""
     @State private var showingCapture = false
@@ -186,6 +190,7 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
                 onSaved: {
                     nameSheet = nil
                     store.refresh()
+                    reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview)
                 },
                 onCancel: { nameSheet = nil }
             )

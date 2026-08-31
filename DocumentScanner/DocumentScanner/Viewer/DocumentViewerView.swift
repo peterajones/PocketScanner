@@ -1,6 +1,7 @@
 import SwiftUI
 import PDFKit
 import UIKit
+import StoreKit
 
 struct DocumentViewerView: View {
     let summary: DocumentSummary
@@ -16,6 +17,9 @@ struct DocumentViewerView: View {
     /// new files on its own the way the iCloud `NSMetadataQuery` store does, so
     /// without this the extracted doc wouldn't appear until a manual refresh.
     let onDocumentCreated: () -> Void
+
+    @Environment(\.reviewPrompt) private var reviewPrompt
+    @Environment(\.requestReview) private var requestReview
 
     init(summary: DocumentSummary,
          storage: DocumentStorage,
@@ -644,9 +648,12 @@ struct DocumentViewerView: View {
                                          userName: DocumentSession.signatureAnnotationName)
         stamp.contents = id    // remember which saved signature this is, for Move
         page.addAnnotation(stamp)
-        _ = try? session.save()
+        let saved = (try? session.save()) != nil
         annotationRevision &+= 1
         signatureRevision &+= 1
+        // Signing a document without a printer is the app's strongest "that worked"
+        // moment. Only on a successful write — a failed save is the opposite of one.
+        if saved { reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview) }
     }
 
     private func placeDateStamp(_ image: UIImage, dateString: String, at rect: CGRect, on page: PDFPage, session: DocumentSession) {

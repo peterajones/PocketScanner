@@ -7,6 +7,7 @@ struct DocumentScannerApp: App {
     @State private var inMemoryStore: InMemoryLibraryStore
     @State private var lockSettings = AppLockSettings()
     @State private var alertCenter = AlertCenter()
+    private let reviewPrompt = ReviewPromptTracker()
     @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
 
     private let container = ICloudContainer()
@@ -118,6 +119,7 @@ struct DocumentScannerApp: App {
             }
             }
             .touchIndicators()
+            .environment(\.reviewPrompt, reviewPrompt)
             .onOpenURL { url in handleIncomingPDF(url) }
         }
     }
