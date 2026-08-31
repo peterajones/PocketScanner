@@ -49,7 +49,13 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 |---|---|---|---|
 | v3.1 (30) | 2026-07-24 | Approved 2026-07-31 *(session notes, not confirmable in ASC)* | 7 |
 | v3.2 (31) | 2026-07-31 | **Rejected 2026-08-07**; contested, withdrawn, Ready for Distribution 2026-08-11 | 7 to rejection, 11 total |
-| v3.3 (32) | 2026-08-29 | *Waiting for Review* | — |
+| v3.3 (32) | 2026-08-29 | **Approved + LIVE 2026-08-31** | 2 |
+
+**v3.3 went through in 2 days, against 7 for both v3.1 and v3.2.** Same subtitle that was
+rejected under 2.3.7 in v3.2 and contested — it passed without comment this time. Two data
+points worth keeping straight: review turnaround is not stable enough to plan around, and
+**the 2.3.7 rejection was reviewer-specific, not a policy shift**. Apple conceded nothing when
+they withdrew it, so a future reviewer could still raise it; the playbook above stands.
 
 The v3.1 turnaround is corroborated by App Review status inquiry case `20000124075803`, filed 2026-07-30 because the review was dragging; it approved the next day. **Two consecutive 7-day reviews — treat a week as the current normal when planning submission windows**, not the 1–4 days v2.8–v3.0 saw.
 
