@@ -1,2 +1,5 @@
 shot	line1	line2	top	fs1	fs2	band	color
 1	Scan any document:	receipts, contracts, anything	2010	64	54	#000000	#ffffff
+2	Search inside your scans		651	64	54		
+3	Emailed a contract?	Sign and date it, no printer	541	78	66		
+4	Already have a PDF?	Import it in a tap	2045	78	66		

@@ -50,12 +50,19 @@ CHROME = "marketing/templates/PocketScannerAppPreviewChrome1290x2796.png"
 # re-framed, and the two facts have to stay in step.
 SHARED_FRAME_SHOT = 1
 
+# es-MX and fr-CA are metadata-only regional variants: same binary, same UI language as
+# their parent, so they ride the parent's captures and differ only in caption wording
+# (fr-CA "courriel"/"numérisez" vs fr "e-mail"/"scannez"). Restored for v3.4 — it existed
+# before the v3.1 restructure, was dropped when v3.2 added two FULL languages, and is
+# needed again now that captures are per-language.
+BASE_LANG = {"es-MX": "es", "fr-CA": "fr"}
+
 
 def base_for(bases_dir, lang, shot):
     """Path to the uncaptioned capture for one shot, or None if missing."""
     if shot == SHARED_FRAME_SHOT:
         return SCAN2A
-    path = f"{bases_dir}/{lang}/{shot}.png"
+    path = f"{bases_dir}/{BASE_LANG.get(lang, lang)}/{shot}.png"
     return path if os.path.exists(path) else None
 
 
