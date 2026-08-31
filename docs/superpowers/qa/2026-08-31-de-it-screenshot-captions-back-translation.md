@@ -105,6 +105,30 @@ per language.
 
 ---
 
+## Addendum — the v3.4 release notes
+
+Written after this record, so covered here rather than in a separate one. One new sentence per
+language, ahead of the sign-off paragraph which is carried over byte-identical from v3.3.
+
+| | new line | back-translation |
+|---|---|---|
+| de | Ein kleines Wartungsupdate mit internen Verbesserungen. | *A small maintenance update with internal improvements.* |
+| it | Un piccolo aggiornamento di manutenzione con migliorie interne. | *A small maintenance update with internal improvements.* |
+
+Both are exact. *Wartungsupdate* and *aggiornamento di manutenzione* are the conventional terms
+in each language rather than literal renderings of "maintenance release". No flags.
+
+**Checks:** character limits pass in all 7 locales (207–251 of 4000); the sign-off is
+byte-identical to the shipped v3.3 text in every locale; no em dashes anywhere in the set.
+
+**Worth recording about the copy itself, not its translation:** v3.4's only user-visible change
+is the App Store gallery, and release notes cannot refer to the store listing. So these notes
+honestly describe a release that reads as a nothing-release to anyone who opens them. That is the
+accepted cost of shipping the gallery fix now — including removing a real bank's trademark from
+the live listing — rather than a copywriting problem to solve.
+
+---
+
 ## Still open
 
 **Nothing in this pass.**

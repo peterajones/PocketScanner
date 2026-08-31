@@ -1,11 +1,3 @@
-Una versión de limpieza, centrada en los momentos justo antes de borrar algo.
-
-Ahora se te pregunta antes de eliminar páginas. Antes ocurría en cuanto tocabas el botón, sin forma de deshacerlo. La confirmación te dice cuántas páginas son, así que siempre sabes exactamente qué va a desaparecer.
-
-Cancelar ha vuelto a dos avisos que lo habían perdido. «¿Eliminar este documento?» y «¿Eliminar esta marca?» mostraban solo la opción de eliminar, lo que hacía que una pregunta normal pareciera un camino sin retorno.
-
-Las opciones Resaltar y Tachar ahora aparecen en español: eran las únicas que seguían en inglés.
-
-También se ha corregido internamente el seguimiento de páginas en el visor de documentos.
+Una pequeña actualización de mantenimiento con mejoras internas.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.
