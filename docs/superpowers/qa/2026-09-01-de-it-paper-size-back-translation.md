@@ -89,6 +89,32 @@ setting would then explain a control the user cannot find. Verified verbatim in 
 
 ---
 
+## Addendum — the Tips entry
+
+A ninth tip was added after the pass, so its de/it copy is covered here rather than in a
+separate record.
+
+| | title | back-translation |
+|---|---|---|
+| de | Scans in echter Papiergröße | *"Scans at a real paper size"* |
+| it | Scansioni con un formato carta reale | *"Scans with a real paper format"* |
+
+Bodies back-translate exactly. German uses *Papiergröße* in the title but *Formato/Seitengröße*
+where it names the control, which is correct: the title describes the outcome, the body must
+name the setting.
+
+**The same cross-reference check applies and passes, 16/16** — the tip body names four
+controls (`Page Size`, `Auto`, `US Letter`, `A4`) and each appears verbatim in each language's
+translation. A tip that told a German user to look for "Page Size" would send them hunting for a
+row labelled *Seitengröße*.
+
+**Not flagged, but recorded:** the pre-existing `signature` tip contains an em dash, which is
+against Peter's standing preference. It is shipped copy, so changing it means a new key, four
+re-translations and another pass — disproportionate for one punctuation mark. Left alone
+deliberately rather than overlooked.
+
+---
+
 ## Still open
 
 **Nothing in this pass.**
