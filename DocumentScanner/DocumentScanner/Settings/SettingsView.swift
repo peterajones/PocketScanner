@@ -11,6 +11,7 @@ struct SettingsView: View {
     private let signatureStore = SignatureStore()
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
+    @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.detected.rawValue
     #if DEBUG
     @AppStorage(TouchIndicatorSettings.key) private var touchIndicatorsEnabled = TouchIndicatorSettings.defaultEnabled
     #endif
@@ -39,10 +40,15 @@ struct SettingsView: View {
                         Text(f.displayName).tag(f.rawValue)
                     }
                 }
+                Picker("Page Size", selection: $scanPaperSizeRaw) {
+                    ForEach(PaperSize.allCases) { p in
+                        Text(p.displayName).tag(p.rawValue)
+                    }
+                }
             } header: {
                 Text("Scanning")
             } footer: {
-                Text("New scans start with this filter. You can still change it for any scan.")
+                Text("New scans start with this filter. You can still change it for any scan.\n\nPage Size sets the paper size of the PDF. Detected keeps the shape the scanner found; US Letter and A4 produce exactly that size, adding margins if the scan is a different shape.")
             }
             #if DEBUG
             Section {

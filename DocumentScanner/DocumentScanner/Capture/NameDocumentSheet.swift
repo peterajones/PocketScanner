@@ -22,6 +22,7 @@ struct NameDocumentSheet: View {
     @State private var selectedDestination: URL = URL(fileURLWithPath: "/")
     @State private var destinationTree: (main: ScanDestination, groups: [ScanDestinationGroup])?
     @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
+    @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.detected.rawValue
     private let filterEngine = ImageFilterEngine()
     @Environment(\.alertCenter) private var alertCenter
 
@@ -153,7 +154,8 @@ struct NameDocumentSheet: View {
         defer { isWorking = false }
         do {
             let pages = await recognizeTask.value
-            let result = try await pipeline.assemble(pages: pages, filter: filter)
+            let paperSize = PaperSize(rawValue: scanPaperSizeRaw) ?? .detected
+            let result = try await pipeline.assemble(pages: pages, filter: filter, paperSize: paperSize)
             let destinationStorage = DocumentStorage(documentsURL: selectedDestination)
             _ = try destinationStorage.write(result.pdf, preferredName: name)
             onSaved()

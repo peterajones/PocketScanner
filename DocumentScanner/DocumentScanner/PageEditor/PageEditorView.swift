@@ -270,9 +270,13 @@ struct PageEditorView: View {
         let rotated = rotatedImage(corrected)
         let finalImage = filterEngine.apply(filter, to: rotated) ?? rotated
         let observations = (try? await ocr.recognizeText(in: finalImage)) ?? []
+        // Inherit the size of the page being replaced. Reading the scan-time paper-size
+        // setting here would give this one page a different size from its siblings.
+        let existingSize = session.pdf.page(at: pageIndex)?.bounds(for: .mediaBox).size
         let newDoc = try PDFAssembler().assemble(
             pages: [ScannedPage(image: finalImage, observations: observations)],
-            createdAt: Date()
+            createdAt: Date(),
+            pageSize: { existingSize ?? PaperSize.detected.pageSize(forImage: $0) }
         )
         DocumentMutations.replacePage(in: session.pdf, at: pageIndex, with: newDoc)
     }
@@ -282,9 +286,12 @@ struct PageEditorView: View {
               let rendered = renderer.image(from: page) else { return }
         let filtered = filterEngine.apply(filter, to: rendered) ?? rendered
         let observations = (try? await ocr.recognizeText(in: filtered)) ?? []
+        // Same reasoning as above: preserve this page's existing size.
+        let existingSize = page.bounds(for: .mediaBox).size
         let newDoc = try PDFAssembler().assemble(
             pages: [ScannedPage(image: filtered, observations: observations)],
-            createdAt: Date()
+            createdAt: Date(),
+            pageSize: { _ in existingSize }
         )
         DocumentMutations.replacePage(in: session.pdf, at: index, with: newDoc)
     }

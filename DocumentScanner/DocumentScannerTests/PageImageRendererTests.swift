@@ -16,7 +16,11 @@ final class PageImageRendererTests: XCTestCase {
         )
         let page = try XCTUnwrap(pdf.page(at: 0))
         let rendered = try XCTUnwrap(PageImageRenderer().image(from: page))
-        XCTAssertEqual(rendered.size.width, 100, accuracy: 1)
-        XCTAssertEqual(rendered.size.height, 100, accuracy: 1)
+        // Assert against the page's OWN bounds rather than the source image's pixels.
+        // Those were the same number until PaperSize decoupled page size from image
+        // resolution; the renderer's actual contract is "an image at the page's size".
+        let pageSize = page.bounds(for: .mediaBox).size
+        XCTAssertEqual(rendered.size.width, pageSize.width, accuracy: 1)
+        XCTAssertEqual(rendered.size.height, pageSize.height, accuracy: 1)
     }
 }

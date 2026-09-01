@@ -10,7 +10,13 @@ enum PDFAssemblerError: Error {
 
 struct PDFAssembler {
 
-    func assemble(pages: [ScannedPage], createdAt: Date) throws -> PDFDocument {
+    /// - Parameter pageSize: maps a page image's pixel size to the physical page size in
+    ///   points. Scans pass `PaperSize.…​.resolver`; the page editor passes the size of
+    ///   the page it is replacing, so an edit can never give one page in a document a
+    ///   different size from its siblings.
+    func assemble(pages: [ScannedPage],
+                  createdAt: Date,
+                  pageSize: (CGSize) -> CGSize = PaperSize.detected.resolver) throws -> PDFDocument {
         // Render each scanned page into a PDF page via UIGraphicsPDFRenderer so that
         // any OCR text is part of the page content stream — that's what PDFKit's
         // `PDFDocument.string` extracts, and what other PDF readers index for search.
@@ -21,7 +27,7 @@ struct PDFAssembler {
             throw PDFAssemblerError.pageCreationFailed
         }
 
-        // Use US Letter as a sane default; each page's actual bounds come from its image.
+        // Placeholder box for the context; each page sets its own via beginPage(mediaBox:).
         var defaultBox = CGRect(x: 0, y: 0, width: 612, height: 792)
 
         // Embed metadata directly in the PDF byte stream via auxiliaryInfo so it
@@ -42,7 +48,7 @@ struct PDFAssembler {
         }
 
         for page in pages {
-            try renderPage(page, into: context)
+            try renderPage(page, into: context, pageSize: pageSize)
         }
 
         context.closePDF()
@@ -54,28 +60,52 @@ struct PDFAssembler {
         return document
     }
 
-    private func renderPage(_ page: ScannedPage, into context: CGContext) throws {
+    /// Fit `size` inside `rect` without distortion, centred. Margins appear on one axis
+    /// when the proportions differ — which is what asking for a fixed paper size means.
+    static func aspectFitRect(_ size: CGSize, in rect: CGRect) -> CGRect {
+        guard size.width > 0, size.height > 0 else { return rect }
+        let scale = min(rect.width / size.width, rect.height / size.height)
+        let fitted = CGSize(width: size.width * scale, height: size.height * scale)
+        return CGRect(x: rect.midX - fitted.width / 2,
+                      y: rect.midY - fitted.height / 2,
+                      width: fitted.width,
+                      height: fitted.height)
+    }
+
+    private func renderPage(_ page: ScannedPage,
+                            into context: CGContext,
+                            pageSize: (CGSize) -> CGSize) throws {
         let cgImage = try compressedCGImage(from: page.image)
 
-        // Page size in points matches the (possibly downsampled) image's pixel size at
-        // 1pt-per-pixel; preserves aspect ratio without further resampling.
-        let size = CGSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height))
-        var pageRect = CGRect(origin: .zero, size: size)
+        // Page size and image resolution are INDEPENDENT. The image's pixel count only
+        // determines effective DPI; the page's physical size comes from the caller's
+        // resolver. Before this, pixels were used as points directly, which produced
+        // pages around 29 × 39 inches instead of 8.5 × 11.
+        let imageSize = CGSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height))
+        var pageRect = CGRect(origin: .zero, size: pageSize(imageSize))
 
         context.beginPage(mediaBox: &pageRect)
-        context.draw(cgImage, in: pageRect)
+
+        // Paint the page white first: with a fixed paper size the fitted image may not
+        // cover it, and unpainted PDF space is transparent, not white.
+        context.setFillColor(CGColor(gray: 1, alpha: 1))
+        context.fill(pageRect)
+
+        let drawRect = Self.aspectFitRect(imageSize, in: pageRect)
+        context.draw(cgImage, in: drawRect)
 
         if !page.observations.isEmpty {
-            drawInvisibleText(page.observations, in: pageRect, into: context)
+            // Text must follow the IMAGE, not the page — otherwise the invisible OCR
+            // layer drifts off the glyphs it belongs to whenever there are margins.
+            drawInvisibleText(page.observations, in: drawRect, into: context)
         }
         context.endPage()
     }
 
     /// Returns a CGImage whose pixel data matches what the UIImage displays —
     /// i.e. with the imageOrientation baked in — and whose pixel dimensions
-    /// equal the UIImage's point size. Forcing scale=1 here is what keeps the
-    /// resulting PDF page sized in document points rather than screen pixels;
-    /// `renderPage` derives the page mediaBox from these dimensions.
+    /// equal the UIImage's point size. Forcing scale=1 keeps the pixel dimensions
+    /// predictable; the PAGE size no longer comes from them — see `renderPage`.
     private func normalizedCGImage(from image: UIImage) -> CGImage? {
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
@@ -102,7 +132,11 @@ struct PDFAssembler {
         return normalized
     }
 
-    private func drawInvisibleText(_ observations: [OCRObservation], in pageRect: CGRect, into context: CGContext) {
+    /// - Parameter imageRect: where the page image was actually drawn, which is NOT the
+    ///   page rect once a fixed paper size introduces margins. Vision's coordinates are
+    ///   normalized to the image, so they must be mapped onto the image's rect — including
+    ///   its origin, or the whole text layer shifts by the margin.
+    private func drawInvisibleText(_ observations: [OCRObservation], in imageRect: CGRect, into context: CGContext) {
         context.saveGState()
         context.setTextDrawingMode(.invisible)
 
@@ -111,10 +145,10 @@ struct PDFAssembler {
             // CGContext PDF coords are also origin bottom-left, y-up — no flip needed.
             let bbox = observation.boundingBox
             let rect = CGRect(
-                x: bbox.origin.x * pageRect.width,
-                y: bbox.origin.y * pageRect.height,
-                width: bbox.width * pageRect.width,
-                height: bbox.height * pageRect.height
+                x: imageRect.origin.x + bbox.origin.x * imageRect.width,
+                y: imageRect.origin.y + bbox.origin.y * imageRect.height,
+                width: bbox.width * imageRect.width,
+                height: bbox.height * imageRect.height
             )
             guard rect.height > 0, rect.width > 0 else { continue }
 
