@@ -22,7 +22,7 @@ struct NameDocumentSheet: View {
     @State private var selectedDestination: URL = URL(fileURLWithPath: "/")
     @State private var destinationTree: (main: ScanDestination, groups: [ScanDestinationGroup])?
     @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
-    @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.detected.rawValue
+    @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.auto.rawValue
     private let filterEngine = ImageFilterEngine()
     @Environment(\.alertCenter) private var alertCenter
 
@@ -130,9 +130,14 @@ struct NameDocumentSheet: View {
         selectedDestination = defaultDestination
         let root = rootStorage.documentsURL
         let folders = (try? rootStorage.listFolders()) ?? []
+        // All DESCENDANTS, not just direct children: a level-3 folder must be reachable
+        // here or a scan could never be saved into one. allFolders() is path-sorted, so
+        // "Tax Slips/2006" precedes "Tax Slips/2006/T4" in each group.
+        let everything = (try? rootStorage.allFolders()) ?? []
         var subs: [URL: [URL]] = [:]
         for folder in folders {
-            subs[folder] = (try? rootStorage.listFolders(in: folder)) ?? []
+            let prefix = folder.standardizedFileURL.path + "/"
+            subs[folder] = everything.filter { $0.standardizedFileURL.path.hasPrefix(prefix) }
         }
         destinationTree = ScanDestinations.build(root: root, folders: folders, subfoldersByFolder: subs)
     }
@@ -154,7 +159,7 @@ struct NameDocumentSheet: View {
         defer { isWorking = false }
         do {
             let pages = await recognizeTask.value
-            let paperSize = PaperSize(rawValue: scanPaperSizeRaw) ?? .detected
+            let paperSize = PaperSize(rawValue: scanPaperSizeRaw) ?? .auto
             let result = try await pipeline.assemble(pages: pages, filter: filter, paperSize: paperSize)
             let destinationStorage = DocumentStorage(documentsURL: selectedDestination)
             _ = try destinationStorage.write(result.pdf, preferredName: name)

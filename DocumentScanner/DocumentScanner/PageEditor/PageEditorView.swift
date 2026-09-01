@@ -276,7 +276,7 @@ struct PageEditorView: View {
         let newDoc = try PDFAssembler().assemble(
             pages: [ScannedPage(image: finalImage, observations: observations)],
             createdAt: Date(),
-            pageSize: { existingSize ?? PaperSize.detected.pageSize(forImage: $0) }
+            pageSize: { existingSize ?? PaperSize.auto.pageSize(forImage: $0) }
         )
         DocumentMutations.replacePage(in: session.pdf, at: pageIndex, with: newDoc)
     }

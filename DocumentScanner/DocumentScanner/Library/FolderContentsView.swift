@@ -33,9 +33,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     @State private var subfolderBeingDeleted: URL?
     @State private var folderActionError: String?
 
-    /// True only for a level-1 folder (can hold sub-folders). A level-2 folder cannot.
+    /// True while this folder is shallow enough to hold sub-folders (see FolderPaths.maxDepth).
     private var canCreateSubfolder: Bool {
-        FolderPaths.level(of: folderURL, root: storage.documentsURL) < 2
+        FolderPaths.level(of: folderURL, root: storage.documentsURL) < FolderPaths.maxDepth
     }
 
     /// A sub-folder is empty if no known document lives anywhere inside it.
@@ -212,11 +212,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
     }
 
     private func refreshFolders() {
-        let top = (try? storage.listFolders()) ?? []
-        var all = top
-        for folder in top { all += (try? storage.listFolders(in: folder)) ?? [] }
-        // Byte-sort by full path keeps each sub-folder adjacent to its parent.
-        folders = all.sorted { $0.path < $1.path }
+        // Every folder to the depth the UI allows, already path-sorted so each
+        // sub-folder sits adjacent to its parent.
+        folders = (try? storage.allFolders()) ?? []
         subfolders = (try? storage.listFolders(in: folderURL))?
             .sorted { $0.lastPathComponent.localizedCaseInsensitiveCompare($1.lastPathComponent) == .orderedAscending }
             ?? []

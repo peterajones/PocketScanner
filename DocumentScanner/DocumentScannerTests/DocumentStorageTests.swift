@@ -302,4 +302,43 @@ final class DocumentStorageTests: XCTestCase {
         doc.insert(PDFPage(image: img)!, at: 0)
         return doc
     }
+    // MARK: - allFolders depth cap
+
+    /// The bug this replaced: folder creation was gated at one depth while the Move
+    /// menu's folder walk was hardcoded to another, so a folder could exist that
+    /// nothing would ever list.
+    func test_allFolders_reachesTheThirdLevel() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let tax = try storage.createFolder(named: "Tax Slips")
+        let year = try DocumentStorage(documentsURL: tax).createFolder(named: "2006")
+        let t4 = try DocumentStorage(documentsURL: year).createFolder(named: "T4")
+
+        let all = try storage.allFolders()
+        let paths = all.map(\.standardizedFileURL.path)
+        XCTAssertTrue(paths.contains(tax.standardizedFileURL.path))
+        XCTAssertTrue(paths.contains(year.standardizedFileURL.path))
+        XCTAssertTrue(paths.contains(t4.standardizedFileURL.path), "level 3 must be listed")
+    }
+
+    func test_allFolders_honoursALowerCap() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        let tax = try storage.createFolder(named: "Tax Slips")
+        let year = try DocumentStorage(documentsURL: tax).createFolder(named: "2006")
+        _ = try DocumentStorage(documentsURL: year).createFolder(named: "T4")
+
+        let two = try storage.allFolders(maxDepth: 2).map(\.standardizedFileURL.path)
+        XCTAssertEqual(two.count, 2, "maxDepth 2 must stop at the sub-folder")
+        XCTAssertFalse(two.contains { $0.hasSuffix("/T4") })
+    }
+
+    func test_allFolders_isSortedSoChildrenFollowParents() throws {
+        let storage = DocumentStorage(documentsURL: tempDir)
+        _ = try storage.createFolder(named: "Zebra")
+        let tax = try storage.createFolder(named: "Tax Slips")
+        _ = try DocumentStorage(documentsURL: tax).createFolder(named: "2006")
+
+        let paths = try storage.allFolders().map(\.path)
+        XCTAssertEqual(paths, paths.sorted())
+    }
+
 }

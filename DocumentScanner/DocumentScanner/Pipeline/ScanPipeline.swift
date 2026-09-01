@@ -53,7 +53,7 @@ actor ScanPipeline {
     /// fails to render falls back to the original image.
     func assemble(pages: [ScannedPage],
                   filter: ImageFilter,
-                  paperSize: PaperSize = .detected,
+                  paperSize: PaperSize = .auto,
                   createdAt: Date = .init()) throws -> ScanResult {
         let filteredPages = pages.map { page -> ScannedPage in
             let image = filterEngine.apply(filter, to: page.image) ?? page.image

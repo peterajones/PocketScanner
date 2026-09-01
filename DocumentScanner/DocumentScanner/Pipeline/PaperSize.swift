@@ -14,7 +14,7 @@ import Foundation
 enum PaperSize: String, CaseIterable, Identifiable {
 
     /// Keep the proportions the scanner detected; only normalise the scale.
-    case detected
+    case auto
     case usLetter
     case a4
 
@@ -22,20 +22,20 @@ enum PaperSize: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .detected:  return String(localized: "Detected", comment: "Scan page size: use the detected page proportions")
+        case .auto:      return String(localized: "Auto", comment: "Scan page size: keep the proportions the scanner detected")
         case .usLetter:  return String(localized: "US Letter", comment: "Scan page size")
         case .a4:        return String(localized: "A4", comment: "Scan page size")
         }
     }
 
-    /// Long edge used by `.detected`, in points. 792pt = 11in, so a well-cropped
+    /// Long edge used by `.auto`, in points. 792pt = 11in, so a well-cropped
     /// Letter-shaped scan lands within a percent or two of a true Letter page.
-    static let detectedLongEdge: CGFloat = 792
+    static let autoLongEdge: CGFloat = 792
 
     /// Portrait dimensions in points. 72pt = 1 inch.
     private var portraitSize: CGSize? {
         switch self {
-        case .detected: return nil
+        case .auto: return nil
         case .usLetter: return CGSize(width: 612, height: 792)   // 8.5 × 11 in
         case .a4:       return CGSize(width: 595, height: 842)   // 210 × 297 mm
         }
@@ -48,13 +48,13 @@ enum PaperSize: String, CaseIterable, Identifiable {
     /// proportions differ gets margins rather than distortion.
     func pageSize(forImage imageSize: CGSize) -> CGSize {
         guard imageSize.width > 0, imageSize.height > 0 else {
-            return portraitSize ?? CGSize(width: Self.detectedLongEdge, height: Self.detectedLongEdge)
+            return portraitSize ?? CGSize(width: Self.autoLongEdge, height: Self.autoLongEdge)
         }
         let isLandscape = imageSize.width > imageSize.height
 
         guard let portrait = portraitSize else {
-            // .detected — preserve the aspect exactly, normalise the long edge.
-            let scale = Self.detectedLongEdge / max(imageSize.width, imageSize.height)
+            // .auto — preserve the aspect exactly, normalise the long edge.
+            let scale = Self.autoLongEdge / max(imageSize.width, imageSize.height)
             return CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
         }
         return isLandscape ? CGSize(width: portrait.height, height: portrait.width) : portrait

@@ -13,7 +13,7 @@ values, one row label, and one appended footer paragraph.
 | String | de | it |
 |---|---|---|
 | `Page Size` | Seitengröße | Formato pagina |
-| `Detected` | Erkannt | Rilevato |
+| `Auto` | Automatisch | Automatico |
 | `US Letter` | *(unchanged)* | *(unchanged)* |
 | `A4` | *(unchanged)* | *(unchanged)* |
 | Scanning footer | first sentence reused, one paragraph appended | same |
@@ -31,8 +31,12 @@ as a prefix in all four languages.
 
 ## Back-translation
 
-**`Erkannt` / `Rilevato`** → *"Detected"* in both. Past participle in both languages, matching how
-the rest of each settings screen reads.
+**`Automatisch` / `Automatico`** → *"Automatic"* in both, which is what Apple uses for an
+"Auto" setting in each language rather than a literal four-letter *Auto*.
+
+*(This entry was originally `Detected` / `Erkannt` / `Rilevato`. Peter renamed the option to
+"Auto" after the pass; the strings were re-translated and the cross-reference check re-run —
+see below.)*
 
 **`Seitengröße`** → *"Page size"*. The correct German compound (*Seite* + *Größe*), not a coined
 one.
@@ -40,11 +44,11 @@ one.
 **`Formato pagina`** → *"Page format"*. Italian uses *formato* for paper size, which is more
 idiomatic here than a literal *dimensione*.
 
-**German footer paragraph** — *"Page size sets the paper format of the PDF. Detected keeps the
+**German footer paragraph** — *"Page size sets the paper format of the PDF. Auto keeps the
 shape that the scanner found; US Letter and A4 produce exactly this format and add margins if the
 scan has a different shape."* Exact. *Papierformat* is the standard German term for paper size.
 
-**Italian footer paragraph** — *"Page format sets the paper format of the PDF. Detected keeps the
+**Italian footer paragraph** — *"Page format sets the paper format of the PDF. Auto keeps the
 shape found by the scanner; US Letter and A4 produce exactly that format and add margins if the
 scan has a different shape."* Exact. *formato carta* is the standard term.
 
@@ -58,22 +62,24 @@ sentence (*Du kannst…*) is untouched.
 | Check | Result |
 |---|---|
 | Coverage, all languages, both catalogs | **PASS** — `verify-localization.py` exit 0 |
-| **Cross-reference: picker labels appear verbatim in the footer that explains them** | **PASS** — 4/4 |
+| **Cross-reference: picker labels appear verbatim in the footer that explains them** | **PASS** — 8/8, re-run after the Detected→Auto rename |
 | Footer's shipped first sentence preserved byte-for-byte | **PASS** — all four languages |
 | Em dashes in new copy | **PASS** — none |
 | `String(localized:)` keys all resolve in the catalog | **PASS** |
-| Unit suite | **PASS** — 275/275, 0 failed, 0 skipped |
+| Unit suite | **PASS** — 283/283, 0 failed, 0 skipped |
 
 **The cross-reference check is the one that matters here**, and it is a different shape from
 previous passes. The footer *names the controls it explains*: it has to say `Seitengröße` and
-`Erkannt` because that is what the picker above it says. A translator working from English alone
+`Automatisch` because that is what the picker above it says. A translator working from English alone
 could easily render the footer's "Page Size" as a description rather than as the label — and the
-setting would then explain a control the user cannot find. Verified verbatim in both languages:
+setting would then explain a control the user cannot find. Verified verbatim in all four languages:
 
 | | label | appears in footer |
 |---|---|---|
-| de | `Seitengröße`, `Erkannt` | yes |
-| it | `Formato pagina`, `Rilevato` | yes |
+| de | `Seitengröße`, `Automatisch` | yes |
+| it | `Formato pagina`, `Automatico` | yes |
+| es | `Tamaño de página`, `Automático` | yes |
+| fr | `Format de page`, `Automatique` | yes |
 
 ---
 

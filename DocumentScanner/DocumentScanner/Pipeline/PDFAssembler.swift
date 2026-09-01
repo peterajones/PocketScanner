@@ -16,7 +16,7 @@ struct PDFAssembler {
     ///   different size from its siblings.
     func assemble(pages: [ScannedPage],
                   createdAt: Date,
-                  pageSize: (CGSize) -> CGSize = PaperSize.detected.resolver) throws -> PDFDocument {
+                  pageSize: (CGSize) -> CGSize = PaperSize.auto.resolver) throws -> PDFDocument {
         // Render each scanned page into a PDF page via UIGraphicsPDFRenderer so that
         // any OCR text is part of the page content stream — that's what PDFKit's
         // `PDFDocument.string` extracts, and what other PDF readers index for search.

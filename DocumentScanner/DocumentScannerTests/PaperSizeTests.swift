@@ -3,39 +3,39 @@ import XCTest
 
 final class PaperSizeTests: XCTestCase {
 
-    // MARK: - .detected
+    // MARK: - .auto
 
-    func test_detected_normalisesLongEdgeTo11Inches() {
-        let size = PaperSize.detected.pageSize(forImage: CGSize(width: 2100, height: 2800))
+    func test_auto_normalisesLongEdgeTo11Inches() {
+        let size = PaperSize.auto.pageSize(forImage: CGSize(width: 2100, height: 2800))
         XCTAssertEqual(size.height, 792, accuracy: 0.5, "long edge should be 11in = 792pt")
     }
 
-    func test_detected_preservesAspectExactly() {
+    func test_auto_preservesAspectExactly() {
         let image = CGSize(width: 2100, height: 2800)
-        let size = PaperSize.detected.pageSize(forImage: image)
+        let size = PaperSize.auto.pageSize(forImage: image)
         XCTAssertEqual(size.width / size.height,
                        image.width / image.height,
                        accuracy: 0.0001,
-                       "aspect must survive untouched — the whole point of .detected")
+                       "aspect must survive untouched — the whole point of .auto")
     }
 
     /// The case that motivated all of this: a well-cropped Letter scan should land on
     /// something a normal PDF reader treats as a Letter page.
-    func test_detected_letterShapedScanLandsNearTrueLetter() {
-        let size = PaperSize.detected.pageSize(forImage: CGSize(width: 1700, height: 2200))
+    func test_auto_letterShapedScanLandsNearTrueLetter() {
+        let size = PaperSize.auto.pageSize(forImage: CGSize(width: 1700, height: 2200))
         XCTAssertEqual(size.width, 612, accuracy: 10)
         XCTAssertEqual(size.height, 792, accuracy: 1)
     }
 
     /// A till receipt is not Letter-shaped and must not be forced into it.
-    func test_detected_receiptStaysTallAndNarrow() {
-        let size = PaperSize.detected.pageSize(forImage: CGSize(width: 800, height: 2400))
+    func test_auto_receiptStaysTallAndNarrow() {
+        let size = PaperSize.auto.pageSize(forImage: CGSize(width: 800, height: 2400))
         XCTAssertEqual(size.height, 792, accuracy: 0.5)
         XCTAssertEqual(size.width, 264, accuracy: 1, "1:3 receipt stays 1:3")
     }
 
-    func test_detected_landscapeNormalisesTheWidth() {
-        let size = PaperSize.detected.pageSize(forImage: CGSize(width: 2800, height: 2100))
+    func test_auto_landscapeNormalisesTheWidth() {
+        let size = PaperSize.auto.pageSize(forImage: CGSize(width: 2800, height: 2100))
         XCTAssertEqual(size.width, 792, accuracy: 0.5, "long edge is the width when landscape")
         XCTAssertEqual(size.height, 594, accuracy: 1)
     }
@@ -92,10 +92,10 @@ final class PaperSizeTests: XCTestCase {
         }
     }
 
-    /// The shipped default. `.detected` keeps the proportions users already get, so an
+    /// The shipped default. `.auto` keeps the proportions users already get, so an
     /// upgrade changes a scan's SIZE (the bug) without changing its SHAPE.
-    func test_shippedDefaultIsDetected() {
-        XCTAssertEqual(PaperSize(rawValue: "detected"), .detected)
+    func test_shippedDefaultIsAuto() {
+        XCTAssertEqual(PaperSize(rawValue: "auto"), .auto)
     }
 
     func test_displayNamesAreNonEmptyAndDistinct() {
