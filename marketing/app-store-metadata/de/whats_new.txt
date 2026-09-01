@@ -1,3 +1,5 @@
-Ein kleines Wartungsupdate mit internen Verbesserungen.
+Deine Scans haben jetzt eine echte Papiergröße. Stell in den Einstellungen die Seitengröße auf US Letter oder A4, dann entsteht bei jedem Scan ein PDF in echter Papiergröße, genauso groß wie Dokumente aus jeder anderen Quelle, sodass sie sauber nebeneinander liegen. Automatisch behält die Form bei, die der Scanner gefunden hat.
+
+Ordner lassen sich jetzt drei Ebenen tief anlegen, wenn eine Ebene zum Sortieren nicht reicht.
 
 Wie immer: keine Abos, keine Werbung, kein Tracking und nichts auf unseren Servern. Einmal zahlen, für immer scannen. Danke, dass du mit Pocket Scanner scannst.

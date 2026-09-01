@@ -1,3 +1,5 @@
-Une petite mise à jour de maintenance avec des améliorations internes.
+Vos scans ont maintenant un vrai format papier. Réglez Format de page dans les Réglages sur US Letter ou A4 et chaque scan devient un PDF au vrai format papier, de la même taille que des documents de n'importe quelle autre source, pour qu'ils s'alignent correctement côte à côte. Automatique conserve la forme trouvée par le scanner.
+
+Les dossiers peuvent maintenant compter trois niveaux, quand un seul niveau de classement ne suffit pas.
 
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, scannez pour toujours. Merci d'utiliser Pocket Scanner.

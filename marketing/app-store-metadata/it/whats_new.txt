@@ -1,3 +1,5 @@
-Un piccolo aggiornamento di manutenzione con migliorie interne.
+Le tue scansioni ora hanno un formato carta reale. Imposta Formato pagina nelle Impostazioni su US Letter o A4 e ogni scansione diventa un PDF con un formato carta reale, della stessa dimensione dei documenti di qualsiasi altra provenienza, così stanno affiancate come si deve. Automatico mantiene la forma trovata dallo scanner.
+
+Le cartelle ora possono avere tre livelli, per quando un livello di ordinamento non basta.
 
 Come sempre: nessun abbonamento, nessuna pubblicità, nessun tracciamento e niente salvato sui nostri server. Paghi una volta, scansioni per sempre. Grazie per aver scelto Pocket Scanner.

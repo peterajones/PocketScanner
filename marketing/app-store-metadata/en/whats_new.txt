@@ -1,3 +1,5 @@
-A small maintenance release with refinements under the hood.
+Your scans are now a real paper size. Set Page Size in Settings to US Letter or A4 and every scan becomes a true paper-size PDF, the same size as documents from anywhere else, so they sit side by side properly. Auto keeps whatever shape the scanner found.
+
+Folders can now go three levels deep, for when one level of sorting isn't enough.
 
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.

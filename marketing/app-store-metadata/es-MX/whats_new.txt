@@ -1,3 +1,5 @@
-Una pequeña actualización de mantenimiento con mejoras internas.
+Tus escaneos ahora tienen un tamaño de papel real. Ajusta Tamaño de página en Ajustes a US Letter o A4 y cada escaneo se convierte en un PDF con tamaño de papel real, del mismo tamaño que documentos de cualquier otro origen, así encajan bien uno al lado del otro. Automático mantiene la forma que encontró el escáner.
+
+Las carpetas ahora pueden tener tres niveles, para cuando un nivel de orden no basta.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.
