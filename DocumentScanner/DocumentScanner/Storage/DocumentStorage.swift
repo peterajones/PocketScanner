@@ -177,6 +177,26 @@ struct DocumentStorage {
         try listFolders(in: documentsURL)
     }
 
+    /// Every folder under the documents root, down to `maxDepth` levels
+    /// (1 = top-level only). Sorted by full path, which keeps each sub-folder
+    /// adjacent to its parent.
+    ///
+    /// Replaces the hand-rolled two-level walks that used to live in LibraryView and
+    /// FolderContentsView: those were what silently capped the Move menu, so a folder
+    /// created at a deeper level could never be moved into.
+    func allFolders(maxDepth: Int = FolderPaths.maxDepth) throws -> [URL] {
+        var result: [URL] = []
+        var frontier = try listFolders()
+        var depth = 1
+        while !frontier.isEmpty, depth <= maxDepth {
+            result += frontier
+            guard depth < maxDepth else { break }
+            frontier = frontier.flatMap { (try? listFolders(in: $0)) ?? [] }
+            depth += 1
+        }
+        return result.sorted { $0.path < $1.path }
+    }
+
     /// Rename a folder in place. Sanitizes the new name and resolves
     /// collisions with the same `(N)` suffix scheme used elsewhere.
     @discardableResult

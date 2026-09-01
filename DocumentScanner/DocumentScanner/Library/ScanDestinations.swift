@@ -23,8 +23,12 @@ enum ScanDestinations {
     ) -> (main: ScanDestination, groups: [ScanDestinationGroup]) {
         let main = ScanDestination(url: root, name: FolderPaths.label(for: root, root: root))
         let groups = folders.map { folder -> ScanDestinationGroup in
+            // Name each entry RELATIVE to its group folder, so a level-3 folder reads
+            // "2006 ▸ T4" inside the "Tax Slips" submenu rather than a bare "T4" that
+            // could belong to any year. For direct children this is just the folder
+            // name, matching the previous behaviour exactly.
             let subs = (subfoldersByFolder[folder] ?? []).map {
-                ScanDestination(url: $0, name: $0.lastPathComponent)
+                ScanDestination(url: $0, name: FolderPaths.label(for: $0, root: folder))
             }
             return ScanDestinationGroup(
                 folder: ScanDestination(url: folder, name: folder.lastPathComponent),

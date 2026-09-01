@@ -51,12 +51,15 @@ actor ScanPipeline {
     /// Apply `filter` to each page's image, then assemble the searchable PDF from
     /// the filtered images + the (original-image) observations. A filter that
     /// fails to render falls back to the original image.
-    func assemble(pages: [ScannedPage], filter: ImageFilter, createdAt: Date = .init()) throws -> ScanResult {
+    func assemble(pages: [ScannedPage],
+                  filter: ImageFilter,
+                  paperSize: PaperSize = .auto,
+                  createdAt: Date = .init()) throws -> ScanResult {
         let filteredPages = pages.map { page -> ScannedPage in
             let image = filterEngine.apply(filter, to: page.image) ?? page.image
             return ScannedPage(image: image, observations: page.observations)
         }
-        let pdf = try assembler.assemble(pages: filteredPages, createdAt: createdAt)
+        let pdf = try assembler.assemble(pages: filteredPages, createdAt: createdAt, pageSize: paperSize.resolver)
         let ocrText = pages
             .flatMap(\.observations)
             .map(\.string)

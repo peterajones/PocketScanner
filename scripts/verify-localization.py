@@ -29,19 +29,25 @@ EXEMPT_KEYS = {"CFBundleDisplayName", "CFBundleName"}
 # Values that are legitimately identical to English, per language. Anything
 # identical and NOT listed here fails — that forces a conscious decision
 # rather than letting an untranslated string slip through.
+# "US Letter" and "A4" are international paper-size names, not words: they are
+# written identically in every language this app ships, and Apple leaves them
+# untranslated too. Listed for all four rather than per-language because the
+# reason is the same everywhere.
+PAPER_SIZES = {"US Letter", "A4"}
+
 IDENTICAL_OK = {
-    "es": {" ", "%lld", "%@  %@", "Color", "OK"},
+    "es": {" ", "%lld", "%@  %@", "Color", "OK"} | PAPER_SIZES,
     "fr": {" ", "%lld", "%@  %@", "Date", "Format", "OK", "Photo",
-           "Signature", "Version"},
+           "Signature", "Version"} | PAPER_SIZES,
     # German: "Filter" (der Filter), "Format" (das Format), "Name" (der Name)
     # and "Version" are the same word in German — "Version" is confirmed by
     # Apple's own UIKitCore de.lproj. "in %@" is the preposition "in", also
     # identical. None of these are untranslated oversights.
     "de": {" ", "%lld", "%@  %@", "OK", "Filter", "Format", "Name", "Version",
-           "in %@"},
+           "in %@"} | PAPER_SIZES,
     # Italian: "Privacy" is the word Apple uses in Italian too, and "in %@"
     # is the preposition "in" — identical, not untranslated.
-    "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@"},
+    "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@"} | PAPER_SIZES,
 }
 
 

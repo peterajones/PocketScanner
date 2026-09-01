@@ -5,6 +5,13 @@ import UIKit
 /// smaller in practice). Pure + SwiftUI-free so the size logic is unit-tested.
 enum PageImageCompressor {
 
+    /// Long-edge pixel cap for a page image. Shared deliberately: `PDFAssembler`
+    /// compresses down to it, and `PageImageRenderer` rasterises up to it. If those two
+    /// disagree, a round-trip through the page editor either loses resolution or wastes
+    /// bytes — losing resolution is exactly what happened when page size stopped being
+    /// pixel size.
+    static let pageLongEdgeCap: CGFloat = 2800
+
     /// The size to render at: scaled so the longest edge is at most `maxLongEdge`
     /// points. Never upsamples (returns the source size when already within cap).
     static func downsampledSize(for size: CGSize, maxLongEdge: CGFloat) -> CGSize {
