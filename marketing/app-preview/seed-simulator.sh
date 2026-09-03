@@ -90,6 +90,11 @@ xcrun simctl terminate "$DEVICE" "$BUNDLE_ID" >/dev/null 2>&1 || true
 xcrun simctl status_bar "$DEVICE" override --time "9:41" --batteryLevel 100 --batteryState discharging --cellularBars 4 --wifiBars 3 >/dev/null
 xcrun simctl launch "$DEVICE" "$BUNDLE_ID" -AppleLanguages "($LANG_CODE)" -AppleLocale "$LOCALE" >/dev/null
 
+# Derived, not hardcoded: this used to name v3.4 and would have gone stale the moment a
+# release shipped new screenshots.
+VERSION="$(awk -F' = ' '/MARKETING_VERSION/ {gsub(/;/,"",$2); print $2; exit}' \
+  "$REPO_ROOT/DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj")"
+
 echo
 echo "launched in $LANG_CODE. Capture with:"
-echo "  xcrun simctl io booted screenshot marketing/app-preview/v3.4/Base/$LANG_CODE/<shot>.png"
+echo "  xcrun simctl io booted screenshot marketing/app-preview/v${VERSION}/Base/$LANG_CODE/<shot>.png"

@@ -116,6 +116,24 @@ Do it in this order so docs land in the right folders and nothing needs moving:
 
 ---
 
+## D2. Current workflow (2026-09-03)
+
+The numbered steps in §D are the original v3.0 procedure, kept because they explain *why* each
+shot is framed as it is. In practice a shoot is now:
+
+```bash
+# once per language: wipes the container, copies THAT language's demo library
+# (translated folder and file names), adds the signatures, sets 9:41, relaunches
+./marketing/app-preview/seed-simulator.sh de
+
+# capture into v<VER>/Base/de/<shot>.png, then:
+python3 marketing/app-preview/render-captions.py --version <VER> en es es-MX fr fr-CA de it
+```
+
+Only shots that CHANGED need capturing. Shots carried forward keep their captions and change only
+position, so they are copied and renumbered from the previous release's `Stills/` rather than
+re-rendered — see the v3.4 reorder, where slots 5–7 came across untouched.
+
 ## E. Per-release quick checklist
 
 Once the library exists, a refresh is fast:
@@ -171,19 +189,29 @@ Once the library exists, a refresh is fast:
 > been freehand, not a scroll position. Target: keep **`y ≈ 500 → 700` clear of content in the raw
 > 1206×2622 capture**, which maps to the caption band at `y ≈ 580–760` in the finished image.
 >
-> Historical: v3.0 (`en/es/fr`) and v3.1 (`es-MX/fr-CA`) sets live at `v3.0/Stills/<lang>/` and
-> `v3.1/Stills/<lang>/`; their bases were deleted. The numbered steps below are the original v3.0
-> workflow, kept for reference.
+> Historical note: the v3.0–v3.2 media folders were pruned on 2026-09-03. Recover any of it from
+> the tag that shipped it, e.g. `git show build-32:marketing/app-preview/v3.2/Stills/de/1.png`.
+> **The numbered steps below are the ORIGINAL v3.0 workflow and are superseded** — see
+> "Current workflow" immediately after them.
 
 For localized App Store listings, capture the **same 8 scenes with the app running in
 each language**, then composite translated captions. The app UI, not just the caption,
 must be in-language — a Spanish caption over an English screenshot looks unfinished.
 
-1. **Localize the folder and document names too (new in v3.2).** v3.0/v3.1 left them in English
-   on the reasoning that they're proper nouns. That was a shortcut: a German shopper seeing
-   "Banana Bread Recipe" in the library reads the app as an English shell with translated chrome.
-   Rename the canonical library (§B) before each language's shoot, then rename for the next one —
-   it's sequential, one language at a time.
+1. **Localize the folder and document names too.** A German shopper seeing "Banana Bread Recipe"
+   in the library reads the app as an English shell with translated chrome.
+
+   **Since 2026-08-31 this is automatic**: `seed-simulator.sh <lang>` copies that language's own
+   library from `marketing/translations/Document Scanner {DE,ES,FR,IT}`, which carry translated
+   folder and file names. No renaming between shoots, no sequential one-language-at-a-time pass.
+
+   The PDF *contents* stay English in every language — only names are translated. That is why the
+   v3.4 search shot uses a proper noun (`Northgate`): it needs no translation, and it appears in
+   no filename, so a hit proves OCR read the page.
+
+   *(This step previously claimed v3.0/v3.1 "left them in English". That was wrong — the shipped
+   v3.0 French screenshots show `Personnel / Recettes / Travail`. It also gave the wrong
+   impression that the fix arrived in v3.2. Corrected 2026-09-03.)*
 
    **Keep every name ≤ ~20 characters** (§B explains why: the viewer title bar truncates and the
    back chevron eats the left edge). German is the tight one.
@@ -237,19 +265,14 @@ must be in-language — a Spanish caption over an English screenshot looks unfin
 2. **Force the app language.** Xcode ▸ Edit Scheme ▸ Run ▸ Options ▸ **App Language →
    Spanish** (then French). Release build, 9:41, simulator is fine (no camera needed for
    these 8).
-3. **Capture the 8 base (uncaptioned) shots** per language into:
-   ```
-   v3.0/Base-es/1.png … 8.png
-   v3.0/Base-fr/1.png … 8.png
-   ```
-   Shot #4 is the live-scan frame (no camera on simulator): **reuse the uncaptioned
-   `v2.8/Stills/2a. Scanning a Document.png`** for all languages (it has essentially no
-   app-UI text — only the caption differs).
+3. **Capture the base (uncaptioned) shots** per language into `v<VER>/Base/<lang>/<shot>.png`.
+   The scan frame is shared across every language (no simulator camera) and lives at
+   `shared/scan-frame.png` — `render-captions.py` inserts it automatically.
 4. **Render captions in one command** (Claude does this):
    ```
-   ./caption-all.sh es      # reads captions/es.tsv, writes v3.0/Stills-es/
-   ./caption-all.sh fr
+   python3 marketing/app-preview/render-captions.py --version 3.4 es fr
    ```
+   (`caption-all.sh` no longer exists; `render-captions.py` replaced it.)
    Captions live in `captions/{en,es,fr}.tsv` (shot, line1, line2, top_px, fs1, fs2);
    `caption.sh` takes optional font sizes so longer es/fr captions don't overflow. Tune
    `fs1/fs2` per row if a caption wraps.

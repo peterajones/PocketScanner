@@ -27,7 +27,11 @@ import subprocess
 import sys
 
 APP = "marketing/app-preview"
-SCAN2A = f"{APP}/v2.8/Stills/2a. Scanning a Document.png"
+# The one asset shared across every release AND every language: VisionKit's capture
+# UI, which no simulator can produce (no camera). It lived in v2.8/Stills until
+# 2026-09-03 — a release folder, which made that folder undeletable and silently
+# coupled slot 1 in all seven locales to a release from six versions earlier.
+SCAN_FRAME = f"{APP}/shared/scan-frame.png"
 CAPTION = f"{APP}/caption.sh"
 # Apple's iPhone bezel with a transparent screen cutout. caption.sh drops the raw
 # capture into the cutout and composites this over it, which is what
@@ -61,7 +65,7 @@ BASE_LANG = {"es-MX": "es", "fr-CA": "fr"}
 def base_for(bases_dir, lang, shot):
     """Path to the uncaptioned capture for one shot, or None if missing."""
     if shot == SHARED_FRAME_SHOT:
-        return SCAN2A
+        return SCAN_FRAME
     path = f"{bases_dir}/{BASE_LANG.get(lang, lang)}/{shot}.png"
     return path if os.path.exists(path) else None
 

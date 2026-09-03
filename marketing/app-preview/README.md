@@ -2,9 +2,14 @@
 
 The App Store preview video for Pocket Scanner (6.9" iPhone slot). **As of v2.3 the shipping
 preview is UNFRAMED** (raw screen capture) — the earlier framed-in-chrome version was rejected
-under Guideline 2.3.4 (see Lessons ▸ "Framed App Previews are NOT allowed"). Current upload:
-`v2.3/PocketScanner-v2.3-AppPreview-886x1920.mp4`. The framing pipeline below is kept for
-reference/history (and is still valid for framed *screenshots* / web/press use).
+under Guideline 2.3.4 (see Lessons ▸ "Framed App Previews are NOT allowed"). The framing pipeline
+below is kept for reference/history, and is still valid for framed *screenshots* / web / press use.
+
+**Current upload:** `v3.4/PocketScanner-v3.4-AppPreview-886x1920.mp4` — byte-identical to the
+v2.9 cut, carried forward under each release's name. There are deliberately **no localized
+videos**: previews autoplay muted with no narration, so the value is the interaction, which reads
+the same in any language. That decision is recorded in
+`docs/superpowers/plans/2026-08-29-screenshot-reorder.md`.
 
 Spec: `docs/superpowers/specs/2026-06-10-app-preview-design.md`
 (Note: the spec/plan describe an earlier iMovie-based plan. This README documents what
@@ -12,17 +17,36 @@ actually shipped — the iMovie route was abandoned; see "Lessons" below.)
 
 ## Files
 
-Each release's media lives under its own folder (`v1.8/`, `v1.7/`, …).
+Media for the **live** gallery lives under that release's folder. Everything older was pruned on
+2026-09-03 — see "Pruning" below.
 
-- `v1.8/PocketScanner-v1.8-AppPreview-886x1920.mp4` — **the App Store upload** (App Preview
+- `v3.4/Stills/<locale>/1…7.png` — the 49 framed screenshots (1290×2796) for the 6.9" slot,
+  seven per locale across seven locales.
+- `v3.4/PocketScanner-v3.4-AppPreview-886x1920.mp4` — **the App Store upload** (App Preview
   slot 1). App Previews use **886×1920**, NOT the 1290×2796 screenshot size — see Output spec.
-- `v1.8/PocketScanner-v1.8-Framed.mp4` — high-res framed master (1290×2796). NOT the App Preview
-  upload (wrong size for video); it's the source the 886×1920 is downscaled from, and is handy
-  for web/social/press.
-- `v1.8/Stills/*.png` — the 9 framed screenshots (1290×2796) for the 6.9" slot.
-- Working inputs (not committed): the CapCut 4K export (`v1.7/…-v1.7.mp4`, 2160×4692, gitignored)
-  and the chrome overlay PNG (`../templates/PocketScannerAppPreviewChrome1290x2796.png`).
-- `v1.7/` — prior release's media; can be deleted once v1.8 is live.
+- `v3.4/Base/<lang>/` — raw simulator captures, **gitignored**. Regenerate with
+  `seed-simulator.sh <lang>` rather than expecting them to be there.
+- `shared/scan-frame.png` — VisionKit's capture UI. The one asset shared by every release AND
+  every language, because no simulator can produce it (no camera). It lived in `v2.8/Stills/`
+  until 2026-09-03, which made that folder undeletable; `render-captions.py` reads it from here
+  now. **Do not move it back into a release folder.**
+- The chrome overlay PNG is at `../templates/PocketScannerAppPreviewChrome1290x2796.png`.
+- CapCut 4K exports are never committed (large; local only).
+
+## Pruning
+
+**Keep the LIVE gallery's folder; delete the rest.** Note that is not the same as "the newest
+release" — v3.5 shipped no screenshots, so v3.4's gallery is the live one.
+
+Nothing is lost: every pruned file is recoverable from the build tag that shipped it, e.g.
+`git show build-32:marketing/app-preview/v3.2/Stills/de/1.png > out.png`. That recoverability is
+much of what the `build-*` tags are for.
+
+This shrinks the **working tree only** — deleted blobs stay in history, so `.git` is unchanged.
+Rewriting history to reclaim that would invalidate every build tag; not worth it.
+
+Before deleting anything, check nothing outside the folder points into it:
+`grep -rnE 'v[0-9]+\.[0-9]+/' marketing/app-preview/*.py marketing/app-preview/*.sh`.
 
 ## Output spec
 

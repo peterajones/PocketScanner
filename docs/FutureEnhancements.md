@@ -68,37 +68,25 @@ The core signing project is complete — sign a document, multiple signatures, s
   exactly what the web UI shows — but writing metadata is the opposite case: real, repeated,
   error-prone work removed. Raised 2026-07-31 after hand-entering seven locales for v3.2.
 
-- **Prune the old per-release media folders.** `marketing/app-preview/` holds eighteen release
-  folders totalling **227MB**; the current release accounts for 54MB of that. The README already
-  says as much — *"`v1.7/` — prior release's media; can be deleted once v1.8 is live"* — but it
-  never happened, and that was fourteen releases ago. **Parked deliberately on 2026-08-31 until
-  v3.4 is approved**: if it comes back needing a screenshot change, having v3.2 still on disk is
-  momentarily useful.
+- ~~**Prune the old per-release media folders**~~ — **DONE 2026-09-03.** 227MB → 58MB, freeing
+  169MB of working tree. Sixteen folders (`v1.7`–`v3.2`) removed; the live gallery's folder stays.
 
-  **Do these in order — step 1 is not optional.**
+  **The rule going forward: keep the LIVE gallery's folder, prune the rest.** That is not the same
+  as "the newest release" — v3.5 shipped no screenshots, so v3.4's gallery is the live one.
 
-  1. **Move the shared scan frame out of a release folder first.**
-     `render-captions.py` hardcodes `SCAN2A = v2.8/Stills/2a. Scanning a Document.png`. That frame
-     is *shared* — it is the one shot with no per-language capture, because there is no simulator
-     camera — so it does not belong inside a release folder at all. Pruning `v2.8` without moving
-     it breaks slot 1 rendering for **every** language simultaneously. Move it to
-     `marketing/app-preview/shared/` and update the constant.
-  2. **Prune `v1.7` … `v3.2`, keep the current release.** Frees ~173MB of working tree.
-  3. **Update `README.md`**, which still documents `v1.7`/`v1.8` as though they were current, and
-     fix `demo-library-recipe.md:182` — it claims v3.0/v3.1 left folder and document names in
-     English, but the shipped v3.0 French screenshots show `Personnel / Recettes / Travail`.
+  The ordering constraint was real. `render-captions.py` hardcoded the shared scan frame to
+  `v2.8/Stills/`, so deleting that folder would have broken slot 1 in all seven locales at once.
+  It now lives at `marketing/app-preview/shared/scan-frame.png` — an asset shared by every release
+  AND every language does not belong inside a release folder. Verified by re-rendering all 49
+  stills after the move: byte-identical.
 
-  **What this does and does not buy.** It shrinks the *working tree*, not the repo: deleted blobs
-  stay in history, so `.git` remains ~168MB either way. Actually shrinking that needs history
-  rewriting, which rewrites every hash and invalidates the `build-*` tags — not worth it.
-  Nothing is lost: any pruned file comes back with
-  `git show build-32:marketing/app-preview/v3.2/Stills/de/1.png > out.png`. That recoverability is
-  a large part of what the build tags are *for*.
+  Also corrected two docs that would have misled the next shoot: the recipe claimed v3.0/v3.1 left
+  folder names in English (the shipped v3.0 French screenshots show `Personnel / Recettes /
+  Travail`), and its step-by-step block still invoked `caption-all.sh`, which no longer exists.
+  `seed-simulator.sh` now derives the version from `project.pbxproj` instead of naming v3.4.
 
-  **The rule afterwards:** keep the current release's folder, prune the rest. Once the shared frame
-  moves out, each release folder is self-contained — carried-forward shots are *copied* into the
-  new release rather than referenced across folders (see the v3.4 reorder, where slots 5–7 were
-  copied and renumbered).
+  As predicted this shrank the working tree only — `.git` is unchanged, since deleted blobs stay
+  in history. Nothing is lost: `git show build-32:<path>` recovers anything.
 
 ### Test suite
 
