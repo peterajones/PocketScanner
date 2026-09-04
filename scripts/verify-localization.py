@@ -7,12 +7,20 @@ Checks, for both Localizable.xcstrings and InfoPlist.xcstrings:
   3. no localized value is empty or whitespace-only
   4. no localized value is byte-identical to the English key unless it is
      explicitly allowlisted (catches copy-paste and untranslated leakage)
+  5. every String(localized:) key in the Swift sources EXISTS in the catalog
+
+Check 5 was added 2026-09-04 after "Purple" shipped untranslated in five
+languages. Checks 1-4 all walk keys that are IN the catalog and verify their
+languages -- none of them asks the reverse question, so a key the code requests
+but the catalog lacks was invisible. The string simply falls back to its English
+source at runtime, silently, in every language.
 
 Usage:  python3 scripts/verify-localization.py [lang ...]
         (no args = check every language in REQUIRED)
 Exit 0 = pass, 1 = failures found.
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -87,6 +95,38 @@ def check_catalog(path, languages):
     return failures
 
 
+SWIFT_ROOT = ROOT / "DocumentScanner/DocumentScanner"
+
+# `String(localized: "...")` with a literal. Interpolated keys are skipped: they resolve to
+# a format string in the catalog (e.g. "\(n) pages" -> "%lld pages") that cannot be
+# recovered from the source text.
+LOCALIZED_CALL = re.compile(r'String\(localized:\s*"((?:[^"\\]|\\.)*)"')
+
+
+def check_swift_keys_exist():
+    """Every String(localized:) key in Swift must exist in Localizable.xcstrings.
+
+    The other checks all start from the catalog and verify its contents. This one starts
+    from the CODE, which is the only way to catch a key that was never added -- the case
+    that let "Purple" ship as English in five languages.
+    """
+    catalog_path = ROOT / "DocumentScanner/DocumentScanner/Localizable.xcstrings"
+    if not catalog_path.exists():
+        return [f"missing catalog {catalog_path}"]
+    keys = set(json.loads(catalog_path.read_text())["strings"])
+
+    failures = []
+    for swift in sorted(SWIFT_ROOT.rglob("*.swift")):
+        for key in LOCALIZED_CALL.findall(swift.read_text()):
+            if "\\(" in key:      # interpolated -- see LOCALIZED_CALL
+                continue
+            if key not in keys:
+                failures.append(
+                    f"{swift.name}: NOT IN CATALOG (falls back to English "
+                    f"in every language)  {key!r}")
+    return failures
+
+
 def main():
     languages = sys.argv[1:] or REQUIRED
     unknown = [l for l in languages if l not in IDENTICAL_OK]
@@ -99,6 +139,7 @@ def main():
             print(f"error: missing catalog {path}")
             return 1
         all_failures += check_catalog(path, languages)
+    all_failures += check_swift_keys_exist()
     if all_failures:
         print(f"FAIL — {len(all_failures)} problem(s):")
         for f in all_failures:

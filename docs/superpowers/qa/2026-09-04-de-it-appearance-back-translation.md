@@ -12,16 +12,27 @@ Theme picker (System / Light / Dark), its footer, and the four accent tint names
 
 **Peter found the defect before this pass ran.** He reported German and Italian showing English
 for the colour row and Purple, which was correct — and the cause was not translation quality but
-a script of mine that aborted partway through, leaving `Colour` and `Purple` in the catalog with
-**no localizations at all**. Every language fell back to the English source.
+a script of mine that aborted partway through on a key that already existed, so `Purple` was
+never written to the catalog while `AccentTint.swift` went on asking for it. Every language fell
+back to the English source.
 
-`verify-localization.py` did not catch it, and that is worth recording: the check tests that a
-localization is not *identical to the source*, but these keys had no localizations to compare.
-An entry with an empty `localizations` dictionary passes every existing check.
+`verify-localization.py` did not catch it. **The explanation first written here was wrong** and
+is corrected below, because the wrong version would have sent the next person to fix the wrong
+thing.
 
-**Recommendation for the verifier:** fail a key whose `localizations` is empty or missing a
-required language outright, rather than only comparing values that exist. Logged rather than
-done, since it is a change to shared tooling and belongs in its own commit.
+*Wrong:* "an entry with an empty `localizations` dictionary passes every existing check."
+Tested afterwards by injecting exactly that — the verifier catches it, four failures per key.
+
+*Actual:* the shipped catalog did not contain a `Purple` key **at all**, empty or otherwise,
+while `AccentTint.swift` asked for `String(localized: "Purple")`. Every check walked keys that
+exist **in the catalog** and verified their languages; none asked the reverse question — does
+every key the *code* requests exist? A key referenced in Swift but absent from the catalog was
+invisible, and at runtime it silently falls back to its English source in every language.
+
+**Fixed** the same day in `scripts/verify-localization.py` as check 5, which starts from the
+Swift sources rather than the catalog. Verified against the original bug: deleting `Purple` from
+the catalog now fails with
+`AccentTint.swift: NOT IN CATALOG (falls back to English in every language) 'Purple'`.
 
 ---
 
@@ -94,9 +105,7 @@ defect that mattered was found by Peter on a device *before* the pass, not by th
 
 ## Still open
 
-**One tooling improvement, not blocking:** `verify-localization.py` should fail a key with an
-empty or partial `localizations` dictionary. It currently only compares values that exist, which
-is why two entirely unlocalized strings shipped past it.
+**Nothing.** The tooling gap identified here was fixed the same day — see the correction above.
 
 The standing residual risk is unchanged: no native-speaker review, and back-translation catches
 idiom poorly. These strings ship **inside the binary**, so a correction needs a new build and a
