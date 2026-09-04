@@ -4,6 +4,21 @@ struct QuadOverlay: View {
     let image: UIImage
     @Binding var quad: Quad
 
+    /// Visual size of a corner handle. The TOUCH target is `hitSize`, which is larger:
+    /// Apple's minimum is 44pt and these were 24pt with no expanded hit area, which is
+    /// most of why adjusting a crop felt fiddly.
+    private let handleSize: CGFloat = 24
+    private let hitSize: CGFloat = 44
+
+    /// Below this on-screen length an edge is too short to host a handle without colliding
+    /// with the corners either side of it.
+    private let minimumEdgeLengthForHandle: CGFloat = 80
+
+    /// Where a drag began, so movement is RELATIVE. Previously a handle jumped to the
+    /// finger's centre on touch-down, which made small adjustments impossible: you could
+    /// re-place a corner but never nudge one.
+    @State private var dragStart: Quad?
+
     var body: some View {
         GeometryReader { geo in
             let imageSize = image.size
@@ -12,20 +27,16 @@ struct QuadOverlay: View {
                             viewSize.height / imageSize.height)
             let displayedSize = CGSize(width: imageSize.width * scale,
                                        height: imageSize.height * scale)
-            let offsetX = (viewSize.width - displayedSize.width) / 2
-            let offsetY = (viewSize.height - displayedSize.height) / 2
+            let offset = CGPoint(x: (viewSize.width - displayedSize.width) / 2,
+                                 y: (viewSize.height - displayedSize.height) / 2)
 
             ZStack(alignment: .topLeading) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
 
-                // Quad outline.
                 Path { path in
-                    let pts = quad.corners.map { p in
-                        CGPoint(x: offsetX + p.x * scale,
-                                y: offsetY + p.y * scale)
-                    }
+                    let pts = quad.corners.map { screenPoint($0, scale: scale, offset: offset) }
                     path.move(to: pts[0])
                     path.addLine(to: pts[1])
                     path.addLine(to: pts[2])
@@ -34,44 +45,96 @@ struct QuadOverlay: View {
                 }
                 .stroke(Color.accentColor, lineWidth: 2)
 
-                // 4 corner handles.
-                handle(at: \.topLeft, scale: scale, offset: CGPoint(x: offsetX, y: offsetY), imageSize: imageSize)
-                handle(at: \.topRight, scale: scale, offset: CGPoint(x: offsetX, y: offsetY), imageSize: imageSize)
-                handle(at: \.bottomRight, scale: scale, offset: CGPoint(x: offsetX, y: offsetY), imageSize: imageSize)
-                handle(at: \.bottomLeft, scale: scale, offset: CGPoint(x: offsetX, y: offsetY), imageSize: imageSize)
+                ForEach(Array(Quad.Edge.allCases.enumerated()), id: \.offset) { _, edge in
+                    edgeHandle(edge, scale: scale, offset: offset, imageSize: imageSize)
+                }
+
+                cornerHandle(\.topLeft, scale: scale, offset: offset, imageSize: imageSize)
+                cornerHandle(\.topRight, scale: scale, offset: offset, imageSize: imageSize)
+                cornerHandle(\.bottomRight, scale: scale, offset: offset, imageSize: imageSize)
+                cornerHandle(\.bottomLeft, scale: scale, offset: offset, imageSize: imageSize)
             }
         }
         .aspectRatio(image.size, contentMode: .fit)
     }
 
-    @ViewBuilder
-    private func handle(at corner: WritableKeyPath<Quad, CGPoint>,
-                        scale: CGFloat,
-                        offset: CGPoint,
-                        imageSize: CGSize) -> some View {
-        let point = quad[keyPath: corner]
-        let screenPoint = CGPoint(x: offset.x + point.x * scale,
-                                  y: offset.y + point.y * scale)
+    private func screenPoint(_ p: CGPoint, scale: CGFloat, offset: CGPoint) -> CGPoint {
+        CGPoint(x: offset.x + p.x * scale, y: offset.y + p.y * scale)
+    }
 
+    // MARK: - Corners
+
+    @ViewBuilder
+    private func cornerHandle(_ corner: WritableKeyPath<Quad, CGPoint>,
+                              scale: CGFloat,
+                              offset: CGPoint,
+                              imageSize: CGSize) -> some View {
         Circle()
             .fill(Color.white)
-            .frame(width: 24, height: 24)
+            .frame(width: handleSize, height: handleSize)
             .overlay(Circle().stroke(Color.accentColor, lineWidth: 2))
             .shadow(radius: 2)
-            .position(screenPoint)
+            // A 44pt target around a 24pt dot: the handle looks the same, but is
+            // catchable. contentShape is what makes the invisible area draggable.
+            .frame(width: hitSize, height: hitSize)
+            .contentShape(Rectangle())
+            .position(screenPoint(quad[keyPath: corner], scale: scale, offset: offset))
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        let newScreenX = value.location.x
-                        let newScreenY = value.location.y
-                        let newImagePoint = CGPoint(
-                            x: (newScreenX - offset.x) / scale,
-                            y: (newScreenY - offset.y) / scale
+                        let start = dragStart ?? quad
+                        if dragStart == nil { dragStart = quad }
+                        // Relative: translation from where the drag began, converted to
+                        // image space. A 3pt nudge moves the corner 3pt.
+                        var next = start
+                        next[keyPath: corner] = CGPoint(
+                            x: start[keyPath: corner].x + value.translation.width / scale,
+                            y: start[keyPath: corner].y + value.translation.height / scale
                         )
-                        var next = quad
-                        next[keyPath: corner] = newImagePoint
                         quad = next.clamped(to: imageSize)
                     }
+                    .onEnded { _ in dragStart = nil }
             )
+    }
+
+    // MARK: - Edges
+
+    /// A capsule at the midpoint of each edge, aligned with it — visually distinct from a
+    /// corner dot so it reads as "drag this edge", not "another corner".
+    ///
+    /// Dragging an edge moves both its corners equally, so it trims a margin without
+    /// introducing skew. That is the common case: shaving a strip of desk off one side of
+    /// a scan that is otherwise square.
+    @ViewBuilder
+    private func edgeHandle(_ edge: Quad.Edge,
+                            scale: CGFloat,
+                            offset: CGPoint,
+                            imageSize: CGSize) -> some View {
+        let onScreenLength = quad.length(of: edge) * scale
+        if onScreenLength >= minimumEdgeLengthForHandle {
+            let mid = screenPoint(quad.midpoint(of: edge), scale: scale, offset: offset)
+            let isHorizontal = (edge == .top || edge == .bottom)
+
+            Capsule()
+                .fill(Color.white)
+                .frame(width: isHorizontal ? 36 : 10,
+                       height: isHorizontal ? 10 : 36)
+                .overlay(Capsule().stroke(Color.accentColor, lineWidth: 2))
+                .shadow(radius: 2)
+                .frame(width: hitSize, height: hitSize)
+                .contentShape(Rectangle())
+                .position(mid)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            let start = dragStart ?? quad
+                            if dragStart == nil { dragStart = quad }
+                            let delta = CGPoint(x: value.translation.width / scale,
+                                                y: value.translation.height / scale)
+                            quad = start.moving(edge, by: delta).clamped(to: imageSize)
+                        }
+                        .onEnded { _ in dragStart = nil }
+                )
+        }
     }
 }
