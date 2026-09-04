@@ -140,6 +140,60 @@ business-model claim with no category search intent. That analysis is already in
 it — Peter contested a rejection over that exact line and won, so changing it now would be his
 call, not Apple's. Any change belongs there, not here.
 
+### AI / Apple Foundation Models — raised 2026-09-04
+
+The app already uses on-device ML (Vision OCR, and the pattern-matching auto-namer). These are
+candidates for Apple's **Foundation Models framework**, which needs **iOS 26** and
+Apple-Intelligence-capable hardware. The app targets **iOS 17.6**, so anything here must be an
+`#available` enhancement to a path that already works without it — never the only way to do
+something.
+
+Also worth knowing: enrolment in the App Store Small Business Program (pending, see the project
+memory) grants **Foundation Models on Private Cloud Compute at no cloud API cost** for apps under
+2M lifetime downloads. PCC means data leaving the device, which collides with "nothing leaves your
+phone" — the **on-device** models have no such problem and are the right target here.
+
+- **Ask-the-app assistant.** Raised by Peter 2026-09-04 after using one in a robot-vacuum
+  companion app. **The initial objection was wrong and is recorded here so it is not repeated:**
+  an assistant looked like a plaster over bad navigation — "where is the room map?" is a question
+  a well-organised app should not provoke, and Pocket Scanner has nine tips and ~15 screens, so it
+  is not big enough to get lost in.
+
+  What that missed is the *actual* value Peter got. The answer was not "here is the button." It
+  was: here is where it normally lives, here is the navigation type it requires, your model does
+  not have that type so it cannot produce a map at all, and models X/Y/Z do. **That is a
+  diagnostic answer, not a search result** — no amount of contextually surfacing tips can produce
+  it, because the useful answer is *why the feature does not exist for you*.
+
+  Pocket Scanner has the same shape of question, and the answers exist but are unreachable from
+  inside the app:
+  - *"Why is my scan blurry?"* → filter choice, lighting, page-size setting
+  - *"Why can't I find text in this PDF?"* → **imported PDFs are not OCR'd, only scans are**
+    (see the import follow-up above)
+  - *"Why doesn't my signature look clean?"* → the bold-pen-on-plain-paper guidance in the tips
+  - *"Where are my files?"* → iCloud vs local, and the container showing as "Document Scanner"
+
+  So this is **not** a search over the tips. It is a model answering from a body of knowledge
+  about the app, most of which was never written as a tip — it lives in `docs/icloud-storage.md`,
+  in this file, and in the QA records.
+
+  **Open questions if it is ever built:** where the knowledge base lives and how it stays true as
+  the app changes (a stale assistant is worse than no assistant); what it does on iOS 17.6 or
+  non-Apple-Intelligence hardware, where the honest fallback is the Tips screen that already
+  exists; and whether it can be kept from confidently inventing features the app does not have.
+
+- **Rejected for now: a chat-with-your-document feature.** The on-device model gained vision in
+  2026 and can take image attachments, so "what is the total on this receipt?" is technically
+  available. It turns a focused scanning utility into a general assistant, against
+  [[feedback-scope-scanner-not-editor]]. Recorded so the capability is not rediscovered as if new.
+
+- **The Tips screen is passive, and that is a real weakness independent of any AI.** Nine tips
+  live at Settings ▸ About ▸ Tips, which nobody visits: the tips exist because features are hard
+  to discover, and then the tips are hard to discover. Surfacing a relevant tip contextually
+  (mention search the first time a text-heavy document is opened) needs no AI, works on every
+  device, and attacks the real problem. Cheaper and duller than an assistant; they solve
+  different halves.
+
 ### Business / pricing
 
 - **Tip jar IAP** — one-time "Buy the developer a coffee" tiers ($1.99 / $4.99 / $9.99) in Settings. Some users like to support indie devs they like.
