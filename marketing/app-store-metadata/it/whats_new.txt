@@ -1,5 +1,7 @@
-Le tue scansioni ora hanno un formato carta reale. Imposta Formato pagina nelle Impostazioni su US Letter o A4 e ogni scansione diventa un PDF con un formato carta reale, della stessa dimensione dei documenti di qualsiasi altra provenienza, così stanno affiancate come si deve. Automatico mantiene la forma trovata dallo scanner.
+Ritagliare i bordi di una scansione è molto più facile. Le maniglie agli angoli sono più grandi e più facili da afferrare, e su ogni lato ci sono nuove maniglie: trascinane una per togliere un margine da un solo lato senza storcere tutta la pagina. Anche raddrizzare una scansione storta diventa molto più rapido.
 
-Le cartelle ora possono avere tre livelli, per quando un livello di ordinamento non basta.
+Pocket Scanner finalmente sembra Pocket Scanner. L'app prende il colore dalla propria icona invece del blu standard, e nelle Impostazioni puoi scegliere Chiaro, Scuro o Sistema, oltre a uno di quattro colori.
+
+Anche i nomi delle scansioni sono migliori. Un contratto che nomina la parola scontrino non viene più archiviato come tale, e i nomi ora compaiono nella tua lingua.
 
 Come sempre: nessun abbonamento, nessuna pubblicità, nessun tracciamento e niente salvato sui nostri server. Paghi una volta, scansioni per sempre. Grazie per aver scelto Pocket Scanner.

@@ -1,5 +1,7 @@
-Your scans are now a real paper size. Set Page Size in Settings to US Letter or A4 and every scan becomes a true paper-size PDF, the same size as documents from anywhere else, so they sit side by side properly. Auto keeps whatever shape the scanner found.
+Trimming the edges of a scan is much easier. The corner handles are bigger and easier to grab, and there are new handles on each edge: drag one to shave a margin off a single side without pulling the whole page out of square. It also makes straightening a crooked scan far quicker.
 
-Folders can now go three levels deep, for when one level of sorting isn't enough.
+Pocket Scanner now looks like Pocket Scanner. The app takes its colour from the icon instead of the standard blue, and in Settings you can choose Light, Dark or System, and pick from four colours.
+
+Scans are also named better. A contract that mentions the word receipt is no longer filed as one, and names now appear in your own language.
 
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.

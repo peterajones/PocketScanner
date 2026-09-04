@@ -1,5 +1,7 @@
-Tus escaneos ahora tienen un tamaño de papel real. Ajusta Tamaño de página en Ajustes a US Letter o A4 y cada escaneo se convierte en un PDF con tamaño de papel real, del mismo tamaño que documentos de cualquier otro origen, así encajan bien uno al lado del otro. Automático mantiene la forma que encontró el escáner.
+Recortar los bordes de un escaneo es mucho más fácil. Los tiradores de las esquinas son más grandes y fáciles de agarrar, y hay tiradores nuevos en cada borde: arrastra uno para recortar un margen de un solo lado sin torcer la página entera. También hace mucho más rápido enderezar un escaneo torcido.
 
-Las carpetas ahora pueden tener tres niveles, para cuando un nivel de orden no basta.
+Pocket Scanner ya parece Pocket Scanner. La app toma su color del icono en lugar del azul estándar, y en Ajustes puedes elegir Claro, Oscuro o Sistema, y escoger entre cuatro colores.
+
+Los escaneos también se nombran mejor. Un contrato que menciona la palabra recibo ya no se archiva como tal, y los nombres ahora aparecen en tu idioma.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.

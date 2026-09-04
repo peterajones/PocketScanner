@@ -1,5 +1,7 @@
-Vos numérisations ont maintenant un vrai format papier. Réglez Format de page dans les Réglages sur US Letter ou A4 et chaque numérisation devient un PDF au vrai format papier, de la même taille que des documents de n'importe quelle autre source, pour qu'ils s'alignent correctement côte à côte. Automatique conserve la forme trouvée par le numériseur.
+Rogner les bords d'une numérisation est bien plus simple. Les poignées d'angle sont plus grandes et plus faciles à attraper, et de nouvelles poignées apparaissent sur chaque bord : faites-en glisser une pour retirer une marge d'un seul côté sans déformer toute la page. Redresser une numérisation de travers devient aussi beaucoup plus rapide.
 
-Les dossiers peuvent maintenant compter trois niveaux, quand un seul niveau de classement ne suffit pas.
+Pocket Scanner ressemble enfin à Pocket Scanner. L'app prend sa couleur dans son icône plutôt que le bleu standard, et dans les Réglages vous pouvez choisir Clair, Sombre ou Système, ainsi qu'une couleur parmi quatre.
+
+Les numérisations sont aussi mieux nommées. Un contrat qui mentionne le mot reçu n'est plus classé comme tel, et les noms s'affichent désormais dans votre langue.
 
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, numérisez pour toujours. Merci d'utiliser Pocket Scanner.
