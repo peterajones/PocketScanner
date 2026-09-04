@@ -9,6 +9,9 @@ struct SettingsView: View {
     @State private var renamingID: String?
     @State private var renameField = ""
     private let signatureStore = SignatureStore()
+    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
+    @AppStorage(AccentTint.storageKey) private var accentTintRaw = AccentTint.purple.rawValue
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
     @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.auto.rawValue
@@ -103,6 +106,37 @@ struct SettingsView: View {
                 }
                 AboutRow()
                 SendFeedbackRow()
+            }
+            // LAST, after About. Appearance is its own section because it changes how the
+            // app LOOKS, while Privacy / Library / Scanning / Signature change what it
+            // DOES. It sits below About because Tips and Send Feedback are things a user
+            // might NEED — one to learn the app, one to reach Peter — and a theme picker
+            // is a preference. Needs above preferences.
+            Section {
+                Picker("Theme", selection: $appearanceModeRaw) {
+                    ForEach(AppearanceMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode.rawValue)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Picker("Color", selection: $accentTintRaw) {
+                    ForEach(AccentTint.allCases) { tint in
+                        // A swatch beside the name: the colour is the point, and it shows
+                        // the value for the scheme the user is actually in.
+                        Label {
+                            Text(tint.displayName)
+                        } icon: {
+                            Circle()
+                                .fill(tint.swatch(for: colorScheme))
+                                .frame(width: 18, height: 18)
+                        }
+                        .tag(tint.rawValue)
+                    }
+                }
+            } header: {
+                Text("App Appearance")
+            } footer: {
+                Text("System follows your iPhone's light or dark setting.")
             }
         }
         .navigationTitle("Settings")
