@@ -119,6 +119,11 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                // Shares the "Color" key with ImageFilter's no-filter option. Xcode
+                // harvests the catalog comment from the String(localized:) call in
+                // ImageFilter.swift, so that comment names both uses — otherwise it
+                // regenerates as "Scan filter name" and a translator loses the context
+                // that this also labels a colour picker.
                 Picker("Color", selection: $accentTintRaw) {
                     ForEach(AccentTint.allCases) { tint in
                         // A swatch beside the name: the colour is the point, and it shows
