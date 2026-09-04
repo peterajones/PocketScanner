@@ -750,7 +750,7 @@
       }
     },
     "Blue": {
-      "comment": "Highlight color name",
+      "comment": "Colour name: used for both highlight colours and the app accent tint",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -1911,8 +1911,37 @@
         }
       }
     },
+    "Graphite": {
+      "comment": "Accent colour name: a neutral grey",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graphit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grafito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graphite"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grafite"
+          }
+        }
+      }
+    },
     "Green": {
-      "comment": "Highlight color name",
+      "comment": "Colour name: used for both highlight colours and the app accent tint",
       "localizations": {
         "de": {
           "stringUnit": {

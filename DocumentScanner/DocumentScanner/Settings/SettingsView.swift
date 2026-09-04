@@ -9,7 +9,9 @@ struct SettingsView: View {
     @State private var renamingID: String?
     @State private var renameField = ""
     private let signatureStore = SignatureStore()
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
+    @AppStorage(AccentTint.storageKey) private var accentTintRaw = AccentTint.purple.rawValue
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
     @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.auto.rawValue
@@ -117,6 +119,20 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                Picker("Colour", selection: $accentTintRaw) {
+                    ForEach(AccentTint.allCases) { tint in
+                        // A swatch beside the name: the colour is the point, and it shows
+                        // the value for the scheme the user is actually in.
+                        Label {
+                            Text(tint.displayName)
+                        } icon: {
+                            Circle()
+                                .fill(tint.swatch(for: colorScheme))
+                                .frame(width: 18, height: 18)
+                        }
+                        .tag(tint.rawValue)
+                    }
+                }
             } header: {
                 Text("Appearance")
             } footer: {
