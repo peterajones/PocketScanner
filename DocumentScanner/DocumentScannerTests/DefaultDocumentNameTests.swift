@@ -33,7 +33,9 @@ final class DefaultDocumentNameTests: XCTestCase {
         TOTAL 19.66
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Costco Wholesale Receipt — May 28")
+        // Format deliberately changed: comma not em dash (these become filenames), and
+        // the date is locale-aware now, so assert the parts rather than a fixed string.
+        XCTAssertEqual(name?.hasPrefix("Costco Wholesale Receipt, "), true, "got: \(name ?? "nil")")
     }
 
     func test_receipt_subtotalAndTotalAreEnough() {
@@ -45,7 +47,7 @@ final class DefaultDocumentNameTests: XCTestCase {
         Total 12.96
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Whole Foods Market Receipt — May 28")
+        XCTAssertEqual(name?.hasPrefix("Whole Foods Market Receipt, "), true, "got: \(name ?? "nil")")
     }
 
     // MARK: - invoice
@@ -58,7 +60,7 @@ final class DefaultDocumentNameTests: XCTestCase {
         Total Due: $250.00
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Acme Plumbing Services Ltd Invoice — May 28")
+        XCTAssertEqual(name?.hasPrefix("Acme Plumbing Services Ltd Invoice, "), true, "got: \(name ?? "nil")")
     }
 
     // MARK: - recipe
@@ -73,7 +75,7 @@ final class DefaultDocumentNameTests: XCTestCase {
         Preheat oven to 350F
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Recipe — Banana Bread")
+        XCTAssertEqual(name, "Recipe, Banana Bread")
     }
 
     func test_recipe_skipsTheWordRecipeItself() {
@@ -83,7 +85,7 @@ final class DefaultDocumentNameTests: XCTestCase {
         Ingredients
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Recipe — Pumpkin Pie")
+        XCTAssertEqual(name, "Recipe, Pumpkin Pie")
     }
 
     // MARK: - title fallback
@@ -95,7 +97,7 @@ final class DefaultDocumentNameTests: XCTestCase {
         Page 1 of 12
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Quarterly Sales Forecast — May 28")
+        XCTAssertEqual(name?.hasPrefix("Quarterly Sales Forecast, "), true, "got: \(name ?? "nil")")
     }
 
     func test_titleFallback_titleCasesAllCaps() {
@@ -103,7 +105,7 @@ final class DefaultDocumentNameTests: XCTestCase {
         ANNUAL REPORT 2025
         """
         let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
-        XCTAssertEqual(name, "Annual Report 2025 — May 28")
+        XCTAssertEqual(name?.hasPrefix("Annual Report 2025, "), true, "got: \(name ?? "nil")")
     }
 
     // MARK: - no match
@@ -119,4 +121,73 @@ final class DefaultDocumentNameTests: XCTestCase {
     func test_veryShortLine_returnsNil() {
         XCTAssertNil(DefaultDocumentName.suggest(from: "ok", now: fixedDate))
     }
+    // MARK: - Misclassification (the bug this exists to fix)
+
+    /// The real case: the demo consulting agreement contains "payable within thirty
+    /// (30) days of receipt", and a bare substring match named it
+    /// "Meridian Advisory Group Receipt — Jul 12". It shipped that way in an App
+    /// Store screenshot.
+    func test_contractMentioningReceiptIsNotCalledAReceipt() {
+        let ocr = """
+        MERIDIAN ADVISORY GROUP
+        CONSULTING SERVICES AGREEMENT
+        This Consulting Services Agreement is entered into by and between Meridian
+        Advisory Group, LLC and Jordan Avery, an independent contractor.
+        3. COMPENSATION
+        The Company shall pay the Consultant a fee of $185.00 per hour, invoiced
+        monthly and payable within thirty (30) days of receipt.
+        """
+        let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
+        XCTAssertNotNil(name)
+        XCTAssertFalse(name!.contains("Receipt"), "named a contract a receipt: \(name!)")
+    }
+
+    /// The looser third clause: any document with both "total" and "tax" became a
+    /// receipt. A tax slip has both and is not one.
+    func test_taxDocumentWithATotalIsNotAReceipt() {
+        let ocr = """
+        CANADA REVENUE AGENCY
+        STATEMENT OF REMUNERATION PAID
+        Employment income 148,000.00
+        Income tax deducted 32,410.00
+        Total deductions 41,220.00
+        """
+        let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
+        XCTAssertNotNil(name)
+        XCTAssertFalse(name!.contains("Receipt"), "named a tax slip a receipt: \(name!)")
+    }
+
+    /// A real receipt must still be recognised — the fix must not simply stop
+    /// classifying.
+    func test_realReceiptIsStillRecognised() {
+        let ocr = """
+        COSTCO WHOLESALE
+        #1234 BURNABY
+        ITEM A 12.99
+        SUBTOTAL 17.49
+        TAX 2.17
+        TOTAL 19.66
+        """
+        let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate)
+        XCTAssertNotNil(name)
+        XCTAssertTrue(name!.contains("Receipt"), "stopped recognising a real receipt: \(name!)")
+    }
+
+    // MARK: - No em dashes in generated names
+
+    /// These strings become FILENAMES, and per Peter's standing preference they must
+    /// not contain em dashes.
+    func test_generatedNamesContainNoEmDash() {
+        let samples = [
+            "COSTCO WHOLESALE\nSUBTOTAL 17.49\nTOTAL 19.66",
+            "ACME LTD\nINVOICE #42\nBILL TO: someone",
+            "Banana Bread\nIngredients\nDirections",
+            "Residential Lease Agreement\nbetween the parties",
+        ]
+        for ocr in samples {
+            guard let name = DefaultDocumentName.suggest(from: ocr, now: fixedDate) else { continue }
+            XCTAssertFalse(name.contains("\u{2014}"), "em dash in generated name: \(name)")
+        }
+    }
+
 }
