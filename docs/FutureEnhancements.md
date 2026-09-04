@@ -210,6 +210,12 @@ phone" — the **on-device** models have no such problem and are the right targe
   available. It turns a focused scanning utility into a general assistant, against
   [[feedback-scope-scanner-not-editor]]. Recorded so the capability is not rediscovered as if new.
 
+- **A magnifier loupe for the crop handles.** Deferred from the v3.6 crop work. Your finger
+  covers the corner you are dragging; the standard iOS answer is a loupe showing the area under
+  the touch. Bigger hit targets (24pt → 44pt) and relative dragging landed first and may be
+  enough on their own — Peter's verdict on v3.6 was "sooo much better", so revisit only if
+  corner work still feels imprecise in practice.
+
 - **The Tips screen is passive, and that is a real weakness independent of any AI.** Nine tips
   live at Settings ▸ About ▸ Tips, which nobody visits: the tips exist because features are hard
   to discover, and then the tips are hard to discover. Surfacing a relevant tip contextually

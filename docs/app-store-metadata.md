@@ -52,6 +52,7 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 | v3.3 (32) | 2026-08-29 | **Approved + LIVE 2026-08-31** | 2 |
 | v3.4 (33) | 2026-08-31 | **Approved + LIVE 2026-08-31** | same day |
 | v3.5 (34) | 2026-09-01 | **Approved + LIVE 2026-09-01, 22:51** | same day |
+| v3.6 (35) | 2026-09-04 | *Waiting for Review* | — |
 
 **Turnaround has collapsed: 7, 7, 2, 0, 0 days.** Do not plan submission windows around any of
 these numbers — the spread across five consecutive releases is a week to a few hours, with no
