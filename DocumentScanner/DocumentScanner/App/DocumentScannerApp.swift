@@ -9,6 +9,7 @@ struct DocumentScannerApp: App {
     @State private var alertCenter = AlertCenter()
     private let reviewPrompt = ReviewPromptTracker()
     @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
+    @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
 
     private let container = ICloudContainer()
     private let pipeline = ScanPipeline()
@@ -120,6 +121,11 @@ struct DocumentScannerApp: App {
             }
             .touchIndicators()
             .environment(\.reviewPrompt, reviewPrompt)
+            // Applied at the WindowGroup root so every sheet, alert and fullScreenCover
+            // inherits it. .system passes nil, which means "do not override" — that is what
+            // lets iOS keep control, including when the user changes the system setting
+            // while the app is open.
+            .preferredColorScheme(AppearanceMode.resolve(appearanceModeRaw).preferredColorScheme)
             .onOpenURL { url in handleIncomingPDF(url) }
         }
     }

@@ -42,9 +42,11 @@ IDENTICAL_OK = {
     # German: "Filter" (der Filter), "Format" (das Format), "Name" (der Name)
     # and "Version" are the same word in German — "Version" is confirmed by
     # Apple's own UIKitCore de.lproj. "in %@" is the preposition "in", also
-    # identical. None of these are untranslated oversights.
+    # identical. "System" (das System) likewise, and it is what Apple uses in the
+    # German Settings app for the follow-the-system appearance option. None of
+    # these are untranslated oversights.
     "de": {" ", "%lld", "%@  %@", "OK", "Filter", "Format", "Name", "Version",
-           "in %@"} | PAPER_SIZES,
+           "in %@", "System"} | PAPER_SIZES,
     # Italian: "Privacy" is the word Apple uses in Italian too, and "in %@"
     # is the preposition "in" — identical, not untranslated.
     "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@"} | PAPER_SIZES,

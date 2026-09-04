@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var renamingID: String?
     @State private var renameField = ""
     private let signatureStore = SignatureStore()
+    @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
     @AppStorage("showFolders") private var showFolders = true
     @AppStorage("defaultScanFilter") private var defaultScanFilterRaw = ImageFilter.none.rawValue
     @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.auto.rawValue
@@ -103,6 +104,23 @@ struct SettingsView: View {
                 }
                 AboutRow()
                 SendFeedbackRow()
+            }
+            // LAST, after About. Appearance is its own section because it changes how the
+            // app LOOKS, while Privacy / Library / Scanning / Signature change what it
+            // DOES. It sits below About because Tips and Send Feedback are things a user
+            // might NEED — one to learn the app, one to reach Peter — and a theme picker
+            // is a preference. Needs above preferences.
+            Section {
+                Picker("Appearance", selection: $appearanceModeRaw) {
+                    ForEach(AppearanceMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode.rawValue)
+                    }
+                }
+                .pickerStyle(.segmented)
+            } header: {
+                Text("Appearance")
+            } footer: {
+                Text("System follows your iPhone's light or dark setting.")
             }
         }
         .navigationTitle("Settings")
