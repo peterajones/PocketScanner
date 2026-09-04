@@ -115,12 +115,16 @@ struct QuadOverlay: View {
             let mid = screenPoint(quad.midpoint(of: edge), scale: scale, offset: offset)
             let isHorizontal = (edge == .top || edge == .bottom)
 
+            // Deliberately lighter than a corner dot: thinner, shorter and a finer stroke.
+            // Eight handles on one image reads as busy, and edge handles are the secondary
+            // control — the visual weight should say so. The 44pt touch target below is
+            // unchanged, so this costs nothing in grabbability.
             Capsule()
                 .fill(Color.white)
-                .frame(width: isHorizontal ? 36 : 10,
-                       height: isHorizontal ? 10 : 36)
-                .overlay(Capsule().stroke(Color.accentColor, lineWidth: 2))
-                .shadow(radius: 2)
+                .frame(width: isHorizontal ? 28 : 6,
+                       height: isHorizontal ? 6 : 28)
+                .overlay(Capsule().stroke(Color.accentColor, lineWidth: 1.5))
+                .shadow(radius: 1)
                 .frame(width: hitSize, height: hitSize)
                 .contentShape(Rectangle())
                 .position(mid)
