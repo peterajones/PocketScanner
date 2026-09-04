@@ -113,13 +113,13 @@ struct SettingsView: View {
             // might NEED — one to learn the app, one to reach Peter — and a theme picker
             // is a preference. Needs above preferences.
             Section {
-                Picker("Appearance", selection: $appearanceModeRaw) {
+                Picker("Theme", selection: $appearanceModeRaw) {
                     ForEach(AppearanceMode.allCases) { mode in
                         Text(mode.displayName).tag(mode.rawValue)
                     }
                 }
                 .pickerStyle(.segmented)
-                Picker("Colour", selection: $accentTintRaw) {
+                Picker("Color", selection: $accentTintRaw) {
                     ForEach(AccentTint.allCases) { tint in
                         // A swatch beside the name: the colour is the point, and it shows
                         // the value for the scheme the user is actually in.
@@ -134,7 +134,7 @@ struct SettingsView: View {
                     }
                 }
             } header: {
-                Text("Appearance")
+                Text("App Appearance")
             } footer: {
                 Text("System follows your iPhone's light or dark setting.")
             }
