@@ -182,6 +182,29 @@ phone" — the **on-device** models have no such problem and are the right targe
   non-Apple-Intelligence hardware, where the honest fallback is the Tips screen that already
   exists; and whether it can be kept from confidently inventing features the app does not have.
 
+- ~~**On-device model for document naming**~~ — **BUILT AND REJECTED 2026-09-04.** Branch
+  `feature/ai-naming`, commit `59ddd30`, deleted after a device test. Recorded so it is not
+  rebuilt.
+
+  It ran only when the heuristics returned `.generic` — a letter, certificate or form, where
+  the existing behaviour is to take the document's first line verbatim. Peter tried two real
+  documents: **the model produced nothing better than the first line in either.**
+
+  That is not a flaw in the implementation, it is the premise. Documents put their title at
+  the top — that is how documents are written — so "take line one" is a strong baseline and a
+  model has very little room to beat it. The gap looked bigger before the heuristics were
+  fixed the same morning (see `04253f4`); fixing them properly is what removed the need.
+
+  **What was demonstrably worth keeping instead**, and shipped in `04253f4`: prose as a
+  negative signal, requiring retail vocabulary before calling something a receipt, and
+  localizing the output. Cheap, instant, testable, and they work on iOS 17.6.
+
+  **If it is ever revisited**, the honest test is not "does it produce a plausible title" but
+  "does it beat the first line often enough to justify the wait" — and the answer here was no.
+  The technical work was sound: Guided Generation with `@Generable`, `useCase: .contentTagging`,
+  validation split into a pure `sanitize` function so the rules are testable without an
+  Apple-Intelligence device. Recoverable from the commit if a better use case appears.
+
 - **Rejected for now: a chat-with-your-document feature.** The on-device model gained vision in
   2026 and can take image attachments, so "what is the total on this receipt?" is technically
   available. It turns a focused scanning utility into a general assistant, against
