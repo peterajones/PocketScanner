@@ -52,14 +52,16 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 | v3.3 (32) | 2026-08-29 | **Approved + LIVE 2026-08-31** | 2 |
 | v3.4 (33) | 2026-08-31 | **Approved + LIVE 2026-08-31** | same day |
 | v3.5 (34) | 2026-09-01 | **Approved + LIVE 2026-09-01, 22:51** | same day |
-| v3.6 (35) | 2026-09-04 | *Waiting for Review* | — |
+| v3.6 (35) | 2026-09-04 | **Approved + LIVE 2026-09-05, 07:03** | overnight |
 
-**Turnaround has collapsed: 7, 7, 2, 0, 0 days.** Do not plan submission windows around any of
+**Turnaround has collapsed: 7, 7, 2, 0, 0, overnight.** Do not plan submission windows around any of
 these numbers — the spread across five consecutive releases is a week to a few hours, with no
 change in what was submitted to explain it. Treat a week as the pessimistic case and same-day as
-possible, rather than assuming either. Three consecutive same-or-next-day approvals (v3.3, v3.4,
-v3.5) make the fast path look normal; it is not a guarantee, and the two 7-day reviews were only
-weeks earlier.
+possible, rather than assuming either. **Four** consecutive same-or-next-day approvals (v3.3,
+v3.4, v3.5, v3.6) make the fast path look normal; it is not a guarantee, and the two 7-day
+reviews were only weeks earlier. v3.6 was the largest code change of the run — the crop overhaul,
+a new Settings section and an app-wide colour change — and still cleared overnight, so review
+duration does not appear to track submission size.
 
 **v3.4 carried the most new metadata of any recent release** — seven replaced screenshots in
 seven locales — and 2.3.7 explicitly covers screenshots alongside names and subtitles. It passed
