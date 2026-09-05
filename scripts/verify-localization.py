@@ -48,7 +48,7 @@ IDENTICAL_OK = {
     # "Graphite" is the same word in French (le graphite), and Apple uses it
     # untranslated for the Mac finish of that name.
     "fr": {" ", "%lld", "%@  %@", "Date", "Format", "OK", "Photo",
-           "Signature", "Version", "Graphite"} | PAPER_SIZES,
+           "Signature", "Signatures", "Version", "Graphite"} | PAPER_SIZES,
     # German: "Filter" (der Filter), "Format" (das Format), "Name" (der Name)
     # and "Version" are the same word in German — "Version" is confirmed by
     # Apple's own UIKitCore de.lproj. "in %@" is the preposition "in", also

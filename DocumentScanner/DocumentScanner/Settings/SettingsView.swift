@@ -94,7 +94,24 @@ struct SettingsView: View {
                 }
                 Button("Add Signature") { showingSignatureCapture = true }
             } header: {
-                Text("Signature")
+                // Three separate keys, NOT a String Catalog plural variation. Xcode
+                // rejects a plural whose text does not reference the number:
+                //
+                //   "Plural variation requires referencing the number in the string. To
+                //    maintain grammatical correctness for strings that do not reference
+                //    the number of items, use separate top-level strings for one and
+                //    greater than one."
+                //
+                // Plural variations exist to agree with a quantity that is DISPLAYED. This
+                // header shows no number, so a switch in code is the right tool and each
+                // form is translated independently -- which still lets French and Italian
+                // go singular at zero ("Aucune signature", "Nessuna firma") while German
+                // stays plural ("Keine Unterschriften").
+                switch signatures.count {
+                case 0:  Text("No Signatures")
+                case 1:  Text("Signature")
+                default: Text("Signatures")
+                }
             } footer: {
                 Text("Scan your signature on paper, then reuse it to sign any document. Add more than one — you'll pick which to place.")
             }
