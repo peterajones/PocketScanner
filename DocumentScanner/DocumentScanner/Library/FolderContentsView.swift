@@ -290,10 +290,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             DocumentRow(summary: summary)
                 .contextMenu { docContextMenu(summary) }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
+                    DeleteSwipeButton {
                         docBeingDeleted = summary
-                    } label: {
-                        Label("Delete", systemImage: "trash")
                     }
                 }
         } else {
@@ -302,10 +300,8 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             }
             .contextMenu { docContextMenu(summary) }
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                Button(role: .destructive) {
+                DeleteSwipeButton {
                     docBeingDeleted = summary
-                } label: {
-                    Label("Delete", systemImage: "trash")
                 }
             }
         }

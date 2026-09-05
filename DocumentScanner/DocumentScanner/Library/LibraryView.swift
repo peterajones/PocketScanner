@@ -301,10 +301,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             DocumentRow(summary: summary, folderName: folderLabel(for: summary))
                 .contextMenu { docContextMenu(summary) }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
+                    DeleteSwipeButton {
                         docBeingDeleted = summary
-                    } label: {
-                        Label("Delete", systemImage: "trash")
                     }
                 }
         } else {
@@ -313,10 +311,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             }
             .contextMenu { docContextMenu(summary) }
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                Button(role: .destructive) {
+                DeleteSwipeButton {
                     docBeingDeleted = summary
-                } label: {
-                    Label("Delete", systemImage: "trash")
                 }
             }
         }
@@ -334,10 +330,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                         .accessibilityIdentifier("Library.Folder.\(folderURL.lastPathComponent)")
                         .contextMenu { folderContextMenu(folderURL) }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
+                            DeleteSwipeButton {
                                 folderBeingDeleted = folderURL
-                            } label: {
-                                Label("Delete", systemImage: "trash")
                             }
                         }
                     }
