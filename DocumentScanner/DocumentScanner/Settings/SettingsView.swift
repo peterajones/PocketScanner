@@ -86,10 +86,10 @@ struct SettingsView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { beginRename(sig) }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button(role: .destructive) {
+                        DeleteSwipeButton {
                             signatureStore.remove(id: sig.id)
                             signatures = signatureStore.all()
-                        } label: { Label("Delete", systemImage: "trash") }
+                        }
                     }
                 }
                 Button("Add Signature") { showingSignatureCapture = true }
