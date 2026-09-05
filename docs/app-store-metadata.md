@@ -55,6 +55,28 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 | v3.6 (35) | 2026-09-04 | **Approved + LIVE 2026-09-05, 07:03** | overnight |
 | v3.7 (36) | 2026-09-05 | *Waiting for Review* | — |
 
+### Release cadence — ship freely for now, batch later
+
+Five submissions in eight days (v3.3 → v3.7, 2026-08-29 to 09-05). **This is fine, and the
+current policy is to keep shipping small releases as they are ready.**
+
+**Apple does not appear to mind.** No published rate limit, none reported by developers, and
+four of the five cleared in under a day — including v3.6, the largest code change of the run.
+If frequency counted against a submission, slower reviews would be the signal; the opposite
+happened. Review looks at what is in the binary, not at how recently you last submitted.
+
+**The real cost is to users, not to Apple.** Someone with auto-updates off sees five badges in
+eight days for an app they open occasionally. At **one paying user** that cost is negligible and
+the benefit — a tight fix-verify-ship loop while the work is fresh — is real.
+
+**The tripwire is users, not release count.** Batch small fixes once there is an install base to
+inconvenience; a traffic push that takes the app from 1 to a few hundred installs is the moment
+this flips. Until then, ship.
+
+A related tell: v3.7's note reads "Cosmetic improvements to the app", which is honest but says
+nothing a user can act on. **A release whose notes have nothing to say is the kind that is worth
+bundling into the next one** — once bundling has a cost worth paying.
+
 **Turnaround has collapsed: 7, 7, 2, 0, 0, overnight.** Do not plan submission windows around any of
 these numbers — the spread across five consecutive releases is a week to a few hours, with no
 change in what was submitted to explain it. Treat a week as the pessimistic case and same-day as
