@@ -53,7 +53,7 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 | v3.4 (33) | 2026-08-31 | **Approved + LIVE 2026-08-31** | same day |
 | v3.5 (34) | 2026-09-01 | **Approved + LIVE 2026-09-01, 22:51** | same day |
 | v3.6 (35) | 2026-09-04 | **Approved + LIVE 2026-09-05, 07:03** | overnight |
-| v3.7 (36) | 2026-09-05 | *Waiting for Review* | — |
+| v3.7 (36) | 2026-09-05 | **Approved + LIVE 2026-09-06, 10:34** | overnight |
 
 ### Release cadence — ship freely for now, batch later
 
@@ -77,11 +77,11 @@ A related tell: v3.7's note reads "Cosmetic improvements to the app", which is h
 nothing a user can act on. **A release whose notes have nothing to say is the kind that is worth
 bundling into the next one** — once bundling has a cost worth paying.
 
-**Turnaround has collapsed: 7, 7, 2, 0, 0, overnight.** Do not plan submission windows around any of
+**Turnaround has collapsed: 7, 7, 2, 0, 0, overnight, overnight.** Do not plan submission windows around any of
 these numbers — the spread across five consecutive releases is a week to a few hours, with no
 change in what was submitted to explain it. Treat a week as the pessimistic case and same-day as
-possible, rather than assuming either. **Four** consecutive same-or-next-day approvals (v3.3,
-v3.4, v3.5, v3.6) make the fast path look normal; it is not a guarantee, and the two 7-day
+possible, rather than assuming either. **Five** consecutive same-or-next-day approvals (v3.3,
+v3.4, v3.5, v3.6, v3.7) make the fast path look normal; it is not a guarantee, and the two 7-day
 reviews were only weeks earlier. v3.6 was the largest code change of the run — the crop overhaul,
 a new Settings section and an app-wide colour change — and still cleared overnight, so review
 duration does not appear to track submission size.
