@@ -148,8 +148,8 @@ Apple-Intelligence-capable hardware. The app targets **iOS 17.6**, so anything h
 `#available` enhancement to a path that already works without it — never the only way to do
 something.
 
-Also worth knowing: enrolment in the App Store Small Business Program (pending, see the project
-memory) grants **Foundation Models on Private Cloud Compute at no cloud API cost** for apps under
+Also worth knowing: enrolment in the App Store Small Business Program (accepted 2026-09, see the
+project memory) grants **Foundation Models on Private Cloud Compute at no cloud API cost** for apps under
 2M lifetime downloads. PCC means data leaving the device, which collides with "nothing leaves your
 phone" — the **on-device** models have no such problem and are the right target here.
 
