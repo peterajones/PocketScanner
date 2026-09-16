@@ -24,7 +24,7 @@ enum MoveDestinations {
         let currentPath = currentParent.standardizedFileURL.path
         var result: [MoveDestination] = []
         if root.standardizedFileURL.path != currentPath {
-            result.append(MoveDestination(url: root, name: "Main Library"))
+            result.append(MoveDestination(url: root, name: String(localized: "Main Library", comment: "Name of the top level of the document library, shown as a destination when saving or moving a document")))
         }
         for folder in folders where folder.standardizedFileURL.path != currentPath {
             result.append(MoveDestination(url: folder, name: FolderPaths.label(for: folder, root: root)))

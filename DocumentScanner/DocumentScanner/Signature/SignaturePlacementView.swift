@@ -9,7 +9,7 @@ struct SignaturePlacementView: View {
     let signature: UIImage
     let pageBounds: CGRect          // page.bounds(for: .mediaBox)
     var initialPageRect: CGRect? = nil   // seed position/scale when MOVING an existing signature
-    var title: String = "Place Signature"
+    var title: String = String(localized: "Place Signature", comment: "Navigation title of the screen where the user drags a chosen signature into position on a page")
     let onPlace: (CGRect) -> Void
     let onCancel: () -> Void
 

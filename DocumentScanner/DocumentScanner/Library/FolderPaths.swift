@@ -36,7 +36,7 @@ enum FolderPaths {
     static func label(for url: URL, root: URL) -> String {
         let rootCount = root.standardizedFileURL.pathComponents.count
         let components = url.standardizedFileURL.pathComponents.dropFirst(rootCount)
-        guard !components.isEmpty else { return "Main Library" }
+        guard !components.isEmpty else { return String(localized: "Main Library", comment: "Name of the top level of the document library, shown as a destination when saving or moving a document") }
         return components.joined(separator: " ▸ ")
     }
 }

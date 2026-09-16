@@ -100,7 +100,7 @@ struct DocumentViewerView: View {
         /// When moving an existing signature, the annotation to remove — but only
         /// once the user commits (taps Done), so a Cancel keeps the original.
         var replacing: PDFAnnotation? = nil
-        var title: String = "Place Signature"
+        var title: String = String(localized: "Place Signature", comment: "Navigation title of the screen where the user drags a chosen signature into position on a page")
         var dateString: String? = nil     // non-nil ⇒ a date stamp (place via placeDateStamp)
     }
     private struct SignatureEdit: Identifiable {
@@ -194,7 +194,7 @@ struct DocumentViewerView: View {
                         let str = format.string(for: date)
                         let img = DateStampRenderer.image(for: str)
                         placement = PlacementRequest(signature: img, page: page, seedRect: nil,
-                                                     title: "Place Date", dateString: str)
+                                                     title: String(localized: "Place Date", comment: "Navigation title of the screen where the user drags a date stamp into position on a page"), dateString: str)
                     },
                     onCancel: { showingAddDate = false }
                 )
@@ -211,7 +211,7 @@ struct DocumentViewerView: View {
                     placement = PlacementRequest(signature: img, page: item.page,
                                                  seedRect: item.annotation.bounds,
                                                  replacing: item.annotation,
-                                                 title: "Place Date", dateString: str)
+                                                 title: String(localized: "Place Date", comment: "Navigation title of the screen where the user drags a date stamp into position on a page"), dateString: str)
                     pendingDateEdit = nil
                 }
                 Button("Remove", role: .destructive) {
