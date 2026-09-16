@@ -95,6 +95,16 @@ then re-install from the App Store when done.
   - `PRODUCT_BUNDLE_IDENTIFIER` → `ca.peter-jones.DocumentScanner.dev`
 - Release config keeps the original values
 
+> **Warning: an Xcode upgrade can silently flatten these three.** Xcode 27's
+> Info.plist migration resolved the `INFOPLIST_KEY_*` settings against the
+> ACTIVE configuration (Debug) and wrote that one set into both configs, so
+> Release's display name silently became "Pocket Scanner Dev". A green build
+> and 322 passing tests did not catch it. Only the built plist did.
+>
+> After any Xcode upgrade, or after reopening Xcode following a project-file
+> edit, run `git diff`, then `./scripts/verify-release-name.sh` before
+> archiving.
+
 ## Promoting dev to iCloud-enabled later
 
 If you ever want the dev build to also sync to iCloud (e.g., to test
