@@ -1,3 +1,5 @@
-Mejoras estéticas en la app.
+Pocket Scanner ahora habla chino simplificado.
+
+Algunas etiquetas que seguían apareciendo en inglés en otros idiomas ya están traducidas.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.

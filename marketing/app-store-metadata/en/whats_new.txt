@@ -1,3 +1,5 @@
-Cosmetic improvements to the app.
+Pocket Scanner now speaks Simplified Chinese.
+
+A handful of labels that were still appearing in English in other languages are now translated.
 
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.
