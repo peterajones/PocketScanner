@@ -29,7 +29,14 @@ CATALOGS = [
     ROOT / "DocumentScanner/DocumentScanner/Localizable.xcstrings",
     ROOT / "DocumentScanner/DocumentScanner/InfoPlist.xcstrings",
 ]
-REQUIRED = ["es", "fr", "de", "it"]
+REQUIRED = ["es", "fr", "de", "it", "zh-Hans"]
+
+# Plural forms each language actually has, per CLDR. Most languages this app ships
+# distinguish one/other; Chinese does not — it has only "other", and Xcode's String
+# Catalog editor offers no "one" slot for zh-Hans. Demanding "one" everywhere would
+# force a fake singular into the catalog to satisfy the checker.
+PLURAL_FORMS = {"zh-Hans": ("other",)}
+DEFAULT_PLURAL_FORMS = ("one", "other")
 
 # Keys exempt from the whole check: source-language-only bundle metadata.
 EXEMPT_KEYS = {"CFBundleDisplayName", "CFBundleName"}
@@ -60,6 +67,10 @@ IDENTICAL_OK = {
     # Italian: "Privacy" is the word Apple uses in Italian too, and "in %@"
     # is the preposition "in" — identical, not untranslated.
     "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@"} | PAPER_SIZES,
+    # Simplified Chinese: only format placeholders and the paper-size names,
+    # which Chinese writes in Latin script exactly as English does (A4 is A4;
+    # Letter is the name of the US size, not a word to translate).
+    "zh-Hans": {" ", "%lld", "%@  %@"} | PAPER_SIZES,
 }
 
 
@@ -79,7 +90,7 @@ def check_catalog(path, languages):
                 continue
             if is_plural:
                 plural = loc.get("variations", {}).get("plural", {})
-                for form in ("one", "other"):
+                for form in PLURAL_FORMS.get(lang, DEFAULT_PLURAL_FORMS):
                     unit = plural.get(form, {}).get("stringUnit", {})
                     if not unit.get("value", "").strip():
                         failures.append(

@@ -57,6 +57,12 @@
             "state" : "translated",
             "value" : "Pocket Scanner usa la fotocamera per scansionare documenti cartacei."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner 使用相机扫描纸质文档。"
+          }
         }
       }
     },
@@ -91,6 +97,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pocket Scanner può bloccare la tua libreria con Face ID."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pocket Scanner 可以使用面容 ID 锁定你的资料库。"
           }
         }
       }
