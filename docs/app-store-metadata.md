@@ -286,7 +286,13 @@ Generated on launch by the **DEBUG-only** `-SeedDemoData` launch argument (`Demo
 
 ## Build configuration before archive
 
-A recurring per-release checklist. In Xcode (target build settings, or the General tab):
+A recurring per-release checklist. In Xcode, use **Build Settings** for all of these.
+
+> **Do not use the General tab on this project.** Opening the target's General tab
+> rewrites `project.pbxproj`, silently flattening the three settings that differ between
+> Debug and Release onto the Debug value — so Release's display name becomes
+> "Pocket Scanner Dev". Viewing it is enough; no typing required. Filed with Apple as
+> FB24809836. Full detail and the safe way to read those values: `docs/dev-build.md`.
 
 1. **Bundle identifier:** `ca.peter-jones.DocumentScanner` (production). The dev build uses `…DocumentScanner.dev` — a separate install with no iCloud entitlement; don't archive that one.
 2. **Marketing version** (`MARKETING_VERSION`, shown as "Version" in General): bump for the release — e.g. `1.12`. This is the user-facing version on the Store.
@@ -295,7 +301,15 @@ A recurring per-release checklist. In Xcode (target build settings, or the Gener
 5. **Configuration:** archive the **Release** configuration (`Product → Scheme → Edit Scheme → Archive` is Release by default). The dev `-SeedDemoData` seeding and the DEBUG-only Developer settings section are compiled out of Release, so the archive is clean. (If you flipped the *Run* config to Release for screenshots, flip it back to Debug afterward.)
 6. **Encryption:** `ITSAppUsesNonExemptEncryption` = `NO` in Info.plist — we use only Apple's standard cryptography (HTTPS, iCloud), which is exempt. Skipping this triggers an export-compliance prompt on every upload.
 
-Then **Product → Archive → Validate → Upload**. Note: App Store Connect allows only **one version in the review pipeline at a time** — you can't create the next version until the current one is approved and released, though you *can* upload the build anytime.
+Then **Product → Archive**. The archive builds Release, which runs the **"Verify Release identity"** build phase: it fails the build if the display name, bundle identifier or entitlements have been flattened, naming the offending setting. If the archive stops with one of those errors, that guard has just saved a bad upload — fix the setting in Build Settings, not the General tab.
+
+Before uploading, confirm the finished archive rather than the project file:
+
+```bash
+./scripts/verify-release-name.sh      # newest archive; PASS = safe to upload
+```
+
+It reads `CFBundleDisplayName` and `CFBundleIdentifier` out of the archive's own `Info.plist` and exits non-zero on a mismatch. Then **Validate → Upload**. Note: App Store Connect allows only **one version in the review pipeline at a time** — you can't create the next version until the current one is approved and released, though you *can* upload the build anytime.
 
 ---
 

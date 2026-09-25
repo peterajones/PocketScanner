@@ -115,6 +115,18 @@ then re-install from the App Store when done.
 > edit, run `git diff`, then `./scripts/verify-release-name.sh` before
 > archiving.
 
+**A build phase now catches this for you.** The app target runs a "Verify Release
+identity" script phase that checks all three settings and **fails the build** when
+any of them is wrong. It runs only for Release, so ordinary `⌘R` Debug work is
+unaffected, and Product ▸ Archive builds Release, so a flattened value stops the
+archive with an error naming the setting instead of reaching App Store Connect.
+Nothing to remember and nothing to run.
+
+The two manual checks above are still worth knowing, because they catch the
+problem earlier: `git diff` shows it the moment it happens, and
+`./scripts/verify-release-name.sh` reads the finished archive. The build phase is
+the backstop that works when you forget both.
+
 ## Promoting dev to iCloud-enabled later
 
 If you ever want the dev build to also sync to iCloud (e.g., to test

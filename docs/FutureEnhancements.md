@@ -68,6 +68,7 @@ The core signing project is complete — sign a document, multiple signatures, s
   exactly what the web UI shows — but writing metadata is the opposite case: real, repeated,
   error-prone work removed. Raised 2026-07-31 after hand-entering seven locales for v3.2.
 
+- ~~**Guard the Debug/Release split automatically**~~ — **DONE 2026-09-25.** Xcode 27's General tab silently flattens the three settings that differ between configurations (FB24809836), and a green build with 322 passing tests does not notice. Two checks now cover it without anyone remembering anything: a **"Verify Release identity"** build phase that fails any Release build whose display name, bundle identifier or entitlements are wrong (so Product ▸ Archive stops rather than producing a bad archive), and `scripts/verify-release-name.sh`, which reads the finished archive's own plist before upload. Both are deliberately blunt: they name the setting and point at `docs/dev-build.md`. Raised by Peter as "unless we work continuously on this, one of us (likely me) will forget".
 - ~~**Prune the old per-release media folders**~~ — **DONE 2026-09-03.** 227MB → 58MB, freeing
   169MB of working tree. Sixteen folders (`v1.7`–`v3.2`) removed; the live gallery's folder stays.
 

@@ -112,6 +112,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F46FB33C2FBFAF6A00BA0C63 /* Build configuration list for PBXNativeTarget "DocumentScanner" */;
 			buildPhases = (
+				F4C1A0012FD1000000000001 /* Verify Release identity */,
 				F46FB32D2FBFAF6800BA0C63 /* Sources */,
 				F46FB32E2FBFAF6800BA0C63 /* Frameworks */,
 				F46FB32F2FBFAF6800BA0C63 /* Resources */,
@@ -248,6 +249,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F4C1A0012FD1000000000001 /* Verify Release identity */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Verify Release identity";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Guards the three build settings that differ between Debug and Release.\n# Xcode's General tab silently flattens them onto one value (FB24809836), which\n# is invisible to a green build and a passing test suite. Archive builds Release,\n# so a slip-up stops here instead of reaching App Store Connect.\n# See docs/dev-build.md.\nif [ \"$CONFIGURATION\" != \"Release\" ]; then exit 0; fi\nfail=0\nif [ \"$INFOPLIST_KEY_CFBundleDisplayName\" != \"Pocket Scanner\" ]; then\n  echo \"error: Release display name is '$INFOPLIST_KEY_CFBundleDisplayName', expected 'Pocket Scanner'. Fix it in Build Settings > Info.plist Values > Bundle Display Name (NOT the General tab). See docs/dev-build.md.\"\n  fail=1\nfi\nif [ \"$PRODUCT_BUNDLE_IDENTIFIER\" != \"ca.peter-jones.DocumentScanner\" ]; then\n  echo \"error: Release bundle identifier is '$PRODUCT_BUNDLE_IDENTIFIER', expected 'ca.peter-jones.DocumentScanner'.\"\n  fail=1\nfi\nif [ \"$CODE_SIGN_ENTITLEMENTS\" != \"DocumentScanner/DocumentScanner.entitlements\" ]; then\n  echo \"error: Release entitlements are '$CODE_SIGN_ENTITLEMENTS', expected 'DocumentScanner/DocumentScanner.entitlements'. Shipping the Dev entitlements would ship an app with no iCloud.\"\n  fail=1\nfi\nexit $fail\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F46FB32D2FBFAF6800BA0C63 /* Sources */ = {
