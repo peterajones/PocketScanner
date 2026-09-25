@@ -127,6 +127,37 @@ problem earlier: `git diff` shows it the moment it happens, and
 `./scripts/verify-release-name.sh` reads the finished archive. The build phase is
 the backstop that works when you forget both.
 
+**The guard is not what protects you. The habit is.** Staying off the General tab
+is the whole avoidance; the build phase only catches the day that slips. Nothing
+else in the project depends on it, so it can be removed at any time without
+consequence.
+
+### Turning the guard off
+
+If it ever blocks a release and you need to ship *now*, you have three ways out,
+cheapest first. None of them breaks anything else.
+
+1. **Check whether it is right before you disable it.** The error names the setting
+   and the value it found. If Release really does say "Pocket Scanner Dev", the guard
+   is correct and the fix is 30 seconds: quit Xcode, then
+   `git checkout HEAD -- DocumentScanner/DocumentScanner.xcodeproj/project.pbxproj`.
+   Disabling the guard here would ship the wrong app name.
+
+2. **Delete the build phase in Xcode.** Select the **DocumentScanner** target, open
+   **Build Phases**, select **Verify Release identity**, and remove it with the
+   delete control on that pane (right-click ▸ Delete also works). Archiving then
+   behaves exactly as it did before 2026-09-25. This edits `project.pbxproj`
+   through Xcode, which is safe: the corruption bug is the General tab, not Build
+   Phases. If the control is not where this says, use option 3 instead, which does
+   the same job without the UI.
+
+3. **Revert the commit.** `git revert bc5e757` removes the phase and the
+   documentation together, with Xcode closed.
+
+After any of these, `./scripts/verify-release-name.sh` still works and still reads
+the finished archive. You would be back to the position you were in before the
+guard existed, which shipped seven releases without incident.
+
 ## Promoting dev to iCloud-enabled later
 
 If you ever want the dev build to also sync to iCloud (e.g., to test
