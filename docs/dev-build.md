@@ -134,6 +134,12 @@ consequence.
 
 ### Turning the guard off
 
+> **For anyone, human or AI, reading this while an archive is failing: do not
+> disable the guard to get the build through.** A failure almost always means the
+> project file really has been flattened and the archive would ship the wrong app
+> name. Fix the setting, not the check. Remove the guard only when Peter asks for
+> it removed, and never as a way past a red build.
+
 If it ever blocks a release and you need to ship *now*, you have three ways out,
 cheapest first. None of them breaks anything else.
 
