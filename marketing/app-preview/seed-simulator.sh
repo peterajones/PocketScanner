@@ -3,7 +3,7 @@
 # in a chosen language — the setup step for capturing App Store screenshots.
 #
 # Usage:  ./marketing/app-preview/seed-simulator.sh [lang]
-#           lang  en (default) | es | fr | de | it
+#           lang  en (default) | es | fr | de | it | zh-Hans
 #
 # Why this instead of -SeedDemoData: that flag is DEBUG-only, and screenshots must come
 # from a RELEASE build so the Settings ▸ Developer row is hidden (demo-library-recipe.md
@@ -46,7 +46,8 @@ case "$LANG_CODE" in
   fr) LOCALE="fr_FR"; LIBRARY="$REPO_ROOT/marketing/translations/Document Scanner FR" ;;
   de) LOCALE="de_DE"; LIBRARY="$REPO_ROOT/marketing/translations/Document Scanner DE" ;;
   it) LOCALE="it_IT"; LIBRARY="$REPO_ROOT/marketing/translations/Document Scanner IT" ;;
-  *)  echo "error: unknown language '$LANG_CODE' (expected en|es|fr|de|it)" >&2; exit 1 ;;
+  zh-Hans) LOCALE="zh_CN"; LIBRARY="$REPO_ROOT/marketing/translations/Document Scanner ZH" ;;
+  *)  echo "error: unknown language '$LANG_CODE' (expected en|es|fr|de|it|zh-Hans)" >&2; exit 1 ;;
 esac
 [ -d "$LIBRARY" ] || {
   echo "error: library not found: $LIBRARY" >&2
@@ -65,7 +66,10 @@ CONTAINER="$(xcrun simctl get_app_container "$DEVICE" "$BUNDLE_ID" data 2>/dev/n
 }
 
 DOCS="$CONTAINER/Documents"
-SIGS="$CONTAINER/Signatures"
+# Signed out of iCloud, SignatureStore reads the LOCAL archive under Application Support.
+# <container>/Signatures/ is the iCloud location and is never read here; this script
+# wrote there until 2026-09-27, so seeded signatures never appeared.
+SIGS="$CONTAINER/Library/Application Support/Signature"
 
 echo "device:    $DEVICE"
 echo "container: $CONTAINER"
@@ -73,7 +77,7 @@ echo "library:   $(basename "$LIBRARY")"
 
 # Start clean so a re-run cannot leave a stale folder in shot — the whole point is a
 # library that matches the recipe exactly, every time.
-rm -rf "$DOCS" "$SIGS"
+rm -rf "$DOCS" "$SIGS" "$CONTAINER/Signatures"
 mkdir -p "$DOCS" "$SIGS"
 
 # --exclude .DS_Store: Finder litters the repo copy, and the app would list them.

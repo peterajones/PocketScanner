@@ -9,13 +9,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 META = ROOT / "marketing/app-store-metadata"
-LOCALES = ["en", "es", "es-MX", "fr", "fr-CA", "de", "it"]
+LOCALES = ["en", "es", "es-MX", "fr", "fr-CA", "de", "it", "zh-Hans"]
 LIMITS = {
     "subtitle.txt": 30,
     "promotional_text.txt": 170,
     "keywords.txt": 100,
     "description.txt": 4000,
     "whats_new.txt": 4000,
+}
+# Only locales whose store name differs from "Pocket Scanner" carry one.
+OPTIONAL_LIMITS = {
+    "name.txt": 30,
 }
 
 
@@ -26,10 +30,11 @@ def main():
         if not d.is_dir():
             failures.append(f"{locale}: directory missing")
             continue
-        for name, limit in LIMITS.items():
+        for name, limit in {**LIMITS, **OPTIONAL_LIMITS}.items():
             f = d / name
             if not f.exists():
-                failures.append(f"{locale}/{name}: missing")
+                if name not in OPTIONAL_LIMITS:
+                    failures.append(f"{locale}/{name}: missing")
                 continue
             # ASC counts the visible text; ignore one trailing newline.
             n = len(f.read_text().rstrip("\n"))
