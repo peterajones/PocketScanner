@@ -76,7 +76,7 @@ struct DocumentScannerApp: App {
                     .environment(\.alertCenter, alertCenter)
             } else if iCloudAvailable {
                 // iCloud path: NSMetadataQuery sees ubiquitous documents.
-                LockGate(lockSettings: lockSettings) {
+                LockGate(lockSettings: lockSettings, instantScan: InstantScanCoordinator.shared) {
                     PrivacyBlurOverlay {
                         LibraryView(
                             store: metadataStore,
@@ -99,7 +99,7 @@ struct DocumentScannerApp: App {
                 // Used when the user dismissed iCloud onboarding without
                 // signing in. Without this branch the library list was
                 // permanently empty for these users.
-                LockGate(lockSettings: lockSettings) {
+                LockGate(lockSettings: lockSettings, instantScan: InstantScanCoordinator.shared) {
                     PrivacyBlurOverlay {
                         LibraryView(
                             store: localStore,
