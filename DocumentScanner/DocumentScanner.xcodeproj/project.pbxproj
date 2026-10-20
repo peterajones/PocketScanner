@@ -439,7 +439,7 @@
 				DEVELOPMENT_TEAM = 8QQC2WMRHS;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PocketScannerControls/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = PocketScannerControls;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pocket Scanner Dev";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -469,7 +469,7 @@
 				DEVELOPMENT_TEAM = 8QQC2WMRHS;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PocketScannerControls/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = PocketScannerControls;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pocket Scanner";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
