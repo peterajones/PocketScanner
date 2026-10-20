@@ -1,6 +1,7 @@
 # Instant Scan — Design
 
-**Status:** Approved 2026-10-20.
+**Status:** Approved 2026-10-20. **Built, device-verified and merged to main 2026-10-20; ships in
+v4.0 (39).** See "As built" at the end for where the build departed from this design.
 
 ## Why
 
@@ -177,3 +178,40 @@ Read from developer.apple.com's documentation JSON, not from third-party coverag
   and the widget-extension target.
 - Test strategy: the pure parts (pending-action state, lock sequencing) unit-tested; a
   device check for the Action button, Control Center, the lock screen and Face ID.
+
+## As built (2026-10-20)
+
+Built through the plan with per-task reviews, a whole-branch review and device checks D1–D8, all
+passing on Peter's iPhone. 342 unit tests and 3 UI tests pass. Where the build departed from this design,
+and why:
+
+- **Failure alert:** "Couldn't save" with Retry is a native `UIAlertController` presented over the
+  Saving screen, not the app's SwiftUI `AlertCenter`. The root `.alert` can't appear over an open
+  sheet, which would have left the scan stuck with Face ID never prompting.
+- **Opening the document:** it is pushed onto the library stack only when no modal is open, checked
+  as `topMost(from: root) === root` because the instant-scan screens are still dismissing when the save
+  lands. With a sheet open, the scan is saved and not opened.
+- **A second scan while locked** replaces the first scan's "open after unlock". The first is still in
+  Main Library. Without this, a locked app silently ignored every later instant scan.
+- **The Face ID auto-prompt is withdrawn on cancel** (`withTaskCancellationHandler` →
+  `LAContext.invalidate()`), so it can't sit over the camera on a cold launch. D2 confirmed: camera
+  first, exactly one Face ID prompt after the save.
+- **Controls extension:** target `PocketScannerControlsExtension`; bundle IDs
+  `ca.peter-jones.DocumentScanner.Controls` / `.dev.Controls`; iOS 18.0; display name "Pocket Scanner" /
+  "Pocket Scanner Dev"; version and build hand-synced with the app; `CONTROLS_EXTENSION` compiles out
+  the app-only call in the shared intent file. Creating the target in Xcode did not open the General tab
+  this time, and the app's settings were verified unchanged.
+- **App Shortcut phrases:** `AppShortcuts.xcstrings` stores both phrases as **one string set under the
+  first phrase**, which is how Xcode keys them. Separate keys made the second phrase "stale" and
+  produced build warnings. The short title is translated in `Localizable.xcstrings`.
+
+**What D1–D8 taught that users will meet:**
+
+- The Action button must be set to the **Scan Document control** (or a Shortcut running it). "Open
+  Pocket Scanner" just opens the app.
+- A lock-screen slot only accepts the control after one of the two existing buttons is removed.
+- Siri asks once to "turn on" the app's shortcuts before "Scan with Pocket Scanner" works.
+- The first instant scan asks for camera permission, as any first scan does.
+- From a locked phone, iOS asks for Face ID or the passcode before the app opens. That is iOS
+  behaviour, and the reason this feature is "camera first after unlock", not "camera from the lock
+  screen".

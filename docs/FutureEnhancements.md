@@ -6,6 +6,96 @@ Shipped and dropped items are deleted from this doc as they resolve; the history
 
 ---
 
+## Strategy session 2026-10-20: the funnel, competitors, and what's next
+
+Prompted by flat sales: nothing since ~Oct 1. Peter's framing: **money doesn't matter and time isn't a
+constraint**, so the question is what makes the app worth more to the people who find it, and how more
+of them find it.
+
+### Analytics reading (App Analytics, Jul 22 – Oct 19)
+
+- **Sales:** 3 in 90 days, $19 total (proceeds $12): US/Canada ~Aug 27, Europe ~Sep 6 and ~Sep 30.
+  Three weeks without a sale is normal at roughly one sale a month, and says nothing about zh-Hans on
+  its own.
+- **Funnel:** 1.33K impressions (+124%) → 55 product page views (−43%) → 3 first-time downloads.
+  About 1 in 18 page views buys, which is healthy for a paid app. **The product page is not the problem.**
+- **Where page views come from:** App Store Search 48, Browse 5, App Referrer 2, **Web Referrer 0**.
+  **Search is effectively the only way strangers arrive.**
+- **By territory:** Canada 21, Italy 13, Germany 11, Mexico 6, Colombia 2, Argentina 1, China mainland 1.
+  **Canada is mostly Peter and friends.** Peter checks the listing after every release and shows the
+  app to friends, and the Canadian spikes line up with release dates. Take Canada out and strangers
+  produced ~34 page views in a quarter, about one every 2–3 days.
+- **Reading mistakes made in-session and corrected, recorded so they aren't repeated:**
+  - The Impressions-by-Territory table shows a *daily average*, so low-volume countries read "–" even
+    when they had impressions. It is not evidence that the views came from outside the App Store.
+  - The rise in impressions was not the zh-Hans listing: China doesn't appear in impressions at all.
+
+**Conclusion:** the app is invisible rather than unconvincing. Releases, localizations and polish have
+not moved discovery, because most of the activity they create is the developer, friends and existing
+users.
+
+### Competitor feature comparison
+
+Researched 2026-10-20 across Scanner Pro (Readdle), Genius Scan, Adobe Scan, TurboScan, CamScanner,
+SwiftScan, iScanner, Prizmo and Apple's built-in scanner (Notes / Files / the iOS 26 Preview app).
+
+**Pocket Scanner already matches the field on the basics:** VisionKit capture, filters, on-device OCR to
+searchable PDF, search with highlights, folders, merge, reorder, split, signing, date stamps, PDF import,
+Face ID lock and iCloud sync. Signing and date stamps are paid extras in several rivals.
+
+**What rivals have that Pocket Scanner doesn't**, grouped by fit with "focused scanner, nothing leaves
+the phone":
+
+| Feature | Who has it | Fit / notes |
+|---|---|---|
+| Shortcuts / Siri actions | Genius Scan, Scanner Pro (workflows) | **Built as Instant Scan for v4.0** (below) |
+| ID card / several items on one page | TurboScan, Scanner Pro | Fits. Also a search term ("ID scanner") |
+| Low-light multi-shot capture | TurboScan (SureScan) | Fits |
+| Curved book-page straightening | Adobe Scan, Scanner Pro | Fits; hard to do well |
+| Naming templates (date, prefix) | Genius Scan | Fits; small extension of the auto-namer |
+| Password-protected PDF export | Genius Scan | Fits the privacy pitch |
+| OCR for image-only imported PDFs | most | Fits; already a follow-up under Import a PDF |
+| Copy text / export text or JPG | Scanner Pro, CamScanner | Check first whether viewer text selection already covers it |
+| QR mode, auto-export to a folder, PDF/A, widget, lens-smudge warning | various | Stretch |
+| Translation, AI chat, cloud OCR, Word/Excel export, expense reports, fax | Scanner Pro, SwiftScan, CamScanner, Genius, TurboScan | **Against the principles**; not candidates |
+
+**The finding that mattered more than the table:** Peter has used Pocket Scanner for IDs, receipts,
+handwritten notes, a prescription grabbed off an optometrist's table, and lab results organised in
+Medical ▸ Lab Results. **It has met every real need. The gaps above are mostly marketing checkboxes.**
+
+**Two notes on the competition:**
+
+- **TurboScan is the closest rival in pitch:** one-time purchase, on-device, 4.9★ from ~13K ratings. It
+  is a free download with a single $12.99 unlock. Recorded as a fact, not a reason to reopen pricing
+  (see Business / pricing below).
+- **A feature only brings in strangers if people search for it.** ID-card and multi-receipt scanning
+  would earn their place twice: in the app, and as keywords and a screenshot.
+
+Sources: iThinkDifferent "Best iPhone Document Scanner Apps in 2026"; the Genius Scan plan comparison;
+the TurboScan, Scanner Pro and Prizmo Go App Store listings; iPhone in Canada on Scanner Pro's
+freemium model; Guiding Tech's Adobe Scan vs Genius Scan comparison.
+
+### Decisions: three projects, in order
+
+1. ~~**Instant Scan**~~: **Built and merged 2026-10-20, ships in v4.0 (39).** One `OpenIntent` from the
+   Action button, a Control (Control Center and lock screen) and Siri/Spotlight. It opens straight into
+   the camera, saves silently to Main Library and opens the document, with camera first and Face ID
+   after when the lock is on. Spec, plan and as-built notes:
+   `docs/superpowers/specs/2026-10-20-instant-scan-design.md`,
+   `docs/superpowers/plans/2026-10-20-instant-scan.md`. App Intents was chosen partly because Apple is
+   pushing it: SiriKit's docs now call it "legacy", and App Intents is how apps reach Siri and Apple
+   Intelligence. **No evidence it affects search ranking.** Its discovery value is an App Store
+   **Featuring Nomination** (App Store Connect; at least 2 weeks' notice, up to 3 months recommended)
+   to go with v4.0 (39).
+2. **Siri / Spotlight *finding* documents:** "show my latest lab results" opens the right PDF. Next
+   project; needs its own design (App Entities over the library, indexed for Spotlight, all on-device).
+3. **Listing rework around real moments:** keywords, subtitle, first screenshots and possibly the name,
+   built from Peter's actual uses (prescription, lab results, ID, receipts, handwritten notes) instead of
+   signing and the business model. This is the one aimed at the discovery problem, so it starts with
+   the **English/US** listing, which barely ranks. Pairs naturally with v4.0's new screenshots.
+
+---
+
 ## Candidates (nothing committed)
 
 Lower priority. Some of these may never ship. The list exists to capture what we've considered.
@@ -246,6 +336,6 @@ phone" — the **on-device** models have no such problem and are the right targe
 - ~~**Latin-American Spanish (es-MX) + Canadian French (fr-CA) App Store variants**~~ — **Shipped in v3.1** as metadata-only listings (iOS serves es-ES to es-MX and fr-FR to fr-CA via locale fallback, so no binary change was needed). es-MX reuses the es-ES copy verbatim; fr-CA got a Quebec terminology pass (*numériser*, *application*, *courriel*).
 - ~~**Untranslated placement titles and "Main Library"**~~ — **Fixed for the next release (found 2026-09-16).** `Place Signature`, `Place Date` and `Main Library` shipped in English in every language through v3.7. All three were stored in a plain `String` and displayed later (`.navigationTitle(title)`, `Button(dest.name)`), and SwiftUI shows a `String` variable verbatim, so Xcode never harvested them and `verify-localization.py` check 5, which only sees `String(localized:)` calls, passed regardless. Now wrapped in `String(localized:comment:)` with es/fr/de/it translations; the check covers them. **The class of bug is still open:** any future UI text held in a `String` bypasses both. When passing UI text through a `String`, wrap it at the point of definition. QA: `docs/superpowers/qa/2026-09-16-de-it-placement-titles-back-translation.md`.
 - ~~**Simplified Chinese (zh-Hans), in-app**~~ — **Built 2026-09-25, shipped in v3.8 (37), live 2026-09-26.** All 177 catalogue keys plus the camera and Face ID usage descriptions. **Deliberately in-app only:** no App Store metadata, no screenshots, no new territory. Two reasons at the time. We believed mainland China needed an **ICP filing**, which requires a mainland-registered legal entity, so that storefront looked closed to a solo Canadian developer. **Corrected 2026-09-26: it is not closed.** The app is live in the China mainland storefront at ¥38, and App Store Connect (App Information → Availability in China mainland) shows the ICP Filing Number as optional ("If you have an ICP Filing Number, provide it here"), with no warning. Apple says MIIT requires ICP for "some apps"; v3.8 passed review and published there without one. So a zh-Hans **store listing** is viable; Peter decided to build it starting 2026-09-27 (the Japanese listing stays parked for the ~2026-10-03 analytics reading). **The zh-Hans store listing shipped in v3.9 (38), live 2026-10-02.** The second reason still holds: the funnel data says a fifth language does not address the bottleneck: ~6 impressions/day, 1 first-time download in 90 days, so this was done for the users it serves rather than as a growth move. The product page's **Languages** row picks up "Chinese (Simplified)" automatically once the build ships, because that row is read from the `.lproj` folders in the bundle, not from App Store Connect — so the feature is advertised at zero metadata cost. A Chinese keyword field would need the store listing we chose not to add, and is the part least reviewable without a native speaker. QA: `docs/superpowers/qa/2026-09-25-zh-Hans-back-translation.md`. **Risk recorded there and worth repeating: nobody on this project can read the shipped text**, which is a step beyond the accepted de/it risk.
-- **Japanese (ja) App Store listing** — **Parked; next decision ~2026-11-01.** Reading of 2026-10-03 (App Analytics, Jul 1 – Oct 1, by territory): impressions / product page views were Canada 642 / 40, Italy 225 / 11, Germany 53 / 11, United States 38 / 0, everything else ≤20; Japan and China mainland absent. Total first-time downloads 3 in the last 30 days (1 the period before). **What it showed:** a localized listing does earn impressions in its storefront. de/it metadata landed 2026-07-29 (v3.2), Germany appeared ~Aug 30 and Italy ~Sep 6, so expect a lag of about a month; Italy is now the #2 territory. That corrects the earlier claim (zh-Hans entry above) that another language does nothing for the funnel. **But the bottleneck is impression → product page view**, at 16–20 impressions per view in Canada and Italy (Germany ~5, on small numbers), and a Japanese listing would inherit it. Japan's absence is uninformative: with no Japanese listing the app barely surfaces there. **Plan:** the zh-Hans listing (live 2026-10-02) is the cleaner test. At ~2026-11-01, check China mainland impressions; if they appeared, that is the case for Japanese. Meanwhile, the higher-leverage work is the search-result surface (icon, subtitle, first screenshot), which every locale shares. **Also open:** the US, the largest English storefront, showed only 38 impressions in three months, so the English listing barely ranks there; possibly a bigger lever than any new language. Caveats: Canada likely includes the developer's own testing, and every count here is small enough that one active day moves it.
+- **Japanese (ja) App Store listing** — **Parked; next decision ~2026-11-01.** Reading of 2026-10-03 (App Analytics, Jul 1 – Oct 1, by territory): impressions / product page views were Canada 642 / 40, Italy 225 / 11, Germany 53 / 11, United States 38 / 0, everything else ≤20; Japan and China mainland absent. Total first-time downloads 3 in the last 30 days (1 the period before). **What it showed:** a localized listing does earn impressions in its storefront. de/it metadata landed 2026-07-29 (v3.2), Germany appeared ~Aug 30 and Italy ~Sep 6, so expect a lag of about a month; Italy is now the #2 territory. That corrects the earlier claim (zh-Hans entry above) that another language does nothing for the funnel. **But the bottleneck is impression → product page view**, at 16–20 impressions per view in Canada and Italy (Germany ~5, on small numbers), and a Japanese listing would inherit it. Japan's absence is uninformative: with no Japanese listing the app barely surfaces there. **Plan:** the zh-Hans listing (live 2026-10-02) is the cleaner test. At ~2026-11-01, check China mainland impressions; if they appeared, that is the case for Japanese. Meanwhile, the higher-leverage work is the search-result surface (icon, subtitle, first screenshot), which every locale shares. **Also open:** the US, the largest English storefront, showed only 38 impressions in three months, so the English listing barely ranks there; possibly a bigger lever than any new language. Caveats: Canada likely includes the developer's own testing, and every count here is small enough that one active day moves it. **Interim look, 2026-10-20** (Jul 22 – Oct 19): China mainland shows **1 product page view** and no visible impressions, 18 days after its listing went live. With a ~1-month lag expected, the ~2026-11-01 reading stands. Canada is now confirmed to be mostly Peter and friends (see the 2026-10-20 strategy session at the top).
 - **Localized App Preview videos** — still open, and deferred at every release since v3.0: all locales reuse the English-UI v2.9 video (accepted, mostly visual). A localized re-record per language (device capture → CapCut → conform) removes the last English tell. Cost scales with each language added — now five.
 - **OCR language detection** — Vision supports many languages but defaults to device locale. Surface a language picker in Settings for users who scan multilingual documents.

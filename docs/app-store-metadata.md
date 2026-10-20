@@ -55,6 +55,12 @@ Timeline (submission dates from ASC; **approval dates are not recorded in ASC or
 | v3.6 (35) | 2026-09-04 | **Approved + LIVE 2026-09-05, 07:03** | overnight |
 | v3.7 (36) | 2026-09-05 | **Approved + LIVE 2026-09-06, 10:34** | overnight |
 
+v3.8 (37) and v3.9 (38) went live 2026-09-26 and 2026-10-02 (see `docs/FutureEnhancements.md`, Internationalization);
+their submission dates were not recorded here. **Next: v4.0 (39), Instant Scan** (App Intents + a Controls widget
+extension; see the 2026-10-20 strategy session in `docs/FutureEnhancements.md`). It is the first release with an embedded
+extension, so bump the version and build in **both** targets (checklist below), and file the App Store **Featuring Nomination**
+at least two weeks before the release date.
+
 ### Release cadence — ship freely for now, batch later
 
 Five submissions in eight days (v3.3 → v3.7, 2026-08-29 to 09-05). **This is fine, and the

@@ -4,7 +4,8 @@
 **Scope:** every new user-facing string in the Instant Scan feature, in German, Italian and
 Simplified Chinese: the Tips entry, "Saving…", the Scan Document App Intent strings (title,
 parameter, target), the two App Shortcut phrases and short title, and the Control's label,
-gallery name and description. Spanish and French are Peter's to read and are not covered here.
+gallery name and description. Spanish and French were reviewed by Peter (signed off
+2026-10-20) and are not back-translated here.
 **Precedent:** `2026-09-25-de-it-v3.8-release-notes-back-translation.md` and
 `2026-09-25-zh-Hans-back-translation.md`.
 
