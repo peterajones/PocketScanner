@@ -89,4 +89,10 @@ final class InstantScanCoordinator {
         guard case .saved = phase else { return }
         phase = .idle
     }
+
+    /// Returns the shared coordinator to a clean idle state between tests.
+    internal func resetForTesting() {
+        phase = .idle
+        capturedImages = []
+    }
 }
