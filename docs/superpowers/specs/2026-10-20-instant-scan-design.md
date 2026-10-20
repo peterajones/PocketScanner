@@ -131,6 +131,36 @@ What this means for the build:
 - Any change to the existing `＋` ▸ Scan Document flow.
 - Widgets other than the Control.
 
+## Apple documentation check (2026-10-20)
+
+Read from developer.apple.com's documentation JSON, not from third-party coverage:
+
+- **`openAppWhenRun` is deprecated as of iOS 26** ("Please provide 'supportedModes'
+  instead"), and `supportedModes` / `IntentModes` exist only on **iOS 26+**. With a 17.6
+  deployment target, **conform the intent to `OpenIntent` (iOS 16+)** instead: "The
+  system automatically brings your app to the foreground to run this app intent." That
+  avoids both the deprecated property and the iOS 26-only one. `OpenIntent` needs a
+  `target` parameter. A one-case `AppEnum` (the scanner screen) is the pattern in
+  Apple's own Controls example. Also: setting `openAppWhenRun` to `true` "generates an
+  error if the app intent runs in an app extension".
+- **Controls:** `ControlWidget` and `ControlWidgetButton` are **iOS 18+**, live in a
+  **Widget Extension** target (File ▸ New ▸ Target ▸ Widget Extension, "Include
+  Control"), and are exposed through a `WidgetBundle`. To open the app from a control,
+  use an `OpenIntent`, and "the system requires the Target Membership of the app intent
+  to be set to both the app and the widget extension". Buttons are stateless, "for
+  fire-and-forget actions such as … launching an app". The same control serves Control
+  Center, the Lock Screen and the Action button.
+- **`authenticationPolicy`** defaults to `.alwaysAllowed`, which "allows the intent to
+  run without authentication, including when the device is locked". Opening the app
+  still goes through iOS's own unlock; verify the lock-screen path on a device.
+- **SiriKit's overview page** now says it provides "legacy support" and, "to implement
+  modern support … and integrate your app with Apple Intelligence and Siri AI, use the
+  App Intents framework". That supports the direction. The page doesn't state a formal
+  deprecation date, and the WWDC 2026 session claims remain unchecked.
+- **`AppShortcutsProvider`** is iOS 16+. The page notes Apple may use anonymized App
+  Shortcut phrases and titles to train its models, which has no bearing on user data or
+  the privacy promise.
+
 ## Left to the builder
 
 - How the intent hands off to the running UI (e.g. an observable pending-action flag
