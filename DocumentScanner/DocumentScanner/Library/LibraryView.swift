@@ -224,7 +224,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             .modifier(MergeAlerts(mergePlan: $mergePlan, mergeError: $mergeError,
                                    mergeAction: mergeDocument))
             .task { refreshFolders() }
-            .onChange(of: instantScan.phase) { openInstantScanIfReady() }
+            // initial: a library mounted while a scan is already saved and unlocked still
+            // opens it; markOpened() returns the phase to idle, so this never opens twice.
+            .onChange(of: instantScan.phase, initial: true) { openInstantScanIfReady() }
             .onChange(of: lockSettings.isLocked) { openInstantScanIfReady() }
             .onChange(of: path.count) { oldCount, newCount in
                 // Re-scan when navigation pops back toward the library. The
