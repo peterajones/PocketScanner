@@ -167,8 +167,7 @@ struct DocumentScannerApp: App {
         let presenter = InstantScanPresenter(
             scanner: scannerPresenter,
             saver: SilentScanSaver(pipeline: pipeline, storage: storage),
-            coordinator: instantScan,
-            alertCenter: alertCenter)
+            coordinator: instantScan)
         Task { await presenter.start(from: root) }
     }
 

@@ -10,12 +10,12 @@ struct InstantScanPresenter {
     let scanner: DocumentScannerPresenting
     let saver: SilentScanSaver
     let coordinator: InstantScanCoordinator
-    let alertCenter: AlertCenter
 
-    /// Follows `presentedViewController` to the end of the chain.
+    /// Follows `presentedViewController` to the end of the chain, stopping before any
+    /// controller that is already being dismissed (it can't host a new presentation).
     static func topMost(from root: UIViewController) -> UIViewController {
         var top = root
-        while let presented = top.presentedViewController { top = presented }
+        while let presented = top.presentedViewController, !presented.isBeingDismissed { top = presented }
         return top
     }
 
@@ -57,22 +57,19 @@ struct InstantScanPresenter {
         Self.topMost(from: root).present(denied, animated: true)
     }
 
-    /// Swaps the camera for the Saving screen in one turn so the screen behind never
-    /// shows through, then saves.
+    /// Presents Saving on top of the camera (no animation) so whatever is behind never
+    /// shows through, then saves. The camera and Saving go away together afterwards.
     private func finishCapture(images: [UIImage], root: UIViewController) {
         coordinator.beginSaving(images: images)
-        let top = Self.topMost(from: root)
-        let host = top.presentingViewController ?? root
-        top.dismiss(animated: false) {
-            self.runSave(images: images, root: host)
-        }
-    }
-
-    private func runSave(images: [UIImage], root: UIViewController) {
+        let camera = Self.topMost(from: root)
+        let host = camera.presentingViewController ?? root
         let saving = UIHostingController(rootView: SavingView())
         saving.modalPresentationStyle = .fullScreen
-        Self.topMost(from: root).present(saving, animated: false)
+        camera.present(saving, animated: false)
+        runSave(images: images, host: host)
+    }
 
+    private func runSave(images: [UIImage], host: UIViewController) {
         let defaults = UserDefaults.standard
         let filter = ImageFilter(rawValue: defaults.string(forKey: "defaultScanFilter") ?? "") ?? .none
         let paperSize = PaperSize(rawValue: defaults.string(forKey: "scanPaperSize") ?? "") ?? .auto
@@ -81,29 +78,31 @@ struct InstantScanPresenter {
             do {
                 let url = try await saver.save(images: images, filter: filter, paperSize: paperSize)
                 coordinator.saveSucceeded(url: url)
-                saving.dismiss(animated: false)
+                host.dismiss(animated: false)
             } catch {
                 coordinator.saveFailed()
-                saving.dismiss(animated: false) {
-                    self.presentFailure(error, root: root)
-                }
+                presentFailure(error, host: host)
             }
         }
     }
 
-    private func presentFailure(_ error: Error, root: UIViewController) {
-        alertCenter.present(AppAlert(
+    /// A UIKit alert over the Saving screen: the SwiftUI root alert can't appear while
+    /// the user has a sheet open, and Saving stays up so nothing behind it is exposed.
+    private func presentFailure(_ error: Error, host: UIViewController) {
+        let alert = UIAlertController(
             title: String(localized: "Couldn't save"),
             message: error.localizedDescription,
-            primary: AppAlert.Action(title: String(localized: "Retry"), role: .default, handler: {
-                let images = coordinator.capturedImages
-                coordinator.beginSaving(images: images)
-                runSave(images: images, root: root)
-            }),
-            secondary: AppAlert.Action(title: String(localized: "Cancel"), role: .cancel, handler: {
-                coordinator.cancel()
-            })
-        ))
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: String(localized: "Retry"), style: .default) { _ in
+            let images = coordinator.capturedImages
+            coordinator.beginSaving(images: images)
+            runSave(images: images, host: host)
+        })
+        alert.addAction(UIAlertAction(title: String(localized: "Cancel"), style: .cancel) { _ in
+            host.dismiss(animated: false)
+            coordinator.cancel()
+        })
+        Self.topMost(from: host).present(alert, animated: true)
     }
 
     private final class WeakBox {
