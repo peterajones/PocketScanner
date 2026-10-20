@@ -138,6 +138,12 @@ struct DocumentScannerApp: App {
             // Settings.app tint, which cannot be changed at runtime.
             .tint(AccentTint.resolve(accentTintRaw).color)
             .onOpenURL { url in handleIncomingPDF(url) }
+            .task {
+                // UI-test hook; honoured only in hermetic UI-test mode.
+                if Self.isUITesting && ProcessInfo.processInfo.arguments.contains("-InstantScanOnLaunch") {
+                    instantScan.request()
+                }
+            }
         }
     }
 
@@ -148,11 +154,7 @@ struct DocumentScannerApp: App {
             instantScan.cancel()
             return
         }
-        let root = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .compactMap(\.keyWindow)
-            .first?.rootViewController
-        guard let root else {
+        guard let root = InstantScanPresenter.keyWindowRootViewController() else {
             instantScan.cancel()
             return
         }

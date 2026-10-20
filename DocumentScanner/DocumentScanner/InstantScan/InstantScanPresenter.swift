@@ -13,6 +13,14 @@ struct InstantScanPresenter {
 
     /// Follows `presentedViewController` to the end of the chain, stopping before any
     /// controller that is already being dismissed (it can't host a new presentation).
+    /// The key window's root view controller, where instant scan presents from.
+    static func keyWindowRootViewController() -> UIViewController? {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .compactMap(\.keyWindow)
+            .first?.rootViewController
+    }
+
     static func topMost(from root: UIViewController) -> UIViewController {
         var top = root
         while let presented = top.presentedViewController, !presented.isBeingDismissed { top = presented }

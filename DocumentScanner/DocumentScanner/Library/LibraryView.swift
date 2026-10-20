@@ -12,6 +12,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
 
     @Environment(\.reviewPrompt) private var reviewPrompt
     @Environment(\.requestReview) private var requestReview
+    @State private var instantScan = InstantScanCoordinator.shared
 
     @State private var searchText = ""
     @State private var showingCapture = false
@@ -223,6 +224,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             .modifier(MergeAlerts(mergePlan: $mergePlan, mergeError: $mergeError,
                                    mergeAction: mergeDocument))
             .task { refreshFolders() }
+            .onChange(of: instantScan.phase) { openInstantScanIfReady() }
+            .onChange(of: lockSettings.isLocked) { openInstantScanIfReady() }
             .onChange(of: path.count) { oldCount, newCount in
                 // Re-scan when navigation pops back toward the library. The
                 // local-mode InMemoryLibraryStore doesn't auto-detect files
@@ -237,6 +240,22 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 refreshFolders()
             }
         }
+    }
+
+    /// Opens a just-saved instant scan once the app is unlocked. Appends to the path (never
+    /// resets it) and skips the push when a sheet is open, so nothing the user is doing is
+    /// disturbed; the document is already in Main Library either way.
+    private func openInstantScanIfReady() {
+        guard let url = instantScan.documentToOpen(isLocked: lockSettings.isLocked) else { return }
+        // topMost skips a controller that is mid-dismissal (the instant scan's own camera).
+        let root = InstantScanPresenter.keyWindowRootViewController()
+        let noModalOpen = root.map { InstantScanPresenter.topMost(from: $0) === $0 } ?? false
+        if noModalOpen {
+            path.append(DocumentRoute(summary: .fromFile(at: url), term: "", scope: .library))
+        }
+        store.refresh()
+        instantScan.markOpened()
+        reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview)
     }
 
     private func folderRow(_ url: URL) -> some View {
