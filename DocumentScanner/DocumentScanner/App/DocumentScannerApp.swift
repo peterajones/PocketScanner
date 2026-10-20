@@ -7,6 +7,7 @@ struct DocumentScannerApp: App {
     @State private var inMemoryStore: InMemoryLibraryStore
     @State private var lockSettings = AppLockSettings()
     @State private var alertCenter = AlertCenter()
+    @State private var instantScan = InstantScanCoordinator.shared
     private let reviewPrompt = ReviewPromptTracker()
     @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
     @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
@@ -120,6 +121,10 @@ struct DocumentScannerApp: App {
                 }
             }
             }
+            .task(id: instantScan.phase == .requested) {
+                guard instantScan.phase == .requested else { return }
+                startInstantScan()
+            }
             .touchIndicators()
             .environment(\.reviewPrompt, reviewPrompt)
             // Applied at the WindowGroup root so every sheet, alert and fullScreenCover
@@ -134,6 +139,37 @@ struct DocumentScannerApp: App {
             .tint(AccentTint.resolve(accentTintRaw).color)
             .onOpenURL { url in handleIncomingPDF(url) }
         }
+    }
+
+    /// Starts a requested instant scan above everything, or drops the request while the
+    /// iCloud onboarding screen is showing (there is no library to save into yet).
+    private func startInstantScan() {
+        if !Self.isUITesting && !iCloudOnboardingDismissed && !iCloudAvailable {
+            instantScan.cancel()
+            return
+        }
+        let root = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .compactMap(\.keyWindow)
+            .first?.rootViewController
+        guard let root else {
+            instantScan.cancel()
+            return
+        }
+        let storage: DocumentStorage
+        if Self.isUITesting {
+            storage = testStorage
+        } else if iCloudAvailable {
+            storage = DocumentStorage(documentsURL: resolvedDocumentsURL)
+        } else {
+            storage = DocumentStorage(documentsURL: container.localDocumentsURL)
+        }
+        let presenter = InstantScanPresenter(
+            scanner: scannerPresenter,
+            saver: SilentScanSaver(pipeline: pipeline, storage: storage),
+            coordinator: instantScan,
+            alertCenter: alertCenter)
+        Task { await presenter.start(from: root) }
     }
 
     /// Imports a PDF opened from another app (Mail/Files/Safari) into the library
