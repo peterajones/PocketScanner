@@ -11,8 +11,6 @@ struct InstantScanPresenter {
     let saver: SilentScanSaver
     let coordinator: InstantScanCoordinator
 
-    /// Follows `presentedViewController` to the end of the chain, stopping before any
-    /// controller that is already being dismissed (it can't host a new presentation).
     /// The key window's root view controller, where instant scan presents from.
     static func keyWindowRootViewController() -> UIViewController? {
         UIApplication.shared.connectedScenes
@@ -21,6 +19,8 @@ struct InstantScanPresenter {
             .first?.rootViewController
     }
 
+    /// Follows `presentedViewController` to the end of the chain, stopping before any
+    /// controller that is already being dismissed (it can't host a new presentation).
     static func topMost(from root: UIViewController) -> UIViewController {
         var top = root
         while let presented = top.presentedViewController, !presented.isBeingDismissed { top = presented }
@@ -35,6 +35,7 @@ struct InstantScanPresenter {
             return
         }
 
+        let box = WeakBox()
         let camera = scanner.makeViewController(
             onFinish: { images in
                 Task { @MainActor in
@@ -43,16 +44,31 @@ struct InstantScanPresenter {
             },
             onCancel: {
                 Task { @MainActor in
-                    Self.topMost(from: root).dismiss(animated: true)
+                    // Dismiss through the camera's own presenter, never whatever is on
+                    // top now, so a user's sheet can't be dismissed by mistake.
+                    box.controller?.presentingViewController?.dismiss(animated: true)
                     self.coordinator.cancel()
                 }
             }
         )
+        box.controller = camera
         camera.modalPresentationStyle = .fullScreen
-        Self.topMost(from: root).present(camera, animated: true)
+        present(camera, from: root)
     }
 
     // MARK: - Private
+
+    /// Presents on top of everything. UIKit silently refuses a presentation while
+    /// another transition is in progress; if that happened, cancel the scan on the
+    /// next main-actor turn rather than leave the coordinator capturing forever.
+    private func present(_ controller: UIViewController, from root: UIViewController) {
+        Self.topMost(from: root).present(controller, animated: true)
+        Task { @MainActor in
+            if controller.presentingViewController == nil {
+                coordinator.cancel()
+            }
+        }
+    }
 
     private func presentCameraDenied(from root: UIViewController) {
         let box = WeakBox()
@@ -62,7 +78,7 @@ struct InstantScanPresenter {
         }))
         box.controller = denied
         denied.modalPresentationStyle = .fullScreen
-        Self.topMost(from: root).present(denied, animated: true)
+        present(denied, from: root)
     }
 
     /// Presents Saving on top of the camera (no animation) so whatever is behind never
