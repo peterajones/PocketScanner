@@ -22,4 +22,8 @@ final class TipTests: XCTestCase {
         XCTAssertTrue(Tip.all.contains { $0.id == "highlights" },
                       "the highlights/handwriting note is the reason this screen exists")
     }
+
+    func test_instantScanTip_isPresent() {
+        XCTAssertTrue(Tip.all.contains { $0.id == "instant-scan" })
+    }
 }

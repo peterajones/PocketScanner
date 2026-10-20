@@ -295,8 +295,8 @@ A recurring per-release checklist. In Xcode, use **Build Settings** for all of t
 > FB24809836. Full detail and the safe way to read those values: `docs/dev-build.md`.
 
 1. **Bundle identifier:** `ca.peter-jones.DocumentScanner` (production). The dev build uses `…DocumentScanner.dev` — a separate install with no iCloud entitlement; don't archive that one.
-2. **Marketing version** (`MARKETING_VERSION`, shown as "Version" in General): bump for the release — e.g. `1.12`. This is the user-facing version on the Store.
-3. **Build number** (`CURRENT_PROJECT_VERSION`): increment on **every** upload — must be unique and higher than the last build App Store Connect has seen (e.g. `1.12 (17)`). Commit the bump on its own as `chore: bump to vX.Y (N)`.
+2. **Marketing version** (`MARKETING_VERSION`, shown as "Version" in General): bump for the release — e.g. `1.12`. This is the user-facing version on the Store. Set it in **both** the app target and the `PocketScannerControlsExtension` target: the two are hand-synced, and App Store validation rejects an embedded extension whose version doesn't match the app's.
+3. **Build number** (`CURRENT_PROJECT_VERSION`): increment on **every** upload — must be unique and higher than the last build App Store Connect has seen (e.g. `1.12 (17)`). Bump it in both targets, as for the marketing version. Commit the bump on its own as `chore: bump to vX.Y (N)`.
 4. **Deployment target:** unchanged since launch (iOS 17.6).
 5. **Configuration:** archive the **Release** configuration (`Product → Scheme → Edit Scheme → Archive` is Release by default). The dev `-SeedDemoData` seeding and the DEBUG-only Developer settings section are compiled out of Release, so the archive is clean. (If you flipped the *Run* config to Release for screenshots, flip it back to Debug afterward.)
 6. **Encryption:** `ITSAppUsesNonExemptEncryption` = `NO` in Info.plist — we use only Apple's standard cryptography (HTTPS, iCloud), which is exempt. Skipping this triggers an export-compliance prompt on every upload.

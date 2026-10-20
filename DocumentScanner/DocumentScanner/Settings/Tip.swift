@@ -11,6 +11,9 @@ struct Tip: Identifiable {
 extension Tip {
     /// Tips in display order: everyday tricks first, the highlights caveat last.
     static let all: [Tip] = [
+        Tip(id: "instant-scan",
+            title: String(localized: "Scan in one press", comment: "Tip title"),
+            body: String(localized: "Add Scan Document to the Action button, Control Center or the Lock Screen, or say “Scan with Pocket Scanner” to Siri. The camera opens straight away and the scan saves to Main Library.", comment: "Tip body")),
         Tip(id: "search",
             title: String(localized: "Search inside your scans", comment: "Tip title"),
             body: String(localized: "Search reads the text inside every scan, even ones filed in folders. Tap a result to jump straight to the highlighted match.", comment: "Tip body")),

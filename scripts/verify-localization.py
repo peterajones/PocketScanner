@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Verify String Catalog completeness for every shipped language.
 
-Checks, for both Localizable.xcstrings and InfoPlist.xcstrings:
+Checks, for the app's Localizable.xcstrings and InfoPlist.xcstrings and the Controls
+extension's Localizable.xcstrings:
   1. every key has a localization for every required language
   2. plural keys carry BOTH 'one' and 'other' variations per language
   3. no localized value is empty or whitespace-only
@@ -28,6 +29,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CATALOGS = [
     ROOT / "DocumentScanner/DocumentScanner/Localizable.xcstrings",
     ROOT / "DocumentScanner/DocumentScanner/InfoPlist.xcstrings",
+    ROOT / "DocumentScanner/PocketScannerControls/Localizable.xcstrings",
 ]
 REQUIRED = ["es", "fr", "de", "it", "zh-Hans"]
 
@@ -50,12 +52,14 @@ EXEMPT_KEYS = {"CFBundleDisplayName", "CFBundleName"}
 # reason is the same everywhere.
 PAPER_SIZES = {"US Letter", "A4"}
 
+# "Scanner" (the Scan Document intent's target name) is the same word in French, German
+# and Italian — Apple uses it untranslated for the device in all three.
 IDENTICAL_OK = {
     "es": {" ", "%lld", "%@  %@", "Color", "OK"} | PAPER_SIZES,
     # "Graphite" is the same word in French (le graphite), and Apple uses it
     # untranslated for the Mac finish of that name.
     "fr": {" ", "%lld", "%@  %@", "Date", "Format", "OK", "Photo",
-           "Signature", "Signatures", "Version", "Graphite"} | PAPER_SIZES,
+           "Signature", "Signatures", "Version", "Graphite", "Scanner"} | PAPER_SIZES,
     # German: "Filter" (der Filter), "Format" (das Format), "Name" (der Name)
     # and "Version" are the same word in German — "Version" is confirmed by
     # Apple's own UIKitCore de.lproj. "in %@" is the preposition "in", also
@@ -63,10 +67,10 @@ IDENTICAL_OK = {
     # German Settings app for the follow-the-system appearance option. None of
     # these are untranslated oversights.
     "de": {" ", "%lld", "%@  %@", "OK", "Filter", "Format", "Name", "Version",
-           "in %@", "System"} | PAPER_SIZES,
+           "in %@", "System", "Scanner"} | PAPER_SIZES,
     # Italian: "Privacy" is the word Apple uses in Italian too, and "in %@"
     # is the preposition "in" — identical, not untranslated.
-    "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@"} | PAPER_SIZES,
+    "it": {" ", "%lld", "%@  %@", "OK", "Privacy", "in %@", "Scanner"} | PAPER_SIZES,
     # Simplified Chinese: only format placeholders and the paper-size names,
     # which Chinese writes in Latin script exactly as English does (A4 is A4;
     # Letter is the name of the US size, not a word to translate).
