@@ -8,6 +8,8 @@ struct DocumentScannerApp: App {
     @State private var lockSettings = AppLockSettings()
     @State private var alertCenter = AlertCenter()
     @State private var instantScan = InstantScanCoordinator.shared
+    /// The `-InstantScanOnLaunch` UI-test hook fires once per launch, not on every reappearance.
+    @State private var instantScanOnLaunchFired = false
     private let reviewPrompt = ReviewPromptTracker()
     @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
     @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
@@ -139,8 +141,12 @@ struct DocumentScannerApp: App {
             .tint(AccentTint.resolve(accentTintRaw).color)
             .onOpenURL { url in handleIncomingPDF(url) }
             .task {
-                // UI-test hook; honoured only in hermetic UI-test mode.
-                if Self.isUITesting && ProcessInfo.processInfo.arguments.contains("-InstantScanOnLaunch") {
+                // UI-test hook; honoured only in hermetic UI-test mode. Once per launch:
+                // this task re-runs when a full-screen cover is dismissed, and a second
+                // request would replace the saved scan waiting to open.
+                if Self.isUITesting && !instantScanOnLaunchFired
+                    && ProcessInfo.processInfo.arguments.contains("-InstantScanOnLaunch") {
+                    instantScanOnLaunchFired = true
                     instantScan.request()
                 }
             }

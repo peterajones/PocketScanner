@@ -22,6 +22,17 @@ final class InstantScanCoordinatorTests: XCTestCase {
         XCTAssertEqual(c.phase, .capturing)
     }
 
+    func test_request_fromSaved_startsNewScan() {
+        let c = InstantScanCoordinator()
+        c.request()
+        _ = c.beginCapture()
+        c.beginSaving(images: [UIImage()])
+        c.saveSucceeded(url: url)
+        c.request()
+        XCTAssertEqual(c.phase, .requested)
+        XCTAssertNil(c.documentToOpen(isLocked: false))
+    }
+
     func test_beginCapture_onlyFromRequested() {
         let c = InstantScanCoordinator()
         XCTAssertFalse(c.beginCapture())

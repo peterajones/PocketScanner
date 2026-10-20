@@ -36,9 +36,11 @@ final class InstantScanCoordinator {
 
     init() {}
 
-    /// idle → requested; otherwise ignored.
+    /// idle / saved → requested; ignored while a scan is in flight. From `.saved`
+    /// the pending open is simply replaced: that document is already in Main
+    /// Library, and a locked app must not swallow every later instant scan.
     func request() {
-        guard phase == .idle else { return }
+        guard !isBusy else { return }
         phase = .requested
     }
 
