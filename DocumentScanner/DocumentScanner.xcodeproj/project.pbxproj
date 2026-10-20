@@ -6,7 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F432FC273087E8B80018E079 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F432FC263087E8B70018E079 /* WidgetKit.framework */; };
+		F432FC293087E8B80018E079 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F432FC283087E8B80018E079 /* SwiftUI.framework */; };
+		F432FC363087E8B90018E079 /* PocketScannerControlsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F432FC243087E8B70018E079 /* PocketScannerControlsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		F432FC343087E8B90018E079 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F46FB3292FBFAF6800BA0C63 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F432FC233087E8B70018E079;
+			remoteInfo = PocketScannerControlsExtension;
+		};
 		F46FB3472FBFB1B400BA0C63 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F46FB3292FBFAF6800BA0C63 /* Project object */;
@@ -23,13 +36,37 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		F432FC373087E8B90018E079 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F432FC363087E8B90018E079 /* PocketScannerControlsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		F432FC243087E8B70018E079 /* PocketScannerControlsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PocketScannerControlsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F432FC263087E8B70018E079 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		F432FC283087E8B80018E079 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F46FB3312FBFAF6800BA0C63 /* DocumentScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DocumentScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F46FB3432FBFB1B400BA0C63 /* DocumentScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DocumentScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F46FB3502FBFB1E500BA0C63 /* DocumentScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DocumentScannerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F432FC3B3087E8B90018E079 /* Exceptions for "PocketScannerControls" folder in "PocketScannerControlsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F432FC233087E8B70018E079 /* PocketScannerControlsExtension */;
+		};
 		F461AB6C2FC0A07200B53F6C /* Exceptions for "DocumentScanner" folder in "DocumentScanner" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -40,6 +77,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		F432FC2A3087E8B80018E079 /* PocketScannerControls */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F432FC3B3087E8B90018E079 /* Exceptions for "PocketScannerControls" folder in "PocketScannerControlsExtension" target */,
+			);
+			path = PocketScannerControls;
+			sourceTree = "<group>";
+		};
 		F46FB3332FBFAF6800BA0C63 /* DocumentScanner */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -61,6 +106,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F432FC213087E8B70018E079 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F432FC293087E8B80018E079 /* SwiftUI.framework in Frameworks */,
+				F432FC273087E8B80018E079 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F46FB32E2FBFAF6800BA0C63 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -85,12 +139,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F432FC253087E8B70018E079 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F432FC263087E8B70018E079 /* WidgetKit.framework */,
+				F432FC283087E8B80018E079 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F46FB3282FBFAF6800BA0C63 = {
 			isa = PBXGroup;
 			children = (
 				F46FB3332FBFAF6800BA0C63 /* DocumentScanner */,
 				F46FB3442FBFB1B400BA0C63 /* DocumentScannerTests */,
 				F46FB3512FBFB1E500BA0C63 /* DocumentScannerUITests */,
+				F432FC2A3087E8B80018E079 /* PocketScannerControls */,
+				F432FC253087E8B70018E079 /* Frameworks */,
 				F46FB3322FBFAF6800BA0C63 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,6 +166,7 @@
 				F46FB3312FBFAF6800BA0C63 /* DocumentScanner.app */,
 				F46FB3432FBFB1B400BA0C63 /* DocumentScannerTests.xctest */,
 				F46FB3502FBFB1E500BA0C63 /* DocumentScannerUITests.xctest */,
+				F432FC243087E8B70018E079 /* PocketScannerControlsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,6 +174,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F432FC233087E8B70018E079 /* PocketScannerControlsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F432FC3A3087E8B90018E079 /* Build configuration list for PBXNativeTarget "PocketScannerControlsExtension" */;
+			buildPhases = (
+				F432FC203087E8B70018E079 /* Sources */,
+				F432FC213087E8B70018E079 /* Frameworks */,
+				F432FC223087E8B70018E079 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F432FC2A3087E8B80018E079 /* PocketScannerControls */,
+			);
+			name = PocketScannerControlsExtension;
+			packageProductDependencies = (
+			);
+			productName = PocketScannerControlsExtension;
+			productReference = F432FC243087E8B70018E079 /* PocketScannerControlsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F46FB3302FBFAF6800BA0C63 /* DocumentScanner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F46FB33C2FBFAF6A00BA0C63 /* Build configuration list for PBXNativeTarget "DocumentScanner" */;
@@ -116,10 +204,12 @@
 				F46FB32D2FBFAF6800BA0C63 /* Sources */,
 				F46FB32E2FBFAF6800BA0C63 /* Frameworks */,
 				F46FB32F2FBFAF6800BA0C63 /* Resources */,
+				F432FC373087E8B90018E079 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F432FC353087E8B90018E079 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				F46FB3332FBFAF6800BA0C63 /* DocumentScanner */,
@@ -184,9 +274,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2650;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					F432FC233087E8B70018E079 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					F46FB3302FBFAF6800BA0C63 = {
 						CreatedOnToolsVersion = 26.5;
 					};
@@ -222,11 +315,19 @@
 				F46FB3302FBFAF6800BA0C63 /* DocumentScanner */,
 				F46FB3422FBFB1B400BA0C63 /* DocumentScannerTests */,
 				F46FB34F2FBFB1E500BA0C63 /* DocumentScannerUITests */,
+				F432FC233087E8B70018E079 /* PocketScannerControlsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F432FC223087E8B70018E079 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F46FB32F2FBFAF6800BA0C63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -273,6 +374,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F432FC203087E8B70018E079 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F46FB32D2FBFAF6800BA0C63 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -297,6 +405,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		F432FC353087E8B90018E079 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F432FC233087E8B70018E079 /* PocketScannerControlsExtension */;
+			targetProxy = F432FC343087E8B90018E079 /* PBXContainerItemProxy */;
+		};
 		F46FB3482FBFB1B400BA0C63 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F46FB3302FBFAF6800BA0C63 /* DocumentScanner */;
@@ -310,6 +423,68 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		F432FC383087E8B90018E079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8QQC2WMRHS;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PocketScannerControls/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PocketScannerControls;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ca.peter-jones.DocumentScanner.dev.Controls";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F432FC393087E8B90018E079 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8QQC2WMRHS;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PocketScannerControls/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PocketScannerControls;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ca.peter-jones.DocumentScanner.Controls";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F46FB33A2FBFAF6A00BA0C63 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -612,6 +787,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F432FC3A3087E8B90018E079 /* Build configuration list for PBXNativeTarget "PocketScannerControlsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F432FC383087E8B90018E079 /* Debug */,
+				F432FC393087E8B90018E079 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F46FB32C2FBFAF6800BA0C63 /* Build configuration list for PBXProject "DocumentScanner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
