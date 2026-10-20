@@ -1,83 +1,60 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Scan a document with ${applicationName}" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Dokument mit ${applicationName} scannen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scan a document with ${applicationName}"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escanear un documento con ${applicationName}"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scanner un document avec ${applicationName}"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scansiona un documento con ${applicationName}"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "用${applicationName}扫描文档"
-          }
-        }
-      }
-    },
     "Scan with ${applicationName}" : {
       "localizations" : {
         "de" : {
-          "stringUnit" : {
+          "stringSet" : {
             "state" : "translated",
-            "value" : "Mit ${applicationName} scannen"
+            "values" : [
+              "Mit ${applicationName} scannen",
+              "Ein Dokument mit ${applicationName} scannen"
+            ]
           }
         },
         "en" : {
-          "stringUnit" : {
+          "stringSet" : {
             "state" : "translated",
-            "value" : "Scan with ${applicationName}"
+            "values" : [
+              "Scan with ${applicationName}",
+              "Scan a document with ${applicationName}"
+            ]
           }
         },
         "es" : {
-          "stringUnit" : {
+          "stringSet" : {
             "state" : "translated",
-            "value" : "Escanear con ${applicationName}"
+            "values" : [
+              "Escanear con ${applicationName}",
+              "Escanear un documento con ${applicationName}"
+            ]
           }
         },
         "fr" : {
-          "stringUnit" : {
+          "stringSet" : {
             "state" : "translated",
-            "value" : "Scanner avec ${applicationName}"
+            "values" : [
+              "Scanner avec ${applicationName}",
+              "Scanner un document avec ${applicationName}"
+            ]
           }
         },
         "it" : {
-          "stringUnit" : {
+          "stringSet" : {
             "state" : "translated",
-            "value" : "Scansiona con ${applicationName}"
+            "values" : [
+              "Scansiona con ${applicationName}",
+              "Scansiona un documento con ${applicationName}"
+            ]
           }
         },
         "zh-Hans" : {
-          "stringUnit" : {
+          "stringSet" : {
             "state" : "translated",
-            "value" : "用${applicationName}扫描"
+            "values" : [
+              "用${applicationName}扫描",
+              "用${applicationName}扫描文档"
+            ]
           }
         }
       }
