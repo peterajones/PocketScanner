@@ -16,6 +16,12 @@ struct LockGate<Content: View>: View {
         isLocked && !instantScanBusy
     }
 
+    /// A cancelled auto-prompt (its key changed, e.g. an instant scan started) never
+    /// unlocks, even if Face ID happened to succeed as the task was withdrawn.
+    static func shouldUnlockAfterAutoPrompt(authenticated: Bool, cancelled: Bool) -> Bool {
+        authenticated && !cancelled
+    }
+
     private struct PromptKey: Hashable {
         let isLocked: Bool
         let instantScanBusy: Bool
@@ -32,13 +38,17 @@ struct LockGate<Content: View>: View {
             lockSettings.scenePhaseChanged(to: newPhase)
         }
         .task(id: PromptKey(isLocked: lockSettings.isLocked, instantScanBusy: instantScan.isBusy)) {
-            // Auto-prompt on cold launch (isLocked started true) and any
-            // explicit relock that doesn't already have an auth in flight.
-            // Deferred while an instant scan runs; re-keys and fires once it
-            // finishes if the app is still locked.
+            // Auto-prompt on cold launch (isLocked started true) and on every
+            // relock. Deferred while an instant scan runs; re-keys and fires once
+            // it finishes if the app is still locked. When the key changes
+            // mid-prompt, SwiftUI cancels this task: `authenticate` invalidates
+            // its LAContext, which withdraws the system prompt, and the
+            // cancelled task never unlocks.
             if Self.shouldAutoPrompt(isLocked: lockSettings.isLocked, instantScanBusy: instantScan.isBusy) {
                 let ok = await lockSettings.authenticate(reason: "Unlock your document library")
-                if ok { lockSettings.unlock() }
+                if Self.shouldUnlockAfterAutoPrompt(authenticated: ok, cancelled: Task.isCancelled) {
+                    lockSettings.unlock()
+                }
             }
         }
     }

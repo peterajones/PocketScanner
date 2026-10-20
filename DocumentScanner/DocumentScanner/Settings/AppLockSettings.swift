@@ -76,16 +76,30 @@ final class AppLockSettings {
     // MARK: - LocalAuthentication (not unit-tested — hardware call)
 
     /// Show the system Face ID / passcode prompt and return whether it succeeded.
+    /// Cancelling the calling task invalidates the context, which withdraws the
+    /// prompt if it is showing, and the result is then always false.
     func authenticate(reason: String) async -> Bool {
-        let context = LAContext()
+        let box = ContextBox(LAContext())
         var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
+        guard box.context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
             return false
         }
-        do {
-            return try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
-        } catch {
-            return false
+        return await withTaskCancellationHandler {
+            do {
+                let ok = try await box.context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
+                return ok && !Task.isCancelled
+            } catch {
+                return false
+            }
+        } onCancel: {
+            box.context.invalidate()
         }
+    }
+
+    /// Lets the `@Sendable` cancellation handler reach the context.
+    /// `LAContext.invalidate()` may be called from any thread.
+    private final class ContextBox: @unchecked Sendable {
+        let context: LAContext
+        init(_ context: LAContext) { self.context = context }
     }
 }
