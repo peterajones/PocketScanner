@@ -1,0 +1,149 @@
+# Instant Scan — Design
+
+**Status:** Approved 2026-10-20.
+
+## Why
+
+Pocket Scanner's best moments are fast ones. Peter's example: an optometrist left a
+prescription on the table without handing it over; he scanned it and left. Today that
+takes unlock → find the app → wait for the library → `＋` → Scan Document. The goal is
+**one press to a live camera**.
+
+Two secondary reasons, both from the 2026-10-20 strategy session:
+
+- **Apple is pushing App Intents.** WWDC 2026 coverage (third-party, not yet checked
+  against Apple's own session pages) says App Intents replaces SiriKit as the only way
+  Siri reaches third-party apps in iOS 27. Adopting it is a plausible hook for an App
+  Store **Featuring Nomination**, the only route to new users that doesn't depend on
+  search.
+- **No evidence it affects App Store search ranking.** This feature is for owners of the
+  app and for the nomination story. It does not fix discoverability on its own; the
+  listing rework (a separate project) does that.
+
+This is the first of three projects agreed that day: (1) instant scan, (2) Siri/Spotlight
+*finding* documents ("show my lab results"), (3) listing rework around real use cases.
+
+## What it does
+
+### Entry points
+
+All of these run **one App Intent** ("Scan Document"), so they behave identically:
+
+| Entry point | Availability |
+|---|---|
+| Action button | iOS 17.6+ (assign via Shortcuts on 17; directly as a Control on 18+) |
+| Siri / Spotlight phrase, e.g. "Scan with Pocket Scanner" (an App Shortcut) | iOS 17.6+ |
+| Control Center button | iOS 18+ |
+| Lock-screen button | iOS 18+ |
+
+The deployment target stays **iOS 17.6**. On iOS 17 there are no Controls; nothing else
+changes for anyone who never uses the feature.
+
+### The flow
+
+1. The intent opens Pocket Scanner straight into the **existing scanner camera**
+   (`scannerPresenter` / `CaptureSheet`, the same capture the `＋` ▸ Scan Document path
+   uses).
+2. After the user captures and taps Save in the camera, the scan is saved to
+   **Main Library** (the storage root).
+3. Pocket Scanner then shows **that document open in the viewer**, pushed onto the
+   library's `NavigationStack` (`DocumentRoute`), so Back lands on the library.
+
+**Cancel:** dismissing the camera without saving creates nothing; the app shows
+wherever it would normally show (the lock screen, if the lock is on).
+
+### With the Face ID lock on (decided by Peter)
+
+**Camera first; Face ID before anything is shown.**
+
+- The camera is presented **above** the `LockGate` lock screen, and nothing from the
+  library is visible at any point before Face ID succeeds.
+- `LockGate`'s automatic Face ID prompt (its `.task(id: isLocked)`) must **not** fire
+  while an instant-scan capture is in progress. Today it fires on cold launch and on
+  relock, which would put a Face ID sheet over the camera.
+- **The scan is saved before Face ID** *(Claude's call, explained to Peter)*. If Face ID
+  fails or is cancelled, the scan is already in Main Library, behind the lock, and is
+  not lost. The app stays locked, and the new document opens after the next successful
+  unlock, or not at all *(builder's choice)*.
+- Accepted consequence: someone holding the unlocked phone can *add* a scan without Face
+  ID. They cannot *see* anything.
+- Coming from the lock screen, iOS requires the **phone** itself to be unlocked before
+  any app opens. That is iOS behaviour, not something this feature controls. Verify it
+  on a device.
+
+### Defaults *(Claude's calls)*
+
+- **Filter and page size:** the user's existing settings (`defaultScanFilter`,
+  `scanPaperSize`).
+- **Name:** the existing auto-namer (`DefaultDocumentName` plus OCR), exactly as a
+  normal scan.
+- **OCR:** runs as it does today, so the document is searchable.
+- **Review prompt:** an instant scan counts as a successful scan for
+  `ReviewPromptTracker`, but the prompt must never appear over the camera or the Face ID
+  prompt. Fire it, if at all, once the document is showing.
+
+- **Telling owners it exists:** add **one new tip** to the existing Tips screen
+  (`Settings/Tip.swift`) explaining how to put Scan Document on the Action button, in
+  Control Center or on the lock screen. It is localized like every other tip and gets
+  the de/it/zh-Hans back-translation pass.
+- **Release work is out of this plan:** the version bump, release notes, screenshots and
+  the Featuring Nomination follow the usual release process, not this build plan.
+
+### No naming sheet: silent save (decided by Peter)
+
+An instant scan **skips `NameDocumentSheet`**. After the camera's Save, the document is
+saved with the defaults above and opened in the viewer. "It can be renamed later," using
+the existing Rename.
+
+What this means for the build:
+
+- **A new save path outside the sheet.** Today `NameDocumentSheet.save()` waits for the
+  OCR task, and the auto-namer needs its result. The silent path has to do the same:
+  wait for OCR, name the document, apply the default filter, write the file.
+- **Something on screen while OCR runs.** Show a short "Saving…" state, not a blank
+  pause. With the lock on, it sits **above the opaque lock screen** and shows no page
+  content.
+- **Order with the lock on:** camera → Saving… → saved → Face ID → document opens.
+  Without the lock: camera → Saving… → document opens.
+- The filter and name can be changed afterwards, as for any document.
+
+## Constraints
+
+- **Privacy promise:** nothing leaves the device. App Intents and Controls are local; no
+  new network access.
+- **Localization:** the App Shortcut phrase(s), the Control's title and any new UI
+  strings ship in **en, es, fr, de, it, zh-Hans**. de/it/zh-Hans copy needs the
+  standing back-translation QA pass (`docs/superpowers/qa/`). Apple requires App
+  Shortcut phrases to include the app name.
+- **Do not open the target's General tab** (`docs/dev-build.md`, FB24809836). Adding a
+  widget-extension target for the Controls means editing build settings; do it in Build
+  Settings, and the "Verify Release identity" build phase must still pass.
+- **Both storage modes:** the iCloud store (`MetadataQueryLibraryStore`) and the
+  local-only store (`InMemoryLibraryStore`) must show the new document.
+- **UI-test mode** (`-UITestMode`, `StubDocumentScanner`) must stay hermetic.
+
+## Non-goals
+
+- Choosing a destination folder from the intent (always Main Library).
+- Siri/Spotlight *finding* or opening existing documents: project 2.
+- Scanning from the lock screen without unlocking the phone (would need Apple's
+  locked-camera capture extension, which can't host the system document camera).
+- Any change to the existing `＋` ▸ Scan Document flow.
+- Widgets other than the Control.
+
+## Left to the builder
+
+- How the intent hands off to the running UI (e.g. an observable pending-action flag
+  that `LibraryView` reacts to), and how it behaves on cold launch vs. warm.
+- What happens if the intent fires while the user is mid-task in a modal (signature
+  placement, naming sheet, an alert). Hard rule: **never discard unsaved user work.**
+  Waiting, or ignoring the request, are both acceptable.
+- What happens if the intent fires while the iCloud onboarding screen is showing:
+  onboarding wins, and the scan request may be dropped.
+- Camera permission denied: reuse `CameraDeniedView`.
+- Navigation when the user was deep in a folder or viewer: resetting to
+  `[DocumentRoute(new doc)]` on the library stack is fine.
+- Whether the intent code lives in a shared framework or is compiled into both the app
+  and the widget-extension target.
+- Test strategy: the pure parts (pending-action state, lock sequencing) unit-tested; a
+  device check for the Action button, Control Center, the lock screen and Face ID.
