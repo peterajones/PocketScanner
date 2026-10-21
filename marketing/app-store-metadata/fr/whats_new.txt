@@ -1,3 +1,11 @@
-La page App Store de Pocket Scanner est désormais disponible en chinois simplifié.
+Scan instantané : une seule pression ouvre l'appareil photo, où que vous soyez sur votre iPhone. Le scan est enregistré, rendu interrogeable et ouvert pour vous. Vous pourrez le renommer ensuite.
+
+Pour l'utiliser :
+- Bouton Action : Réglages > Bouton Action > Commandes > Scanner un document
+- Centre de contrôle : touchez + et ajoutez Scanner un document
+- Écran de verrouillage : retirez l'un des deux boutons du bas, puis ajoutez Scanner un document
+- Siri ou Spotlight : « Scanner avec Pocket Scanner » (la première fois, Siri vous demande d'activer les raccourcis de l'app)
+
+Avec le Verrouillage de l'app activé, l'appareil photo s'ouvre d'abord, et Face ID passe avant tout affichage de votre bibliothèque.
 
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, scannez pour toujours. Merci d'utiliser Pocket Scanner.

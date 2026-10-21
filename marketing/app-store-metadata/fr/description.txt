@@ -1,22 +1,24 @@
-Scannez des documents papier ou à l'écran directement dans votre iCloud Drive.
+Scannez tout avec votre iPhone : une pièce d'identité, une ordonnance, un reçu, un contrat, des résultats d'analyses ou le numéro que quelqu'un a griffonné sur une serviette en papier.
 
-Pocket Scanner est un scanner de documents sans fioritures pour iPhone. Scannez un reçu, un contrat, une recette ou une page de notes, et il arrive dans votre bibliothèque sous forme de PDF interrogeable, synchronisé sur tous vos appareils via votre propre compte iCloud.
+RAPIDE
+- Scan instantané : appuyez sur le bouton Action ou sur un bouton du Centre de contrôle ou de l'écran de verrouillage, ou dites « Scanner avec Pocket Scanner » à Siri, et l'appareil photo s'ouvre
+- Le scanner de documents d'Apple détecte les bords, redresse la page et capture plusieurs pages d'un coup
+- Chaque scan est enregistré en PDF interrogeable et nommé pour vous ; renommez-le quand vous voulez
 
-C'est tout. Sans abonnement. Sans publicité. Aucun compte à créer. Aucune vente incitative. Payez une fois, scannez pour toujours.
+ORGANISÉ À VOTRE FAÇON
+- Des dossiers dans des dossiers, comme Médical > Analyses ou Impôts > 2025
+- Déplacez des documents d'un dossier à l'autre, triez par date, nom ou nombre de pages, et passez de la liste à la grille
+- Cherchez dans toute votre bibliothèque par nom ou par le texte d'un document ; les résultats sont surlignés directement sur la page
 
-CE QU'IL FAIT
+SIGNER ET ANNOTER
+- Scannez votre signature une fois, puis placez-la avec la date sur n'importe quel document. Sans imprimante
+- Surlignez ou barrez du texte, recadrez, faites pivoter et filtrez les pages, et séparez des pages dans un nouveau document
+- Importez les PDF que vous avez déjà
 
-- Capturez des pages avec le scanner de documents d'Apple : détection automatique des bords, correction de perspective, plusieurs pages en une seule prise
-- Choisissez un rendu en scannant : Couleur, Gris, Noir et blanc ou Photo
-- OCR sur l'appareil : chaque scan devient un PDF entièrement interrogeable, sans connexion internet
-- Recherchez dans toute votre bibliothèque, y compris dans les dossiers, par nom de fichier ou par le texte du document ; les correspondances sont surlignées directement sur la page
-- Restez organisé : des dossiers entre lesquels déplacer vos documents, un tri par date, nom ou nombre de pages, et une vue en liste ou en grille de miniatures
-- Éditeur page par page : recadrez, pivotez et appliquez un filtre net ; ou pivotez une page depuis la bande de pages
-- Extrayez des pages : sortez les pages sélectionnées dans un nouveau document
-- Annotez vos scans : surlignez ou barrez du texte directement sur la page
-- Balayez pour supprimer documents et dossiers
-- Synchronisation iCloud Drive : vos scans apparaissent sur tous les appareils de votre compte iCloud, dans votre propre espace de stockage, où vous pouvez les voir et les gérer
-- Confidentialité intégrée : verrouillage facultatif par Face ID pour la bibliothèque, ainsi qu'un floutage dans le sélecteur d'apps pour que les miniatures n'apparaissent pas au changement d'application
+À VOUS
+- Verrouillage de l'app : Face ID garde votre bibliothèque privée, et le sélecteur d'apps masque vos pages
+- iCloud Drive garde vos scans sur tous vos appareils, dans votre propre espace de stockage. Ou utilisez l'app sans iCloud et gardez tout sur cet iPhone
+- Choisissez le rendu des nouveaux scans (Couleur, Gris, Noir et blanc ou Photo) et le format de page du PDF
 
 CE QU'IL NE FAIT PAS
 
@@ -34,8 +36,9 @@ Politique de confidentialité complète : https://peterajones.github.io/PocketSc
 CONFIGURATION REQUISE
 
 - iOS 17.6 ou version ultérieure
+- Les boutons du Centre de contrôle et de l'écran de verrouillage nécessitent iOS 18 ou version ultérieure ; le bouton Action, un iPhone qui en est équipé
 - iCloud Drive recommandé (fonctionne aussi en mode local si vous préférez)
 
 À PROPOS
 
-Développée en solo par un développeur indépendant lassé de voir chaque app de scan exiger un abonnement. Si vous aimez l'app, laissez un avis : c'est la chose la plus utile que vous puissiez faire pour aider.
+Développée en solo par un développeur indépendant lassé de voir chaque app de scan exiger un abonnement. Sans abonnement, sans publicité, sans compte. Payez une fois, scannez pour toujours. Si vous aimez l'app, laissez un avis : c'est la chose la plus utile que vous puissiez faire pour aider.

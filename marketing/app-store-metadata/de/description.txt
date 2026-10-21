@@ -1,22 +1,24 @@
-Scanne Papierdokumente oder Bildschirminhalte direkt in dein iCloud Drive.
+Scanne alles mit deinem iPhone: einen Ausweis, ein Rezept, einen Kassenbon, einen Vertrag, Laborbefunde oder die Nummer, die dir jemand auf eine Serviette geschrieben hat.
 
-Pocket Scanner ist ein unkomplizierter Dokumentenscanner für das iPhone. Scanne einen Beleg, einen Vertrag, ein Rezept oder eine Seite Notizen – und er landet als durchsuchbares PDF in deiner Bibliothek, synchronisiert auf all deinen Geräten über deinen eigenen iCloud-Account.
+SCHNELL
+- Sofort-Scan: Drück die Aktionstaste oder eine Taste im Kontrollzentrum oder auf dem Sperrbildschirm, oder sag zu Siri „Mit Pocket Scanner scannen“, und die Kamera öffnet sich
+- Apples Dokumentenscanner erkennt die Ränder, richtet die Seite gerade aus und erfasst mehrere Seiten auf einmal
+- Jeder Scan wird als durchsuchbares PDF gespeichert und automatisch benannt; umbenennen kannst du ihn jederzeit
 
-Das war's. Kein Abo. Keine Werbung. Kein Account, den du anlegen musst. Keine Upsells. Einmal zahlen, für immer scannen.
+ORGANISIERT, WIE DU WILLST
+- Ordner in Ordnern, etwa Medizin > Laborbefunde oder Steuern > 2025
+- Verschiebe Dokumente zwischen Ordnern, sortiere nach Datum, Name oder Seitenzahl und wechsle zwischen Liste und Raster
+- Durchsuche deine ganze Bibliothek nach Namen oder nach dem Text in einem Dokument; Treffer werden direkt auf der Seite hervorgehoben
 
-WAS ES KANN
+UNTERSCHREIBEN UND MARKIEREN
+- Scanne deine Unterschrift einmal und setze sie samt Datum auf jedes Dokument. Ganz ohne Drucker
+- Markiere Text oder streiche ihn durch, beschneide, drehe und filtere Seiten und trenne Seiten in ein neues Dokument ab
+- Importiere PDFs, die du schon hast
 
-- Seiten mit Apples Dokumentenscanner erfassen – automatische Kantenerkennung, Perspektivkorrektur, mehrere Seiten in einem Durchgang
-- Beim Scannen die Darstellung wählen – Farbe, Grau, Schwarzweiß oder Foto
-- OCR direkt auf dem Gerät – jeder Scan wird zu einem vollständig durchsuchbaren PDF, ganz ohne Internet
-- Deine gesamte Bibliothek durchsuchen, auch in Ordnern, nach Dateiname oder nach Text im Dokument – Treffer werden direkt auf der Seite markiert
-- Ordnung halten – Ordner, zwischen denen du Dokumente bewegen kannst, Sortierung nach Datum, Name oder Seitenanzahl, sowie eine Listen- oder Miniaturansicht
-- Seiteneditor – zuschneiden, drehen und einen sauberen Filter anwenden; oder eine Seite direkt aus der Seitenleiste drehen
-- Seiten heraustrennen – ausgewählte Seiten in ein eigenes neues Dokument übernehmen
-- Scans annotieren – Text direkt auf der Seite markieren oder durchstreichen
-- Streichen zum Löschen von Dokumenten und Ordnern
-- iCloud-Drive-Sync – deine Scans erscheinen auf jedem Gerät deines iCloud-Accounts, in deinem eigenen Speicher, wo du sie sehen und verwalten kannst
-- Datenschutz von Anfang an – optionale Face-ID-Sperre für die Bibliothek und ein Weichzeichner im App-Umschalter, damit dort keine Miniaturen zu sehen sind
+DEINS
+- App-Sperre: Face ID hält deine Bibliothek privat, und im App-Umschalter bleiben deine Seiten verborgen
+- iCloud Drive hält deine Scans auf all deinen Geräten bereit, in deinem eigenen Speicher. Oder nutze die App ohne iCloud und behalte alles auf diesem iPhone
+- Wähle den Look neuer Scans (Farbe, Grau, Schwarzweiß oder Foto) und die Seitengröße des PDFs
 
 WAS ES NICHT TUT
 
@@ -34,8 +36,9 @@ Vollständige Datenschutzrichtlinie: https://peterajones.github.io/PocketScanner
 VORAUSSETZUNGEN
 
 - iOS 17.6 oder neuer
+- Tasten im Kontrollzentrum und auf dem Sperrbildschirm brauchen iOS 18 oder neuer, die Aktionstaste ein iPhone, das eine hat
 - iCloud Drive empfohlen (funktioniert auf Wunsch auch rein lokal)
 
 ÜBER
 
-Im Alleingang von einem unabhängigen Entwickler gebaut, der genug davon hatte, dass jede Scanner-App ein Abo verlangt. Wenn dir die App gefällt, hinterlasse eine Bewertung – das ist das Wertvollste, was du tun kannst, um zu helfen.
+Im Alleingang von einem unabhängigen Entwickler gebaut, der genug davon hatte, dass jede Scanner-App ein Abo verlangt. Kein Abo, keine Werbung, kein Account. Einmal zahlen, für immer scannen. Wenn dir die App gefällt, hinterlasse eine Bewertung – das ist das Wertvollste, was du tun kannst, um zu helfen.

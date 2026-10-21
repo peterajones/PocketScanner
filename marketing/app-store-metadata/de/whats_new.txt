@@ -1,3 +1,11 @@
-Die App-Store-Seite von Pocket Scanner gibt es jetzt auch auf Chinesisch (vereinfacht).
+Sofort-Scan: Ein Druck öffnet die Kamera, egal wo du gerade auf deinem iPhone bist. Der Scan wird gespeichert, durchsuchbar gemacht und für dich geöffnet. Umbenennen kannst du ihn später.
+
+So nutzt du ihn:
+- Aktionstaste: Einstellungen > Aktionstaste > Steuerelemente > Dokument scannen
+- Kontrollzentrum: Tippe auf + und füge „Dokument scannen“ hinzu
+- Sperrbildschirm: Entferne eine der beiden Tasten unten und füge dann „Dokument scannen“ hinzu
+- Siri oder Spotlight: „Mit Pocket Scanner scannen“ (beim ersten Mal fragt Siri, ob die Kurzbefehle der App aktiviert werden sollen)
+
+Ist die App-Sperre aktiv, öffnet sich zuerst die Kamera, und Face ID kommt, bevor irgendetwas aus deiner Bibliothek angezeigt wird.
 
 Wie immer: keine Abos, keine Werbung, kein Tracking und nichts auf unseren Servern. Einmal zahlen, für immer scannen. Danke, dass du mit Pocket Scanner scannst.

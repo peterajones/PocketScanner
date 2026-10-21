@@ -1,1 +1,1 @@
-scanner,dokumente,pdf,scannen,unterschrift,ocr,texterkennung,belege,ohne abo,papierlos
+dokument,pdf,beleg,kassenbon,rechnung,rezept,befund,ausweis,vertrag,unterschrift,steuer,ocr,ohne abo

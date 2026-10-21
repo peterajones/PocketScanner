@@ -1,1 +1,1 @@
-numériser,document,pdf,reçus,signature,ocr,sans abonnement,scan pdf,numérisation,sans papier
+numériser,document,pdf,reçu,facture,ordonnance,médical,contrat,signature,note,ocr,sans abonnement

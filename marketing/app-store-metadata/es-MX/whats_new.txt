@@ -1,3 +1,11 @@
-La página de Pocket Scanner en la App Store ya está disponible en chino simplificado.
+Escaneo instantáneo: una pulsación abre la cámara desde cualquier lugar de tu iPhone. El escaneo se guarda, se vuelve buscable y se abre solo. Si quieres, cámbiale el nombre después.
+
+Cómo usarlo:
+- Botón de acción: Ajustes > Botón de acción > Controles > Escanear documento
+- Centro de control: toca + y añade Escanear documento
+- Pantalla de bloqueo: quita uno de los dos botones de abajo y añade Escanear documento
+- Siri o Spotlight: "Escanear con Pocket Scanner" (la primera vez, Siri te pide activar los atajos de la app)
+
+Con el Bloqueo de la app activado, primero se abre la cámara, y Face ID llega antes de que se muestre nada de tu biblioteca.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.

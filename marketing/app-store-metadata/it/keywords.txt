@@ -1,1 +1,1 @@
-scanner,documenti,pdf,scansione,firma,ocr,scontrini,senza abbonamento,digitalizzare
+scansione,pdf,scontrino,fattura,ricetta,referto,medico,contratto,firma,ocr,senza abbonamento
