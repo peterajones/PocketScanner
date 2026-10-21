@@ -111,8 +111,10 @@ def main():
         # simply have no row. Adding or dropping a shot is a TSV edit, nothing more.
         for shot in sorted(caps):
             if args.framed:
-                base = f"{bases_dir}/{BASE_LANG.get(lang, lang)}/{shot}.png"
-                base = base if os.path.exists(base) else None
+                # A language with no captures of its own uses the English screens
+                # (v4.0: one set of device shots, captions translated per locale).
+                base = next((b for b in (f"{bases_dir}/{BASE_LANG.get(lang, lang)}/{shot}.png",
+                                         f"{bases_dir}/en/{shot}.png") if os.path.exists(b)), None)
             else:
                 base = base_for(bases_dir, lang, shot)
             if not base:
