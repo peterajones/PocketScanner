@@ -53,15 +53,6 @@ struct SettingsView: View {
             } footer: {
                 Text("New scans start with this filter. You can still change it for any scan.\n\nPage Size sets the paper size of the PDF. Auto keeps the shape the scanner found; US Letter and A4 produce exactly that size, adding margins if the scan is a different shape.")
             }
-            #if DEBUG
-            Section {
-                Toggle("Touch Indicators", isOn: $touchIndicatorsEnabled)
-            } header: {
-                Text("Developer")
-            } footer: {
-                Text("Shows a circle at each touch — for recording App Preview videos. Debug builds only.")
-            }
-            #endif
             Section {
                 ForEach(signatures) { sig in
                     HStack(spacing: 12) {
@@ -160,6 +151,17 @@ struct SettingsView: View {
             } footer: {
                 Text("System follows your iPhone's light or dark setting.")
             }
+            // Very last, below everything a user sees in the shipping app, so it stays out
+            // of Settings screenshots taken on the Dev build.
+            #if DEBUG
+            Section {
+                Toggle("Touch Indicators", isOn: $touchIndicatorsEnabled)
+            } header: {
+                Text("Developer")
+            } footer: {
+                Text("Shows a circle at each touch — for recording App Preview videos. Debug builds only.")
+            }
+            #endif
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
