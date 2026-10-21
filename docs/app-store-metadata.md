@@ -59,7 +59,8 @@ v3.8 (37) and v3.9 (38) went live 2026-09-26 and 2026-10-02 (see `docs/FutureEnh
 their submission dates were not recorded here. **Next: v4.0 (39), Instant Scan** (App Intents + a Controls widget
 extension; see the 2026-10-20 strategy session in `docs/FutureEnhancements.md`). It is the first release with an embedded
 extension, so bump the version and build in **both** targets (checklist below), and file the App Store **Featuring Nomination**
-at least two weeks before the release date.
+at least **three weeks** before the release date (Apple: "a minimum lead time of 3 weeks"). The v4.0 nomination was
+submitted 2026-10-21 for a 2026-11-11 release; text in `docs/featuring/2026-10-21-v4.0-nomination.md`.
 
 ### Release cadence — ship freely for now, batch later
 

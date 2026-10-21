@@ -85,7 +85,7 @@ freemium model; Guiding Tech's Adobe Scan vs Genius Scan comparison.
    `docs/superpowers/plans/2026-10-20-instant-scan.md`. App Intents was chosen partly because Apple is
    pushing it: SiriKit's docs now call it "legacy", and App Intents is how apps reach Siri and Apple
    Intelligence. **No evidence it affects search ranking.** Its discovery value is an App Store
-   **Featuring Nomination** (App Store Connect; at least 2 weeks' notice, up to 3 months recommended)
+   **Featuring Nomination** (App Store Connect; at least 3 weeks' notice, up to 3 months recommended; v4.0's was submitted 2026-10-21 for 2026-11-11)
    to go with v4.0 (39).
 2. **Siri / Spotlight *finding* documents:** "show my latest lab results" opens the right PDF. Next
    project; needs its own design (App Entities over the library, indexed for Spotlight, all on-device).
