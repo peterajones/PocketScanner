@@ -26,6 +26,11 @@ Media for the **live** gallery lives under that release's folder. Everything old
   listing). **Only zh-Hans lives in v3.9**; the other seven locales still use `v3.4/Stills`, so
   both folders are live and neither can be pruned. Render with
   `render-captions.py --version 3.9 zh-Hans`.
+- `v4.0/Captures/<locale>/1…7.png` — **framed device screenshots** for the v4.0 gallery (real camera,
+  Control Center, Files picker: nothing the simulator can produce), so unlike `Base/` they are tracked.
+  Each was run through `fix_clock.py` to remove the patch box around 9:41. Captions come from
+  `captions/<locale>-v4.0.tsv`; render with `render-captions.py --version 4.0 --framed en` into
+  `v4.0/Stills/<locale>/`. Props for the scans are in `props/` (all invented).
 - `v3.4/PocketScanner-v3.4-AppPreview-886x1920.mp4` — **the App Store upload** (App Preview
   slot 1). App Previews use **886×1920**, NOT the 1290×2796 screenshot size — see Output spec.
 - `v3.4/Base/<lang>/` — raw simulator captures, **gitignored**. Regenerate with

@@ -16,9 +16,16 @@ Manifest columns: shot, line1, line2, top, fs1, fs2, band, color
   band  optional CSS background (e.g. the black scan-shot banner); empty = none
   color optional text color; empty = default navy
 
+From v4.0 the captures are FRAMED device screenshots (the shots need a real camera,
+Control Center and the Files picker, which the simulator can't produce). Pass --framed:
+bases are read from v<VERSION>/Captures/<lang>/ (tracked: unlike simulator bases they
+can't be regenerated), every shot is taken as already framed, and the captions come
+from captions/<lang>-v<VERSION>.tsv when that file exists.
+
 Run from the repo root:
     python3 marketing/app-preview/render-captions.py de it
     python3 marketing/app-preview/render-captions.py --version 3.4 en es fr de it
+    python3 marketing/app-preview/render-captions.py --version 4.0 --framed en
 """
 import argparse
 import csv
@@ -70,8 +77,11 @@ def base_for(bases_dir, lang, shot):
     return path if os.path.exists(path) else None
 
 
-def manifest(lang):
-    with open(f"{APP}/captions/{lang}.tsv") as f:
+def manifest(lang, version=None):
+    path = f"{APP}/captions/{lang}.tsv"
+    if version and os.path.exists(f"{APP}/captions/{lang}-v{version}.tsv"):
+        path = f"{APP}/captions/{lang}-v{version}.tsv"
+    with open(path) as f:
         # restval="" so rows that omit the trailing band/color columns yield ""
         # rather than None, which caption.sh cannot accept as an argument.
         return {int(r["shot"]): r for r in csv.DictReader(f, delimiter="\t", restval="")}
@@ -83,14 +93,16 @@ def main():
     ap.add_argument("langs", nargs="+", help="language codes, e.g. de it")
     ap.add_argument("--version", default="3.2",
                     help="release folder under marketing/app-preview (default 3.2)")
+    ap.add_argument("--framed", action="store_true",
+                    help="captures are already framed; read them from v<VERSION>/Captures")
     args = ap.parse_args()
 
-    bases_dir = f"{APP}/v{args.version}/Base"
+    bases_dir = f"{APP}/v{args.version}/{'Captures' if args.framed else 'Base'}"
     stills_dir = f"{APP}/v{args.version}/Stills"
     missing = 0
 
     for lang in args.langs:
-        caps = manifest(lang)
+        caps = manifest(lang, args.version if args.framed else None)
         outdir = f"{stills_dir}/{lang}"
         os.makedirs(outdir, exist_ok=True)
         print(f"== {lang} -> {outdir} ==")
@@ -98,7 +110,11 @@ def main():
         # v3.4 reorder (8 -> 7), and shots that are copied forward rather than rendered
         # simply have no row. Adding or dropping a shot is a TSV edit, nothing more.
         for shot in sorted(caps):
-            base = base_for(bases_dir, lang, shot)
+            if args.framed:
+                base = f"{bases_dir}/{BASE_LANG.get(lang, lang)}/{shot}.png"
+                base = base if os.path.exists(base) else None
+            else:
+                base = base_for(bases_dir, lang, shot)
             if not base:
                 print(f"  #{shot}: NO BASE at {bases_dir}/{lang}/{shot}.png (skipped)")
                 missing += 1
@@ -107,13 +123,14 @@ def main():
             # The shared frame is ALREADY framed — passing the bezel again would
             # double-frame it. Every other shot is a raw simulator capture and needs
             # the chrome.
-            chrome = "" if shot == SHARED_FRAME_SHOT else CHROME
+            framed = args.framed or shot == SHARED_FRAME_SHOT
+            chrome = "" if framed else CHROME
             subprocess.run(
                 [CAPTION, base, f"{outdir}/{shot}.png", c["line1"], c["line2"],
                  c["top"], c["fs1"], c["fs2"], c.get("band", ""), c.get("color", ""),
                  chrome],
                 check=True, stdout=subprocess.DEVNULL)
-            print(f"  #{shot}: {os.path.basename(base)}{'' if shot == SHARED_FRAME_SHOT else '  [framed]'}")
+            print(f"  #{shot}: {os.path.basename(base)}{'' if framed else '  [framed]'}")
 
     if missing:
         print(f"\n{missing} shot(s) had no base capture — the set is INCOMPLETE.")
