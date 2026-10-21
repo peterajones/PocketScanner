@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1275px; height: 1650px; background: #fff; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #222; padding: 70px 80px; box-sizing: border-box; font-size: 21px; }
+  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid #6a3d8f; padding-bottom: 16px; }
+  .head h1 { margin: 0; font-size: 40px; color: #6a3d8f; }
+  .head small { font-size: 18px; color: #555; line-height: 1.5; text-align: right; }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 40px; margin: 28px 0; font-size: 20px; }
+  .meta b { display: inline-block; width: 170px; color: #555; font-weight: normal; }
+  h2 { font-size: 22px; background: #f0eaf5; padding: 8px 12px; margin: 30px 0 6px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 16px; color: #666; font-weight: normal; border-bottom: 2px solid #333; padding: 8px 6px; }
+  td { padding: 10px 6px; border-bottom: 1px solid #ddd; }
+  td.v { font-weight: bold; text-align: right; width: 120px; }
+  td.u, td.r { color: #555; width: 190px; }
+  .note { margin-top: 40px; font-size: 16px; color: #555; line-height: 1.5; }
+</style></head>
+<body>
+  <div class="head">
+    <div><h1>Anytown Community Lab</h1><div style="font-size:20px;color:#555">Laboratory Report</div></div>
+    <small>400 Example Boulevard, Anytown<br>555-0166</small>
+  </div>
+  <div class="meta">
+    <div><b>Patient</b>Jordan Example</div>
+    <div><b>Collected</b>Oct 9, 2026 08:15</div>
+    <div><b>Date of birth</b>Jan 1, 1990</div>
+    <div><b>Reported</b>Oct 10, 2026</div>
+    <div><b>Ordered by</b>Dr. Robin Sample</div>
+    <div><b>Accession</b>SAMPLE-000000</div>
+  </div>
+
+  <h2>Complete Blood Count</h2>
+  <table>
+    <tr><th>Test</th><th style="text-align:right">Result</th><th>Units</th><th>Reference range</th></tr>
+    <tr><td>Hemoglobin</td><td class="v">142</td><td class="u">g/L</td><td class="r">130 – 170</td></tr>
+    <tr><td>White blood cells</td><td class="v">6.1</td><td class="u">×10⁹/L</td><td class="r">4.0 – 11.0</td></tr>
+    <tr><td>Platelets</td><td class="v">245</td><td class="u">×10⁹/L</td><td class="r">150 – 400</td></tr>
+    <tr><td>Hematocrit</td><td class="v">0.43</td><td class="u">L/L</td><td class="r">0.40 – 0.50</td></tr>
+  </table>
+
+  <h2>Chemistry</h2>
+  <table>
+    <tr><th>Test</th><th style="text-align:right">Result</th><th>Units</th><th>Reference range</th></tr>
+    <tr><td>Glucose, fasting</td><td class="v">5.1</td><td class="u">mmol/L</td><td class="r">3.6 – 6.0</td></tr>
+    <tr><td>Creatinine</td><td class="v">84</td><td class="u">µmol/L</td><td class="r">60 – 110</td></tr>
+    <tr><td>Sodium</td><td class="v">140</td><td class="u">mmol/L</td><td class="r">135 – 145</td></tr>
+    <tr><td>Potassium</td><td class="v">4.2</td><td class="u">mmol/L</td><td class="r">3.5 – 5.0</td></tr>
+  </table>
+
+  <h2>Lipid Panel</h2>
+  <table>
+    <tr><th>Test</th><th style="text-align:right">Result</th><th>Units</th><th>Reference range</th></tr>
+    <tr><td>Total cholesterol</td><td class="v">4.6</td><td class="u">mmol/L</td><td class="r">&lt; 5.2</td></tr>
+    <tr><td>HDL cholesterol</td><td class="v">1.4</td><td class="u">mmol/L</td><td class="r">&gt; 1.0</td></tr>
+    <tr><td>LDL cholesterol</td><td class="v">2.6</td><td class="u">mmol/L</td><td class="r">&lt; 3.4</td></tr>
+    <tr><td>Triglycerides</td><td class="v">1.2</td><td class="u">mmol/L</td><td class="r">&lt; 1.7</td></tr>
+  </table>
+
+  <div class="note">All results within reference range. Sample report for demonstration only; not a real patient or laboratory.</div>
+</body></html>

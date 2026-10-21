@@ -1,0 +1,53 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1012px; height: 638px; background: transparent; }
+  .card { position: absolute; inset: 0; border-radius: 36px; overflow: hidden;
+    background: linear-gradient(135deg, #e6f0ec 0%, #d4e6f2 55%, #e9e3f3 100%);
+    font-family: "Helvetica Neue", Arial, sans-serif; color: #1d2b36; }
+  .guilloche { position: absolute; inset: 0; opacity: .35;
+    background: repeating-radial-gradient(circle at 78% 60%, transparent 0 9px, #9ab7c9 9px 10px); }
+  .band { position: absolute; left: 0; right: 0; top: 0; height: 104px;
+    background: #2f5d73; color: #fff; display: flex; align-items: center; padding: 0 40px; gap: 22px; }
+  .seal { width: 64px; height: 64px; border-radius: 50%; border: 4px solid #fff; display: grid;
+    place-items: center; font-weight: 700; font-size: 26px; }
+  .band h1 { margin: 0; font-size: 34px; letter-spacing: 1px; }
+  .band p { margin: 2px 0 0; font-size: 17px; letter-spacing: 3px; opacity: .85; }
+  .photo { position: absolute; left: 44px; top: 140px; width: 230px; height: 290px;
+    background: #c9d6de; border: 3px solid #fff; border-radius: 10px; overflow: hidden; }
+  .fields { position: absolute; left: 310px; top: 140px; right: 40px; font-size: 19px; }
+  .row { display: flex; gap: 40px; margin-bottom: 14px; }
+  .f label { display: block; font-size: 13px; letter-spacing: 1.5px; color: #4f6a7a; }
+  .f b { font-size: 24px; }
+  .sig { position: absolute; left: 50px; top: 446px; font-family: "Bradley Hand", cursive;
+    font-size: 40px; color: #1b2a6b; }
+  .mrz { position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: rgba(255,255,255,.7);
+    font-family: "Courier New", monospace; font-size: 26px; letter-spacing: 3px; padding: 12px 40px; box-sizing: border-box; line-height: 34px; }
+  .specimen { position: absolute; left: 120px; top: 230px; transform: rotate(-18deg);
+    font-size: 132px; font-weight: 800; letter-spacing: 12px; color: rgba(200, 30, 45, .42); }
+</style></head>
+<body><div class="card">
+  <div class="guilloche"></div>
+  <div class="band">
+    <div class="seal">NB</div>
+    <div><h1>NORTHBRIDGE</h1><p>IDENTIFICATION CARD</p></div>
+  </div>
+  <div class="photo">
+    <svg viewBox="0 0 230 290" width="230" height="290">
+      <circle cx="115" cy="112" r="56" fill="#7d93a1"/>
+      <path d="M20 290 C20 205 70 180 115 180 C160 180 210 205 210 290 Z" fill="#7d93a1"/>
+    </svg>
+  </div>
+  <div class="fields">
+    <div class="row"><div class="f"><label>SURNAME</label><b>SAMPLE</b></div>
+      <div class="f"><label>GIVEN NAMES</label><b>ALEX JORDAN</b></div></div>
+    <div class="row"><div class="f"><label>DATE OF BIRTH</label><b>01 JAN 1990</b></div>
+      <div class="f"><label>ID NO.</label><b>S000-0000-00</b></div></div>
+    <div class="row"><div class="f"><label>ISSUED</label><b>15 MAR 2025</b></div>
+      <div class="f"><label>EXPIRES</label><b>15 MAR 2030</b></div></div>
+    <div class="row"><div class="f"><label>ADDRESS</label><b>123 EXAMPLE ST, ANYTOWN</b></div></div>
+  </div>
+  <div class="sig">Alex Sample</div>
+  <div class="specimen">SPECIMEN</div>
+  <div class="mrz">IDNBS000000000&lt;&lt;SAMPLE&lt;&lt;ALEX&lt;JORDAN&lt;&lt;&lt;<br>9001011&lt;3003150NB&lt;&lt;&lt;&lt;SPECIMEN&lt;&lt;&lt;&lt;&lt;&lt;0</div>
+</div></body></html>

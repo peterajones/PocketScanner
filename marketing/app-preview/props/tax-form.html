@@ -1,0 +1,56 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1275px; height: 1650px; background: #fff; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #222; padding: 70px 80px; box-sizing: border-box; font-size: 20px; }
+  .head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 4px solid #333; padding-bottom: 16px; }
+  .head h1 { margin: 0; font-size: 40px; }
+  .head .firm { font-size: 18px; color: #555; text-align: right; line-height: 1.5; }
+  h2 { font-size: 22px; background: #e9ecef; padding: 8px 12px; margin: 34px 0 10px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 30px; }
+  .box label { display: block; font-size: 15px; color: #555; }
+  .box div { border: 1.5px solid #555; height: 42px; padding: 6px 10px; box-sizing: border-box;
+    font-family: "Bradley Hand", cursive; font-size: 26px; color: #1b2a6b; }
+  .line { display: flex; align-items: center; border-bottom: 1px solid #bbb; padding: 9px 0; }
+  .line .n { width: 70px; color: #666; }
+  .line .t { flex: 1; }
+  .line .v { width: 200px; border: 1.5px solid #555; height: 36px; text-align: right; padding: 2px 10px; box-sizing: border-box;
+    font-family: "Bradley Hand", cursive; font-size: 24px; color: #1b2a6b; }
+  .note { margin-top: 30px; font-size: 16px; color: #555; }
+</style></head>
+<body>
+  <div class="head">
+    <div><h1>2025 Tax Organizer</h1><div style="font-size:20px;color:#555">Personal return checklist and summary</div></div>
+    <div class="firm"><b>Maple &amp; Finch Accounting</b><br>300 Example Street, Anytown<br>555-0150</div>
+  </div>
+
+  <h2>1 · Your details</h2>
+  <div class="grid">
+    <div class="box"><label>Name</label><div>Jordan Example</div></div>
+    <div class="box"><label>Client no.</label><div>MF-0000</div></div>
+    <div class="box"><label>Address</label><div>123 Example St</div></div>
+    <div class="box"><label>Phone</label><div>555-0188</div></div>
+  </div>
+
+  <h2>2 · Income</h2>
+  <div class="line"><span class="n">101</span><span class="t">Employment income (all slips)</span><span class="v">58,420.00</span></div>
+  <div class="line"><span class="n">102</span><span class="t">Interest and investment income</span><span class="v">312.55</span></div>
+  <div class="line"><span class="n">103</span><span class="t">Self-employment income</span><span class="v">2,150.00</span></div>
+  <div class="line"><span class="n">104</span><span class="t">Other income</span><span class="v">0.00</span></div>
+  <div class="line"><span class="n">150</span><span class="t"><b>Total income</b></span><span class="v">60,882.55</span></div>
+
+  <h2>3 · Deductions and credits</h2>
+  <div class="line"><span class="n">201</span><span class="t">Retirement plan contributions</span><span class="v">4,000.00</span></div>
+  <div class="line"><span class="n">202</span><span class="t">Childcare expenses</span><span class="v">0.00</span></div>
+  <div class="line"><span class="n">203</span><span class="t">Medical expenses (receipts attached)</span><span class="v">1,284.30</span></div>
+  <div class="line"><span class="n">204</span><span class="t">Charitable donations (receipts attached)</span><span class="v">450.00</span></div>
+  <div class="line"><span class="n">205</span><span class="t">Home office expenses</span><span class="v">620.00</span></div>
+
+  <h2>4 · Documents enclosed</h2>
+  <div class="line"><span class="n">☑</span><span class="t">Employment slips</span></div>
+  <div class="line"><span class="n">☑</span><span class="t">Medical and pharmacy receipts</span></div>
+  <div class="line"><span class="n">☐</span><span class="t">Tuition receipts</span></div>
+  <div class="line"><span class="n">☑</span><span class="t">Donation receipts</span></div>
+
+  <div class="note">Prepared for discussion with your accountant. This organizer is not a government form and is not filed.</div>
+</body></html>
