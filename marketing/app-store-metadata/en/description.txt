@@ -1,22 +1,24 @@
-Scan paper or on-screen documents straight into your iCloud Drive.
+Scan anything into your iPhone: an ID, a prescription, a receipt, a contract, a page of lab results, or the number someone wrote on a napkin.
 
-Pocket Scanner is a no-nonsense document scanner for iPhone. Scan a receipt, a contract, a recipe, a page of notes - and it lands in your library as a searchable PDF, synced to all your devices through your own iCloud account.
+FAST
+- Instant Scan: one press of the Action button, a Control Center or Lock Screen button, or "Scan with Pocket Scanner" to Siri opens the camera
+- Apple's document scanner finds the edges, straightens the page and captures several pages in one go
+- Every scan is saved as a searchable PDF and named for you; rename it whenever you like
 
-That's it. No subscription. No ads. No account to sign up for. No upsells. Pay once, scan forever.
+ORGANIZED YOUR WAY
+- Folders inside folders, like Medical > Lab Results or Taxes > 2025
+- Move documents between folders, sort by date, name or page count, and switch between a list and a grid
+- Search your whole library by name or by the text inside a document; matches are highlighted right on the page
 
-WHAT IT DOES
+SIGN AND MARK UP
+- Scan your signature once, then place it and the date on any document. No printer needed
+- Highlight or strike through text, crop, rotate and filter pages, and split pages out into a new document
+- Import PDFs you already have
 
-- Capture pages with Apple's document scanner - automatic edge detection, perspective correction, multi-page in one shot
-- Pick a look as you scan - Color, Greyscale, Black & White, or Photo
-- On-device OCR - every scan becomes a fully searchable PDF, no internet required
-- Search your whole library, including inside folders, by filename or by text in the document - matches highlight right on the page
-- Stay organized - folders you can move documents between, sorting by date / name / page count, and a list or thumbnail-grid view
-- Per-page editor - crop, rotate, and apply a clean filter; or rotate a page straight from the page strip
-- Split out pages - pull selected pages into their own new document
-- Mark up scans - highlight or strike through text directly on the page
-- Swipe to delete documents and folders
-- iCloud Drive sync - your scans appear on every device on your iCloud account, in your own storage where you can see and manage them
-- Privacy built in - optional Face ID lock for the library, plus an app-switcher blur so thumbnails don't appear in the task switcher
+YOURS
+- App Lock: Face ID keeps the library private, and the app switcher hides your pages
+- iCloud Drive keeps scans on all your devices, in your own storage. Or use the app without iCloud and keep everything on this iPhone
+- Choose the look of new scans (Color, Greyscale, Black & White or Photo) and the page size of the PDF
 
 WHAT IT DOESN'T DO
 
@@ -34,8 +36,9 @@ Full privacy policy: https://peterajones.github.io/PocketScanner/privacy-policy
 REQUIREMENTS
 
 - iOS 17.6 or later
+- Control Center and Lock Screen buttons need iOS 18 or later; the Action button needs an iPhone that has one
 - iCloud Drive recommended (works in local-only mode if you prefer)
 
 ABOUT
 
-Built solo by an indie developer who got tired of every scanner app demanding a subscription. If you like the app, leave a review - it's the single most valuable thing you can do to help.
+Built by one independent developer who got tired of every scanner app demanding a subscription. No subscription, no ads, no account. Pay once, scan forever. If you like the app, a review is the most helpful thing you can leave.

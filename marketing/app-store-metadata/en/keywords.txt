@@ -1,1 +1,1 @@
-scanner,pdf,document,scan,receipts,searchable,icloud,paperless,no subscription,ocr,signature
+id,card,receipt,tax,form,prescription,medical,note,lab,contract,license,pdf,ocr,sign,no subscription

@@ -1,3 +1,11 @@
-Pocket Scanner's App Store page is now available in Simplified Chinese.
+Instant Scan: one press opens the camera, from anywhere on your iPhone. The scan is saved, made searchable and opened for you. Rename it later if you like.
+
+Ways to use it:
+- Action button: Settings > Action Button > Controls > Scan Document
+- Control Center: tap + and add Scan Document
+- Lock Screen: remove one of the two bottom buttons, then add Scan Document
+- Siri or Spotlight: "Scan with Pocket Scanner" (the first time, Siri asks to turn on the app's shortcuts)
+
+With App Lock on, the camera opens first and Face ID comes before anything in your library is shown.
 
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.
