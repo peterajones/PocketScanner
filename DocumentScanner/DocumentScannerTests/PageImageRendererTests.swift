@@ -49,6 +49,18 @@ final class PageImageRendererTests: XCTestCase {
         XCTAssertEqual(rendered.size.height, 4000, accuracy: 2)
     }
 
+    /// An imported PDF can declare a page up to 14,400 pt. Rendered as-is that is an
+    /// ~830 MB bitmap and the app is killed, so there is a hard ceiling above which a
+    /// page is scaled down.
+    func test_render_scalesDownAPageAboveTheCeiling() throws {
+        let huge = try page(sized: CGSize(width: 14_400, height: 14_400),
+                            imagePixels: CGSize(width: 1000, height: 1000))
+        let rendered = try XCTUnwrap(PageImageRenderer().image(from: huge))
+        XCTAssertLessThanOrEqual(max(rendered.size.width, rendered.size.height),
+                                 PageImageRenderer.maxLongEdge)
+        XCTAssertEqual(PageImageRenderer.maxLongEdge, 2 * PageImageCompressor.pageLongEdgeCap)
+    }
+
     /// The renderer's output feeds straight back into PDFAssembler, whose compressor
     /// reads `image.size`. So point size must equal pixel size, or the resolution is
     /// discarded on the way back in.

@@ -16,13 +16,22 @@ import PDFKit
 /// independent now; images stay 1pt = 1px throughout.
 struct PageImageRenderer {
 
+    /// Hard ceiling on the rendered long edge. A page between the cap and this is
+    /// rendered as-is, so a crop of a large page keeps its detail; above it the page is
+    /// scaled down. Without it, an imported PDF declaring a 14,400 pt page became an
+    /// ~830 MB bitmap and the app was killed.
+    static let maxLongEdge: CGFloat = 2 * PageImageCompressor.pageLongEdgeCap
+
     func image(from page: PDFPage) -> UIImage? {
         let bounds = page.bounds(for: .mediaBox)
         guard bounds.width > 0, bounds.height > 0 else { return nil }
 
-        // Never below 1: a page already larger than the cap is rendered as-is and the
-        // compressor brings it back down.
-        let scale = max(1, PageImageCompressor.pageLongEdgeCap / max(bounds.width, bounds.height))
+        // Never below 1 up to `maxLongEdge`: a page already larger than the cap is
+        // rendered as-is and the compressor brings it back down. Above the ceiling it
+        // is scaled down to it.
+        let longEdge = max(bounds.width, bounds.height)
+        let scale = min(max(1, PageImageCompressor.pageLongEdgeCap / longEdge),
+                        Self.maxLongEdge / longEdge)
         let pixelSize = CGSize(width: (bounds.width * scale).rounded(),
                                height: (bounds.height * scale).rounded())
 
