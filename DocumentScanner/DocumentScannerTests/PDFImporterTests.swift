@@ -195,7 +195,35 @@ final class PDFImporterTests: XCTestCase {
                        "got text: \(doc.string ?? "nil")")
     }
 
+    func test_import_hugePage_isRenderedForOCRWithinTheCap() async throws {
+        // A PDF can declare pages up to 14,400 pt. Rendering one at full size would be
+        // an ~830 MB bitmap; OCR must get an image no larger than the page-edge cap.
+        let pdf = PDFDocument()
+        let page = PDFPage()
+        page.setBounds(CGRect(x: 0, y: 0, width: 14_400, height: 14_400), for: .mediaBox)
+        pdf.insert(page, at: 0)
+        let source = tempDir().appendingPathComponent("Huge.pdf")
+        pdf.write(to: source)
+        let ocr = SizeRecordingOCR()
+
+        _ = try await PDFImporter.importPDF(from: source, using: DocumentStorage(documentsURL: tempDir()), ocr: ocr)
+
+        let size = try XCTUnwrap(ocr.sizes.first)
+        XCTAssertLessThanOrEqual(max(size.width, size.height), PageImageCompressor.pageLongEdgeCap)
+    }
+
     // MARK: - Doubles
+
+    private final class SizeRecordingOCR: OCRProviding, @unchecked Sendable {
+        private let lock = NSLock()
+        private var _sizes: [CGSize] = []
+        var sizes: [CGSize] { lock.withLock { _sizes } }
+        func recognizeText(in image: UIImage) async throws -> [OCRObservation] {
+            lock.withLock { _sizes.append(CGSize(width: image.size.width * image.scale,
+                                                 height: image.size.height * image.scale)) }
+            return []
+        }
+    }
 
     private struct StubOCR: OCRProviding {
         let strings: [String]

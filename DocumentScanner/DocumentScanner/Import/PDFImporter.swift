@@ -77,11 +77,14 @@ enum PDFImporter {
     }
 
     /// Rasterizes the page as displayed, so text on a rotated page reaches Vision
-    /// upright. Same resolution cap as the page editor.
+    /// upright. The long edge is always exactly the page-edge cap: small pages scale up
+    /// for legible OCR, and large ones scale DOWN. Unlike the page editor, this file
+    /// can come from any app, and a page may declare up to 14,400 pt, which rendered
+    /// at full size is an ~830 MB bitmap.
     private static func renderDisplayed(_ page: PDFPage) -> UIImage? {
         let size = displayedSize(of: page)
         guard size.width > 0, size.height > 0 else { return nil }
-        let scale = max(1, PageImageCompressor.pageLongEdgeCap / max(size.width, size.height))
+        let scale = PageImageCompressor.pageLongEdgeCap / max(size.width, size.height)
         let pixelSize = CGSize(width: (size.width * scale).rounded(), height: (size.height * scale).rounded())
 
         let format = UIGraphicsImageRendererFormat()
