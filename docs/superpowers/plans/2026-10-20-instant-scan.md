@@ -1,5 +1,7 @@
 # Instant Scan Implementation Plan
 
+**Status:** COMPLETE — 2026-10-22 (confirmed in daily review)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** One "Scan Document" App Intent (Action button, Siri/Spotlight, Control Center, lock screen) opens straight into the camera, silently saves the scan to Main Library, and opens it, with Face ID after capture when the lock is on.
