@@ -10,6 +10,8 @@ struct DocumentScannerApp: App {
     @State private var instantScan = InstantScanCoordinator.shared
     /// The `-InstantScanOnLaunch` UI-test hook fires once per launch, not on every reappearance.
     @State private var instantScanOnLaunchFired = false
+    /// OCR progress for a PDF opened from another app; nil when no import is running.
+    @State private var importProgress: ImportProgress?
     private let reviewPrompt = ReviewPromptTracker()
     @AppStorage("iCloudOnboardingDismissed") private var iCloudOnboardingDismissed = false
     @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
@@ -127,6 +129,9 @@ struct DocumentScannerApp: App {
                 guard instantScan.phase == .requested else { return }
                 startInstantScan()
             }
+            .overlay {
+                if let importProgress { ImportProgressOverlay(progress: importProgress) }
+            }
             .touchIndicators()
             .environment(\.reviewPrompt, reviewPrompt)
             // Applied at the WindowGroup root so every sheet, alert and fullScreenCover
@@ -184,13 +189,19 @@ struct DocumentScannerApp: App {
     private func handleIncomingPDF(_ url: URL) {
         guard url.pathExtension.lowercased() == "pdf" else { return }
         let storage = DocumentStorage(documentsURL: resolvedDocumentsURL)
-        do {
-            _ = try PDFImporter.importPDF(from: url, using: storage)
-            if iCloudAvailable { metadataStore.refresh() } else { localStore.refresh() }
-        } catch {
-            alertCenter.present(AppAlert(
-                title: String(localized: "Couldn't Import"),
-                message: String(localized: "That file isn't a readable PDF.")))
+        Task {
+            do {
+                _ = try await PDFImporter.importPDF(from: url, using: storage) { current, total in
+                    await MainActor.run { importProgress = ImportProgress(current: current, total: total) }
+                }
+                importProgress = nil
+                if iCloudAvailable { metadataStore.refresh() } else { localStore.refresh() }
+            } catch {
+                importProgress = nil
+                alertCenter.present(AppAlert(
+                    title: String(localized: "Couldn't Import"),
+                    message: String(localized: "That file isn't a readable PDF.")))
+            }
         }
     }
 

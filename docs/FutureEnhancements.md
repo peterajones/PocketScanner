@@ -117,12 +117,15 @@ shared `ImportPDFModifier` (also keeps both views under the SwiftUI type-check
 ceiling). Spec/plan under `docs/superpowers/` dated 2026-07-12. (Surfaced 2026-07-10
 while shooting the App Store media.)
 
-  - **Follow-up (still open): OCR image-only imported PDFs.** v1 import deliberately does NO OCR —
-    born-digital PDFs (the emailed-contract case) are already searchable via
-    `pdf.string`, but an *image-only* PDF (someone's camera scan) imports and is fully
-    usable yet **not text-searchable**. A later pass could detect a missing text layer
-    and OCR each page (render → Vision → rebuild with an invisible text layer, reusing
-    the scan pipeline) to make any imported PDF searchable. Deferred to keep v1 small.
+  - ~~**Follow-up: OCR image-only imported PDFs.**~~ **Built 2026-10-22 for v4.0 (39)
+    (branch `feature/ocr-imported-pdfs`).** `PDFImporter` OCRs only pages whose
+    `page.string` is empty: it renders the page as displayed, runs `OCREngine`, and
+    replaces it with a page that draws the original unchanged plus
+    `PDFAssembler.drawInvisibleText`. Pages with text are untouched; an OCR failure
+    or empty result keeps the page as it was. Both entry points show
+    `ImportProgressOverlay` ("Processing page %lld of %lld", already translated).
+    Rotated pages come out upright with rotation 0: `PDFPage.draw(with:to:)` already
+    applies rotation, so `transform(_:for:)` must not be called before it.
 
 ### Signing follow-ups
 

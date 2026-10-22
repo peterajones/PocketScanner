@@ -97,7 +97,7 @@ struct PDFAssembler {
         if !page.observations.isEmpty {
             // Text must follow the IMAGE, not the page — otherwise the invisible OCR
             // layer drifts off the glyphs it belongs to whenever there are margins.
-            drawInvisibleText(page.observations, in: drawRect, into: context)
+            Self.drawInvisibleText(page.observations, in: drawRect, into: context)
         }
         context.endPage()
     }
@@ -132,11 +132,13 @@ struct PDFAssembler {
         return normalized
     }
 
+    /// Also used by `PDFImporter` to lay a text layer over imported image-only pages.
+    ///
     /// - Parameter imageRect: where the page image was actually drawn, which is NOT the
     ///   page rect once a fixed paper size introduces margins. Vision's coordinates are
     ///   normalized to the image, so they must be mapped onto the image's rect — including
     ///   its origin, or the whole text layer shifts by the margin.
-    private func drawInvisibleText(_ observations: [OCRObservation], in imageRect: CGRect, into context: CGContext) {
+    static func drawInvisibleText(_ observations: [OCRObservation], in imageRect: CGRect, into context: CGContext) {
         context.saveGState()
         context.setTextDrawingMode(.invisible)
 

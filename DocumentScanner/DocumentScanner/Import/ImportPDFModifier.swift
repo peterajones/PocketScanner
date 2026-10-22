@@ -12,6 +12,7 @@ struct ImportPDFModifier: ViewModifier {
     let onImported: () -> Void
 
     @State private var importError: String?
+    @State private var progress: ImportProgress?
 
     func body(content: Content) -> some View {
         content
@@ -21,15 +22,24 @@ struct ImportPDFModifier: ViewModifier {
                 switch result {
                 case .success(let urls):
                     guard let url = urls.first else { return }
-                    do {
-                        _ = try PDFImporter.importPDF(from: url, using: storage)
-                        onImported()
-                    } catch {
-                        importError = "That file isn't a readable PDF."
+                    Task {
+                        do {
+                            _ = try await PDFImporter.importPDF(from: url, using: storage) { current, total in
+                                await MainActor.run { progress = ImportProgress(current: current, total: total) }
+                            }
+                            progress = nil
+                            onImported()
+                        } catch {
+                            progress = nil
+                            importError = "That file isn't a readable PDF."
+                        }
                     }
                 case .failure:
                     importError = "Couldn't import the file."
                 }
+            }
+            .overlay {
+                if let progress { ImportProgressOverlay(progress: progress) }
             }
             .alert("Couldn't Import", isPresented: Binding(
                 get: { importError != nil },
