@@ -4,6 +4,10 @@ import Observation
 protocol LibraryStoring: AnyObject {
     var summaries: [DocumentSummary] { get }
     func refresh()
+    /// Call after a delete the user confirmed has succeeded: removes the document, or
+    /// every document inside a deleted folder, from `summaries` at once instead of
+    /// waiting for the next refresh to notice.
+    func didDelete(at url: URL)
 }
 
 /// Testable in-memory store. Originally `nonisolated` to opt out of the project's
@@ -22,6 +26,12 @@ final class InMemoryLibraryStore: LibraryStoring {
     func append(_ summary: DocumentSummary) {
         summaries.append(summary)
         summaries.sort { $0.createdAt > $1.createdAt }
+    }
+
+    func didDelete(at url: URL) {
+        var deleted = PendingDeletions()
+        deleted.add(url)
+        summaries = deleted.filter(summaries)
     }
 
     func refresh() {

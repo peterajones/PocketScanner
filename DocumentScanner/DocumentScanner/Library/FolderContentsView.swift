@@ -90,7 +90,9 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
             presenting: docBeingDeleted
         ) { summary in
             Button("Delete", role: .destructive) {
-                try? storage.delete(at: summary.url)
+                if (try? storage.delete(at: summary.url)) != nil {
+                    store.didDelete(at: summary.url)
+                }
                 store.refresh()
             }
             Button("Cancel", role: .cancel) {}
@@ -424,7 +426,12 @@ struct FolderContentsView<Store: LibraryStoring & Observable>: View {
 
     private func deleteSubfolder() {
         guard let folder = subfolderBeingDeleted else { return }
-        do { try storage.deleteFolder(at: folder); store.refresh(); refreshFolders() }
+        do {
+            try storage.deleteFolder(at: folder)
+            store.didDelete(at: folder)
+            store.refresh()
+            refreshFolders()
+        }
         catch { folderActionError = error.localizedDescription }
         subfolderBeingDeleted = nil
     }

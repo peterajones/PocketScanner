@@ -5,6 +5,7 @@ import Observation
 @Observable
 final class MetadataQueryLibraryStore: NSObject, LibraryStoring {
     private(set) var summaries: [DocumentSummary] = []
+    private var pendingDeletions = PendingDeletions()
 
     private let query: NSMetadataQuery = {
         let q = NSMetadataQuery()
@@ -32,6 +33,11 @@ final class MetadataQueryLibraryStore: NSObject, LibraryStoring {
         NotificationCenter.default.removeObserver(self)
     }
 
+    func didDelete(at url: URL) {
+        pendingDeletions.add(url)
+        summaries = pendingDeletions.filter(summaries)
+    }
+
     func refresh() {
         query.disableUpdates()
         query.enableUpdates()
@@ -51,7 +57,10 @@ final class MetadataQueryLibraryStore: NSObject, LibraryStoring {
                 urls.map { DocumentSummary.fromFile(at: $0) }
                     .sorted(by: { $0.createdAt > $1.createdAt })
             }.value
-            self.summaries = built
+            // `urls` may predate a delete made while this update was being built;
+            // the pending entry keeps that row hidden until the query drops it.
+            self.pendingDeletions.prune(keepingThoseStillIn: urls)
+            self.summaries = self.pendingDeletions.filter(built)
             self.query.enableUpdates()
         }
     }

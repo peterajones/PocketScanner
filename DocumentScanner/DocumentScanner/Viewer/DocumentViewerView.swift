@@ -11,7 +11,9 @@ struct DocumentViewerView: View {
     let searchContext: SearchContext?
     /// Closure dismissing the viewer; provided by LibraryView so the deletion
     /// path can pop the navigation stack.
-    let onDeleted: () -> Void
+    /// Called after the delete confirmation, with the document's URL if the file was
+    /// removed (nil if the delete failed), so the library can drop the row at once.
+    let onDeleted: (_ deletedURL: URL?) -> Void
     /// Called after this viewer creates a NEW document (page extraction) so the
     /// library can refresh. The local-mode `InMemoryLibraryStore` doesn't detect
     /// new files on its own the way the iCloud `NSMetadataQuery` store does, so
@@ -26,7 +28,7 @@ struct DocumentViewerView: View {
          scannerPresenter: DocumentScannerPresenting,
          pipeline: ScanPipeline,
          searchContext: SearchContext?,
-         onDeleted: @escaping () -> Void,
+         onDeleted: @escaping (_ deletedURL: URL?) -> Void,
          onDocumentCreated: @escaping () -> Void) {
         self.summary = summary
         self.storage = storage
@@ -258,8 +260,8 @@ struct DocumentViewerView: View {
         // confirms have always used .alert and show both buttons correctly.
         .alert("Delete this document?", isPresented: $showDeleteConfirm) {
             Button("Delete", role: .destructive) {
-                try? storage.delete(at: session.url)
-                onDeleted()
+                let deleted = (try? storage.delete(at: session.url)) != nil
+                onDeleted(deleted ? session.url : nil)
             }
             Button("Cancel", role: .cancel) {}
         } message: {

@@ -67,7 +67,8 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     scannerPresenter: scannerPresenter,
                     pipeline: pipeline,
                     searchContext: searchContext(for: route),
-                    onDeleted: {
+                    onDeleted: { deletedURL in
+                        if let deletedURL { store.didDelete(at: deletedURL) }
                         store.refresh()
                         path.removeLast()
                     },
@@ -214,7 +215,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                 presenting: docBeingDeleted
             ) { summary in
                 Button("Delete", role: .destructive) {
-                    try? storage.delete(at: summary.url)
+                    if (try? storage.delete(at: summary.url)) != nil {
+                        store.didDelete(at: summary.url)
+                    }
                     store.refresh()
                 }
                 Button("Cancel", role: .cancel) {}
@@ -558,6 +561,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         guard let folder = folderBeingDeleted else { return }
         do {
             try storage.deleteFolder(at: folder)
+            store.didDelete(at: folder)
             refreshFolders()
             store.refresh()
         } catch {
