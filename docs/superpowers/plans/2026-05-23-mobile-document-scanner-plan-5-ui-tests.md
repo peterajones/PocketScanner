@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 5: XCUITest golden-path tests
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Lock the app's most important user flows into automated UI tests that run on the simulator, with no real iCloud / camera dependence. Catches regressions in the navigation, name-and-save flow, and edit-mode interactions across all future changes.

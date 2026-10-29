@@ -1,5 +1,7 @@
 # Date Stamp Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a date stamp — pick a date (default today) and one of 5 fixed format presets, render it to an image, and place it on the page via the existing signature-stamp machinery (drag/resize, Move/Remove, persistence).

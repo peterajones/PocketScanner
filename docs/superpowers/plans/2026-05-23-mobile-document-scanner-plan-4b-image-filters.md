@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 4b: Image filter presets
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let the user pick a visual filter for any page in the per-page editor. Presets: Color (default), Greyscale, Black & White, Photo. The filtered image is what gets re-OCR'd and written back to the PDF on Apply.

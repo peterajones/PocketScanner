@@ -1,5 +1,7 @@
 # Debug Touch-Indicator Overlay Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A DEBUG-only, app-wide overlay that draws a fading circle at every touch,

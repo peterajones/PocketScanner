@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 2a: Viewer toolbar + page operations
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make saved documents editable. Add the viewer toolbar (share, rename, delete-document) and an edit mode that supports page-level operations: reorder, delete a page, append more pages.

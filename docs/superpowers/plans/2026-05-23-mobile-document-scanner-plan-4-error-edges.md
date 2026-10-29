@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 4: Error edges + cleanup
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make the app resilient in failure modes that the happy path doesn't see. iCloud unavailable, camera permission denied, storage full, multi-device conflicts, corrupt PDFs. Plus one known cleanup: strip search-highlight annotations before saving so they don't bake into the on-disk PDF.

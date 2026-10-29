@@ -1,5 +1,7 @@
 # Scan to a Chosen Folder + One Level of Nesting — Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add sub-folders (one level of nesting, level-2 cap enforced in the UI) and a "Save to" destination picker in the scan Save sheet defaulting to the current context.

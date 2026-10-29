@@ -1,5 +1,7 @@
 # Signature Signing Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let a user scan a pen-on-paper signature, auto-clean it to a transparent cut-out, save one reusable signature, and drag/resize it onto a page as an editable (deletable) stamp. Ships as **v2.0 (18)**.

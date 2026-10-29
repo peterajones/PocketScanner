@@ -1,5 +1,7 @@
 # Search Scope Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make Main Library search find documents inside folders, and make in-folder search highlight its matches in the viewer — one model: "search is scoped to where you are."

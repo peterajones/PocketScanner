@@ -1,5 +1,7 @@
 # v3.4 Screenshot Reorder
 
+**Status:** FOLDED into TODO.md
+
 **Date:** 2026-08-29
 **Ships with:** v3.4 (screenshots are version metadata; a live version's media is locked)
 **Why now:** see the ASO section of `docs/FutureEnhancements.md` and the funnel data in the

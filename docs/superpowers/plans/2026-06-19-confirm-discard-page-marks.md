@@ -1,5 +1,7 @@
 # Confirm Before Discarding Page Marks — Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the silent loss of a page's highlights/marks when it's edited with an informed confirmation — warn before `PageEditorView` rebuilds an annotated page (single Apply) or annotated pages (Apply-to-all). Do not preserve/remap the marks (decided against).

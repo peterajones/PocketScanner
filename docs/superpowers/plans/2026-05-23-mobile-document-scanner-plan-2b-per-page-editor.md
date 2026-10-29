@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 2b: Per-page crop / rotate editor
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let the user fix a single page after the fact — adjust the crop quadrilateral (with auto-detection as a starting point) and rotate in 90° increments. The corrected page replaces the original in the PDF and is re-OCR'd so search continues to work.

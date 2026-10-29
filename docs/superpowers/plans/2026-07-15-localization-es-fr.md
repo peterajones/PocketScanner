@@ -1,5 +1,7 @@
 # v3.0 Localization (Spanish + French) Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Localize Pocket Scanner into Spanish (es) and French (fr) — in-app UI plus App Store listing and screenshots — shipped as one bundled v3.0 release.

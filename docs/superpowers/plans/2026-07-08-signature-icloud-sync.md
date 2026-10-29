@@ -1,5 +1,7 @@
 # Signature iCloud Sync Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Persist signatures to iCloud (in the hidden sibling of the document scope) so they survive reinstall / new-phone setup, without changing `SignatureStore`'s public API or its callers.

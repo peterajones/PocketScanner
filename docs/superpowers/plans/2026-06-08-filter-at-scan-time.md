@@ -1,5 +1,7 @@
 # Filter at Scan Time Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let the user pick a filter (Color / Greyscale / B&W / Photo) with a live page-1 preview while saving a fresh scan, baking it into every page.

@@ -1,5 +1,7 @@
 # Scanned-PDF File-Size Reduction Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Shrink scanned PDFs ~10–20× (from ~3.5 MB/page toward flatbed-comparable) by downsampling + JPEG-compressing each page at the single image→PDF chokepoint.

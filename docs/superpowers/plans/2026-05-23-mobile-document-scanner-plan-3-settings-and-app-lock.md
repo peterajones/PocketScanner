@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 3: Settings + App Lock + Privacy Blur
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a Settings screen with an optional Face ID app lock. When the lock is on, the library hides behind a lock screen on cold launch and again after the app has been in the background for >30 seconds. Independently of the lock state, the app's content gets blurred whenever the app is in the background so document names and thumbnails don't appear in the iOS app-switcher snapshot.

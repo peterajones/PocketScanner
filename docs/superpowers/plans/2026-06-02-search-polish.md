@@ -1,5 +1,7 @@
 # Search polish Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Two-item v1.2 search polish: (1) horizontal highlight accuracy via text-matrix scaling in `PDFAssembler.drawInvisibleText`, (2) cross-doc match navigation via a new `SearchContext` value type passed from library into viewer.

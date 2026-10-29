@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 1: Foundation & MVP
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Stand up an iOS app that can scan a document with VisionKit, OCR it on-device, save it as a searchable PDF in iCloud Drive, list it on the home screen, and open it in a viewer.

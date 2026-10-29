@@ -1,5 +1,7 @@
 # App Store Screenshot Template Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** This is a manual graphics deliverable built in Krita's GUI.
 > Most tasks are performed by the human at the keyboard (marked **[Peter]**); a few
 > are scriptable (marked **[Claude]**). Steps use checkbox (`- [ ]`) syntax for

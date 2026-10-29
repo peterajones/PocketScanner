@@ -1,5 +1,7 @@
 # Import a PDF Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let a user bring an existing PDF into the library (to view/sign/date/search) via two entry points — a document handler ("Open in Pocket Scanner") and an in-app "Import PDF" picker — reusing the existing storage + library so there's no new pipeline.

@@ -1,5 +1,7 @@
 # Tips Screen Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a findable **Tips** screen (Settings ▸ About ▸ Tips) with six short tips — five everyday tricks plus the decided highlights/handwriting expectation-setter — built so more tips are a one-line append.

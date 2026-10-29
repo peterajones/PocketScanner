@@ -1,5 +1,7 @@
 # Mobile Document Scanner — Plan 2c: Search highlighting in the viewer
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** When the user taps a result from the library's search, open the viewer with all matches of the search term highlighted in the PDF and prev/next buttons in the bottom toolbar to step through them.

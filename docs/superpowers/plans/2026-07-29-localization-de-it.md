@@ -1,5 +1,7 @@
 # v3.2 Localization — German + Italian Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship Pocket Scanner v3.2 (build 31) with German (`de`) and Italian (`it`) as fully localized languages — in-app UI, App Store metadata, and captioned screenshots — mirroring the v3.0 es/fr launch.

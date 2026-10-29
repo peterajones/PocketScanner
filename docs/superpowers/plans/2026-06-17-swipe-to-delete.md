@@ -1,5 +1,7 @@
 # Swipe-to-Delete Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a left-swipe Delete on document and folder rows (List), plus a Delete item in the document context menu (Grid/long-press parity), with a confirmation for documents.

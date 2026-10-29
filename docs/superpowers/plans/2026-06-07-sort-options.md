@@ -1,5 +1,7 @@
 # Sort Options Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let users sort the document library by Date, Name, or Page Count (ascending/descending) via a Files-style toolbar menu, with the choice persisted globally.

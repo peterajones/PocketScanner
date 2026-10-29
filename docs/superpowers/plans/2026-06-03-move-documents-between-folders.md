@@ -1,5 +1,7 @@
 # Move Documents Between Folders Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a unified "Move to…" submenu to document context menus so a doc can move folder→folder, folder→main library, and main library→folder.

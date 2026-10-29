@@ -1,5 +1,7 @@
 # Pocket Scanner App Preview Implementation Plan
 
+**Status:** FOLDED into TODO.md
+
 > **Superseded (2026-06-15):** this plan's iMovie/Storyboard-A approach was abandoned
 > during execution. The video that shipped (v1.8) was edited in **CapCut** and framed
 > in iPhone 17 chrome via **ffmpeg**. For the real, reproducible workflow and the exact
