@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 @main
 struct DocumentScannerApp: App {
@@ -57,6 +58,23 @@ struct DocumentScannerApp: App {
             DemoSeeder(documentsURL: container.localDocumentsURL).seed()
         }
         #endif
+
+        // Contextual tips (ContextualTipCard). Not configured in UI-test or demo-seed
+        // launches, so no tip can ever appear there. At most one new tip a day.
+        if ContextualTipTracker.isEnabledForLaunch {
+            var frequency = Tips.ConfigurationOption.DisplayFrequency.daily
+            #if DEBUG
+            // Device checks: -TipsReset forgets closed tips, -TipsImmediate drops the
+            // daily limit so the next tip shows as soon as one is closed.
+            let arguments = ProcessInfo.processInfo.arguments
+            if arguments.contains("-TipsReset") {
+                try? Tips.resetDatastore()
+                ContextualTipTracker().resetForDeviceChecks()
+            }
+            if arguments.contains("-TipsImmediate") { frequency = .immediate }
+            #endif
+            try? Tips.configure([.displayFrequency(frequency)])
+        }
     }
 
     private static var isUITesting: Bool {

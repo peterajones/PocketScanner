@@ -260,6 +260,7 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
         }
         store.refresh()
         instantScan.markOpened()
+        ContextualTipTracker().recordInstantScanUsed()
         reviewPrompt.recordSuccessAndMaybeRequest(using: requestReview)
     }
 
@@ -345,6 +346,9 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private var listBody: some View {
         List {
+            if searchText.isEmpty {
+                ContextualTipCard(documentCount: store.summaries.count)
+            }
             if showFolders && !folders.isEmpty && searchText.isEmpty {
                 Section {
                     ForEach(folders, id: \.self) { folderURL in
@@ -388,6 +392,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @ViewBuilder
     private var gridBody: some View {
         ScrollView {
+            if searchText.isEmpty {
+                ContextualTipCard(documentCount: store.summaries.count)
+                    .padding([.horizontal, .top])
+            }
             LazyVGrid(columns: gridColumns, spacing: 16) {
                 if showFolders && !folders.isEmpty && searchText.isEmpty {
                     ForEach(folders, id: \.self) { folderURL in

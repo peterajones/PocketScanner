@@ -11,7 +11,7 @@ _Single source of truth for unfinished work in this project. Tick an item when i
 - [ ] Push App Store metadata for all locales from marketing/app-store-metadata/ via the App Store Connect API (from: docs/FutureEnhancements.md)
 
 ## Later
-- [ ] Surface relevant tips contextually instead of only on the passive Settings ▸ About ▸ Tips screen (from: docs/FutureEnhancements.md)
+- [x] Surface relevant tips contextually instead of only on the passive Settings ▸ About ▸ Tips screen (from: docs/FutureEnhancements.md)
 - [ ] Add ID card mode: scan front and back of a card onto one page at true card size, backing the v4.0 id/card/license keywords (from: docs/FutureEnhancements.md)
 - [ ] Add password-protected PDF export (from: docs/FutureEnhancements.md)
 
