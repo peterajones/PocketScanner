@@ -3,7 +3,7 @@
 _Single source of truth for unfinished work in this project. Tick an item when it is done; the review harness records it and removes the line._
 
 ## Next
-- [ ] Let Siri / Spotlight find documents ("show my latest lab results") via on-device App Entities indexed for Spotlight; needs its own design (from: docs/FutureEnhancements.md)
+- [x] Let Siri / Spotlight find documents ("show my latest lab results") via on-device App Entities indexed for Spotlight; needs its own design (from: docs/FutureEnhancements.md)
 - [ ] Push App Store metadata for all locales from marketing/app-store-metadata/ via the App Store Connect API (from: docs/FutureEnhancements.md)
 
 ## Later
