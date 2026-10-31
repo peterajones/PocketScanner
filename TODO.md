@@ -1,6 +1,6 @@
 # TODO
 
-_Single source of truth for unfinished work in this project. Remove an item when it is done._
+_Single source of truth for unfinished work in this project. Tick an item when it is done; the review harness records it and removes the line._
 
 ## Next
 - [ ] Fix OCR being English-only: OCREngine sets no recognitionLanguages, so Vision defaults to en_US; set them from the user's preferred languages with automatic detection as fallback (from: docs/FutureEnhancements.md)
