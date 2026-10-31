@@ -61,6 +61,12 @@ struct OCREngine: OCRProviding {
             }
             request.recognitionLevel = .accurate
             request.usesLanguageCorrection = true
+            // Left alone, Vision reads en_US only, and a Chinese page comes back empty.
+            // Both settings are needed: detection alone picks one language per page and
+            // garbles the Chinese on a mostly-English page; zh-Hans without detection
+            // strips Latin diacritics ("Straße" → "StraBe"), breaking search in de/fr/es/it.
+            request.recognitionLanguages = ["zh-Hans", "en-US"]
+            request.automaticallyDetectsLanguage = true
 
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             DispatchQueue.global(qos: .userInitiated).async {
