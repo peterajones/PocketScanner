@@ -84,3 +84,4 @@ Add one line per change, newest last:
 - 2026-10-22 — Searchable imports — `6b832d3` — 39 — no
 - 2026-10-22 — Oversized-page caps (import and editor) — `b67988a`, `cbc600c` — 39 — no
 - 2026-10-22 — Instant delete on iCloud — `3178ae6` — 39 — no
+- 2026-10-31 — Chinese text recognized by OCR — `1d26b8c` — 40 — yes
