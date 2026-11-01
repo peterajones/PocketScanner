@@ -52,6 +52,10 @@ Center or lock screen, or tell Siri 'Scan with Pocket Scanner'. The camera opens
 the scan is saved in the Main Library." Accurate. *Action-Taste*, *Kontrollzentrum* and
 *Sperrbildschirm* are Apple's German terms. The quoted phrase is identical to the shortcut phrase.
 
+> **Correction 2026-10-21 (`ce6ec75`):** Apple's German term is *Aktionstaste*, not *Action-Taste*;
+> the shipped string now reads "…zur Aktionstaste, zum Kontrollzentrum…". The back-translation is
+> unchanged. It now matches the v4.0 listing copy.
+
 **it:** *Aggiungi "Scansiona documento" al tasto Azione, al Centro di Controllo o alla schermata
 di blocco, oppure di' a Siri "Scansiona con Pocket Scanner". La fotocamera si apre subito e la
 scansione viene salvata in Libreria principale.* → "Add 'Scan Document' to the Action button,

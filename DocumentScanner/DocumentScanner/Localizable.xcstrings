@@ -1201,7 +1201,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "合并为正面和背面？"
+            "value": "将正面和背面合并为一页？"
           }
         }
       }
