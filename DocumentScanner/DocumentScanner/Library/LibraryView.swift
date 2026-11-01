@@ -18,6 +18,10 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
     @State private var showingCapture = false
     @State private var showingCameraDenied = false
     @State private var nameSheet: NameSheetContext?
+    @State private var cardPending: CardScanPending?
+    /// The front of a card while its back is being captured.
+    @State private var cardFront: UIImage?
+    @AppStorage("scanPaperSize") private var scanPaperSizeRaw = PaperSize.auto.rawValue
     @State private var path = NavigationPath()
     @State private var folders: [URL] = []          // root display: top-level folders only
     @State private var moveTargets: [URL] = []       // Move menu: top-level folders + sub-folders
@@ -130,14 +134,21 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
                     presenter: scannerPresenter,
                     onFinish: { images in
                         showingCapture = false
-                        let captured = images
-                        let recognizeTask = Task { await pipeline.recognize(images: captured) }
-                        nameSheet = NameSheetContext(images: captured, recognizeTask: recognizeTask)
+                        handleCapture(images)
                     },
-                    onCancel: { showingCapture = false }
+                    onCancel: {
+                        showingCapture = false
+                        keepFrontIfBackAbandoned()
+                    }
                 )
                 .ignoresSafeArea()
             }
+            .modifier(CardScanPrompt(pending: $cardPending,
+                                     onScanBack: { front in
+                                         cardFront = front
+                                         showingCapture = true
+                                     },
+                                     onSave: startNaming))
             .fullScreenCover(isPresented: $showingCameraDenied) {
                 CameraDeniedView(onDismiss: { showingCameraDenied = false })
             }
@@ -500,6 +511,29 @@ struct LibraryView<Store: LibraryStoring & Observable>: View {
             sortKeyRaw = key.rawValue
             sortAscending = DocumentSort.defaultAscending(for: key)
         }
+    }
+
+    /// A finished capture: a card may be asked about first (see `CardScan`).
+    private func handleCapture(_ images: [UIImage]) {
+        let front = cardFront
+        cardFront = nil
+        switch CardScan.route(captured: images, awaitingBackFor: front,
+                              paperSize: PaperSize(rawValue: scanPaperSizeRaw) ?? .auto) {
+        case .save(let pages): startNaming(pages)
+        case .ask(let offer, let pages): cardPending = CardScanPending(offer: offer, images: pages)
+        }
+    }
+
+    /// Cancelling the camera for a card's back still saves its front.
+    private func keepFrontIfBackAbandoned() {
+        guard let front = cardFront else { return }
+        cardFront = nil
+        startNaming([front])
+    }
+
+    private func startNaming(_ pages: [UIImage]) {
+        let recognizeTask = Task { await pipeline.recognize(images: pages) }
+        nameSheet = NameSheetContext(images: pages, recognizeTask: recognizeTask)
     }
 
     private func triggerScan() {
