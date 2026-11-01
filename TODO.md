@@ -14,6 +14,5 @@ _Single source of truth for unfinished work in this project. Tick an item when i
 - [ ] Add a UI or unit test for the contextual tip rules: each tip appears once and until closed, the scan-in-one-press tip is suppressed after Instant Scan use, and the card is hidden while searching in list and grid. (from: review harness)
 
 ## Later
-- [x] Add password-protected PDF export (from: docs/FutureEnhancements.md)
 
 ## Undecided
