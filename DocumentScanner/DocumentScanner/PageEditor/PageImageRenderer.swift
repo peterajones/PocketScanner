@@ -22,6 +22,28 @@ struct PageImageRenderer {
     /// ~830 MB bitmap and the app was killed.
     static let maxLongEdge: CGFloat = 2 * PageImageCompressor.pageLongEdgeCap
 
+    /// `image` turned clockwise by `quarterTurns` × 90°, at 1pt = 1px. A default
+    /// renderer would use the screen's scale (3x), turning a 2800 px page into an
+    /// ~200 MB bitmap before the filter and OCR run on it.
+    static func rotated(_ image: UIImage, quarterTurns: Int) -> UIImage {
+        guard quarterTurns != 0 else { return image }
+        let angle = CGFloat(quarterTurns) * .pi / 2
+        let size: CGSize = (quarterTurns % 2 == 0)
+            ? image.size
+            : CGSize(width: image.size.height, height: image.size.width)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        return renderer.image { ctx in
+            ctx.cgContext.translateBy(x: size.width / 2, y: size.height / 2)
+            ctx.cgContext.rotate(by: angle)
+            image.draw(in: CGRect(x: -image.size.width / 2,
+                                  y: -image.size.height / 2,
+                                  width: image.size.width,
+                                  height: image.size.height))
+        }
+    }
+
     func image(from page: PDFPage) -> UIImage? {
         let bounds = page.bounds(for: .mediaBox)
         guard bounds.width > 0, bounds.height > 0 else { return nil }
