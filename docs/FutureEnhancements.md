@@ -55,7 +55,7 @@ the phone":
 | Low-light multi-shot capture | TurboScan (SureScan) | Fits |
 | Curved book-page straightening | Adobe Scan, Scanner Pro | Fits; hard to do well |
 | Naming templates (date, prefix) | Genius Scan | Fits; small extension of the auto-namer |
-| Password-protected PDF export | Genius Scan | Fits the privacy pitch |
+| Password-protected PDF export | Genius Scan | **Dropped 2026-11-01**: an encrypted send service (e.g. Bitwarden Send) protects a shared scan better; reconsider if users ask |
 | OCR for image-only imported PDFs | most | Fits; already a follow-up under Import a PDF |
 | Copy text / export text or JPG | Scanner Pro, CamScanner | Check first whether viewer text selection already covers it |
 | QR mode, auto-export to a folder, PDF/A, widget, lens-smudge warning | various | Stretch |
