@@ -11,7 +11,7 @@ _Single source of truth for unfinished work in this project. Tick an item when i
 - [x] Add a regression test for OCR language handling: run OCREngine on a Chinese-only page and a mixed English/Chinese page, and assert that the request lists zh-Hans + en-US with automatic language detection on. (from: review harness)
 - [x] Check whether the Chinese OCR fix needs to reach the already-submitted v4.0 build, and if so upload a new build; also reconsider other CJK languages (ja, ko, zh-Hant) for recognitionLanguages. (from: review harness)
 - [x] Add the contextual Main Library tips (scan in one press, search inside your scans, touch and hold for more) to the v4.0 What's New and the locale translations, if they are meant to be announced. (from: review harness)
-- [ ] Add a UI or unit test for the contextual tip rules: each tip appears once and until closed, the scan-in-one-press tip is suppressed after Instant Scan use, and the card is hidden while searching in list and grid. (from: review harness)
+- [x] Add a UI or unit test for the contextual tip rules: each tip appears once and until closed, the scan-in-one-press tip is suppressed after Instant Scan use, and the card is hidden while searching in list and grid. (from: review harness)
 
 ## Later
 
