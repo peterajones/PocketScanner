@@ -3,7 +3,7 @@
 _Single source of truth for unfinished work in this project. Tick an item when it is done; the review harness records it and removes the line._
 
 ## Next
-- [ ] Update the v4.0 What's New for the changes since build 39 (e.g. the OCR Chinese fix): en whats_new.txt, the other 7 locales (back-translation QA for de/it/zh-Hans), then ASC before submitting (from: docs/WhatsNew-v4.md)
+- [ ] On 2026-11-03, update the v4.0 What's New for the changes since build 39 (e.g. the OCR Chinese fix): en whats_new.txt, the other 7 locales (back-translation QA for de/it/zh-Hans), then ASC before submitting (from: docs/WhatsNew-v4.md)
 - [ ] On 2026-11-04, bump to 4.0 (40) in the app and Controls targets, archive with everything merged since build 39, and upload (from: docs/WhatsNew-v4.md)
 - [ ] On 2026-11-04, select build 40 for v4.0 in App Store Connect and submit for review (from: docs/WhatsNew-v4.md)
 - [ ] Release v4.0 manually on Wednesday 2026-11-11, the Featuring Nomination date (from: docs/WhatsNew-v4.md)
@@ -14,7 +14,7 @@ _Single source of truth for unfinished work in this project. Tick an item when i
 - [ ] Add a UI or unit test for the contextual tip rules: each tip appears once and until closed, the scan-in-one-press tip is suppressed after Instant Scan use, and the card is hidden while searching in list and grid. (from: review harness)
 
 ## Later
-- [ ] Add ID card mode: scan front and back of a card onto one page at true card size, backing the v4.0 id/card/license keywords (from: docs/FutureEnhancements.md)
+- [x] Add card scans: with Page Size on Auto, a wallet-card-shaped scan offers to scan the back and stitches it below the front on one page; front and back captured together offer Combine (from: docs/FutureEnhancements.md)
 - [ ] Add password-protected PDF export (from: docs/FutureEnhancements.md)
 
 ## Undecided
