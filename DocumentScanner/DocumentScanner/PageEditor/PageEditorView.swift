@@ -171,23 +171,9 @@ struct PageEditorView: View {
     }
 
     private func rotatedImage(_ image: UIImage) -> UIImage {
-        guard rotationQuarterTurns != 0 else { return image }
-        // Apply rotation to the displayed image only. The actual quad still
-        // operates in the underlying image's coordinate space; the apply
-        // step rotates the corrected output, not the source.
-        let angle = CGFloat(rotationQuarterTurns) * .pi / 2
-        let size: CGSize = (rotationQuarterTurns % 2 == 0)
-            ? image.size
-            : CGSize(width: image.size.height, height: image.size.width)
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { ctx in
-            ctx.cgContext.translateBy(x: size.width / 2, y: size.height / 2)
-            ctx.cgContext.rotate(by: angle)
-            image.draw(in: CGRect(x: -image.size.width / 2,
-                                  y: -image.size.height / 2,
-                                  width: image.size.width,
-                                  height: image.size.height))
-        }
+        // Rotation applies to the displayed image and to the corrected output; the
+        // quad still operates in the underlying image's coordinate space.
+        PageImageRenderer.rotated(image, quarterTurns: rotationQuarterTurns)
     }
 
     private func displayedImage(_ image: UIImage) -> UIImage {
