@@ -3,8 +3,6 @@
 _Single source of truth for unfinished work in this project. Tick an item when it is done; the review harness records it and removes the line._
 
 ## Next
-- [x] On 2026-11-04, bump to 4.0 (40) in the app and Controls targets, archive with everything merged since build 39, and upload (from: docs/WhatsNew-v4.md)
-- [x] On 2026-11-04, select build 40 for v4.0 in App Store Connect and submit for review (from: docs/WhatsNew-v4.md)
 - [ ] Release v4.0 manually on Wednesday 2026-11-11, the Featuring Nomination date (from: docs/WhatsNew-v4.md)
 
 ## Later
