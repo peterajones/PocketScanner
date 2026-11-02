@@ -2,8 +2,8 @@
 
 A running log of everything that ships in **Pocket Scanner 4.0**. Started 2026-10-22.
 
-- **Version / build:** 4.0 (39), uploaded 2026-10-22 and tested from TestFlight. 4.0 (40) is planned for
-  2026-11-04 and is the build to submit.
+- **Version / build:** 4.0 (39), uploaded 2026-10-22 and tested from TestFlight. 4.0 (40), bumped
+  2026-11-02, is the build to submit.
 - **Submit by:** about 2026-11-04. **Release:** manual, Wednesday 2026-11-11, the date in the
   Featuring Nomination (`docs/featuring/2026-10-21-v4.0-nomination.md`).
 - **Previous release:** 3.9 (38), git tag `build-38`. `git log build-38..HEAD` lists every commit
