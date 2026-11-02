@@ -2,7 +2,8 @@
 
 A running log of everything that ships in **Pocket Scanner 4.0**. Started 2026-10-22.
 
-- **Version / build:** 4.0 (39), uploaded 2026-10-22 and tested from TestFlight.
+- **Version / build:** 4.0 (39), uploaded 2026-10-22 and tested from TestFlight. 4.0 (40) is planned for
+  2026-11-04 and is the build to submit.
 - **Submit by:** about 2026-11-04. **Release:** manual, Wednesday 2026-11-11, the date in the
   Featuring Nomination (`docs/featuring/2026-10-21-v4.0-nomination.md`).
 - **Previous release:** 3.9 (38), git tag `build-38`. `git log build-38..HEAD` lists every commit
@@ -17,10 +18,11 @@ both targets (app and Controls). Once 4.0 is released, further changes need 4.0.
 
 ---
 
-## App Store What's New (as entered in ASC)
+## App Store What's New (for build 40)
 
 Source of truth: `marketing/app-store-metadata/en/whats_new.txt`, translated in the other 7
-locales next to it. English, as entered:
+locales next to it. The "Also new" section was added 2026-11-02 and still has to be entered in ASC.
+English:
 
 > Instant Scan: one press opens the camera, from anywhere on your iPhone. The scan is saved, made
 > searchable and opened for you. Rename it later if you like.
@@ -36,6 +38,12 @@ locales next to it. English, as entered:
 > With App Lock on, the camera opens first and Face ID comes before anything in your library is
 > shown.
 >
+> Also new:
+>
+> - Card scans: with Page Size on Auto, scan a wallet-sized card with Scan Document and Pocket
+>   Scanner offers to scan the back too, then puts both sides on one page.
+> - Simplified Chinese text in your scans is now recognized, so you can search for it.
+>
 > As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan
 > forever. Thanks for scanning with Pocket Scanner.
 
@@ -47,6 +55,8 @@ locales next to it. English, as entered:
 |---|---|---|---|
 | **Instant Scan** | One `OpenIntent` from the Action button, a Control (Control Center and Lock Screen, iOS 18+) and Siri/Spotlight ("Scan with Pocket Scanner", iOS 17.6+). Opens straight into the camera, then OCRs, auto-names, saves to Main Library and opens the document. With App Lock on, the camera comes first and Face ID before any library content. A one-time tip explains the setup, in six languages. | Yes, the whole text | 2026-10-20, merged before 39. Design and plan: `docs/superpowers/specs/2026-10-20-instant-scan-design.md`, `docs/superpowers/plans/2026-10-20-instant-scan.md` |
 | **Searchable imports** | A PDF that is really a camera scan (no text layer) is OCR'd on import, page by page, with "Processing page X of Y". Pages that already have text are untouched. Works from Import PDF and from "Open in Pocket Scanner". | No | 2026-10-22, `6b832d3`, build 39. Device PASS (Dev build and TestFlight 39) |
+| **Card scans** | With Page Size on Auto, a one-page capture shaped like a wallet card offers to scan the back and stitches it below the front on one page. Two card-shaped pages in one capture offer Combine. Instant Scan never prompts. | Yes | 2026-11-01, merge `e59dbc7`, build 40. Device C1–C9 PASS |
+| **Contextual tips** | Three tips (scan in one press, search inside your scans, touch and hold for more) appear at the top of Main Library when useful, one at a time. | No: they introduce themselves | 2026-10-31, `87b2c29`, build 40. Device T1–T6 PASS |
 | **Instant delete on iCloud** | A deleted document or folder disappears as soon as the delete is confirmed, instead of lingering about 5 s until iCloud catches up. | No | 2026-10-22, `3178ae6`, build 39. TestFlight 39 PASS |
 
 ## Fixes and hardening
@@ -55,6 +65,8 @@ locales next to it. English, as entered:
 |---|---|---|
 | OCR render capped at 2,800 px (`b67988a`) | A PDF can declare a 14,400 pt page; importing one could allocate ~830 MB and get the app killed. Found by the automated security review. | 2026-10-22, build 39 |
 | Page editor render ceiling of 5,600 px (`cbc600c`) | Same oversized-page risk when such a page is opened in the editor. | 2026-10-22, build 39 |
+| Simplified Chinese OCR (`1d26b8c`) | Chinese text came back empty, so those scans couldn't be searched. In the store What's New. | 2026-10-31, build 40 |
+| Page editor rotates at 1x (`3ff1c9d`) | Rotating drew at the screen's 3x, about 200 MB for a normal page, before the filter and OCR ran. | 2026-11-01, build 40 |
 | German tip says "Aktionstaste" (`ce6ec75`) | Apple's German name for the Action button; matches the listing. | 2026-10-21, build 39 |
 | Italian tip says "tasto Azione" (`2bc1c4e`) | Apple's Italian name for the Action button. | Before 39 |
 | Controls extension named "Pocket Scanner" / "Pocket Scanner Dev" (`88ba016`) | The name shown when adding the Control. | Before 39 |
@@ -85,3 +97,6 @@ Add one line per change, newest last:
 - 2026-10-22 — Oversized-page caps (import and editor) — `b67988a`, `cbc600c` — 39 — no
 - 2026-10-22 — Instant delete on iCloud — `3178ae6` — 39 — no
 - 2026-10-31 — Chinese text recognized by OCR — `1d26b8c` — 40 — yes
+- 2026-10-31 — Contextual tips in Main Library — `87b2c29` — 40 — no
+- 2026-11-01 — Card scans — `e59dbc7` — 40 — yes
+- 2026-11-01 — Page editor rotates at 1x — `3ff1c9d` — 40 — no

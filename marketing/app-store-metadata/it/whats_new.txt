@@ -8,4 +8,8 @@ Come usarla:
 
 Con il Blocco app attivo, si apre prima la fotocamera e Face ID arriva prima che venga mostrato qualsiasi contenuto della libreria.
 
+Altre novità:
+- Scansione di tessere: con Formato pagina su Automatico, scansiona una tessera formato carta di credito con Scansiona documento e Pocket Scanner ti propone di scansionare anche il retro, poi unisce i due lati in un'unica pagina.
+- Il testo in cinese semplificato nelle tue scansioni ora viene riconosciuto, così puoi cercarlo.
+
 Come sempre: nessun abbonamento, nessuna pubblicità, nessun tracciamento e niente salvato sui nostri server. Paghi una volta, scansioni per sempre. Grazie per aver scelto Pocket Scanner.

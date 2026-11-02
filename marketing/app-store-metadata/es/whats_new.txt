@@ -8,4 +8,8 @@ Cómo usarlo:
 
 Con el Bloqueo de la app activado, primero se abre la cámara, y Face ID llega antes de que se muestre nada de tu biblioteca.
 
+Otras novedades:
+- Escaneo de tarjetas: con Tamaño de página en Automático, escanea una tarjeta de tamaño cartera con Escanear documento y Pocket Scanner te ofrece escanear también el reverso y luego pone ambas caras en una sola página.
+- Ahora se reconoce el texto en chino simplificado de tus escaneos, así que puedes buscarlo.
+
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.

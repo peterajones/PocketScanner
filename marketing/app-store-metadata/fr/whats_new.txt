@@ -8,4 +8,8 @@ Pour l'utiliser :
 
 Avec le Verrouillage de l'app activé, l'appareil photo s'ouvre d'abord, et Face ID passe avant tout affichage de votre bibliothèque.
 
+Autres nouveautés :
+- Scan de cartes : avec Format de page sur Automatique, scannez une carte au format carte bancaire avec Scanner un document et Pocket Scanner vous propose de scanner aussi le verso, puis réunit les deux faces sur une seule page.
+- Le texte en chinois simplifié de vos scans est désormais reconnu : vous pouvez le rechercher.
+
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, scannez pour toujours. Merci d'utiliser Pocket Scanner.

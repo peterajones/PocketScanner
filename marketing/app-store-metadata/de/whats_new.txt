@@ -8,4 +8,8 @@ So nutzt du ihn:
 
 Ist die App-Sperre aktiv, öffnet sich zuerst die Kamera, und Face ID kommt, bevor irgendetwas aus deiner Bibliothek angezeigt wird.
 
+Außerdem neu:
+- Kartenscans: Ist die Seitengröße auf „Automatisch“ gestellt und du scannst mit „Dokument scannen“ eine Karte im Scheckkartenformat, bietet Pocket Scanner an, auch die Rückseite zu scannen, und bringt dann Vorder- und Rückseite auf eine einzige Seite.
+- Text in vereinfachtem Chinesisch wird in deinen Scans jetzt erkannt, sodass du danach suchen kannst.
+
 Wie immer: keine Abos, keine Werbung, kein Tracking und nichts auf unseren Servern. Einmal zahlen, für immer scannen. Danke, dass du mit Pocket Scanner scannst.

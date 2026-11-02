@@ -8,4 +8,8 @@ Pour l'utiliser :
 
 Avec le Verrouillage de l'app activé, l'appareil photo s'ouvre d'abord, et Face ID passe avant tout affichage de votre bibliothèque.
 
+Autres nouveautés :
+- Numérisation de cartes : avec Format de page sur Automatique, numérisez une carte au format carte de crédit avec Scanner un document et Pocket Scanner vous propose de numériser aussi le verso, puis réunit les deux faces sur une seule page.
+- Le texte en chinois simplifié de vos numérisations est désormais reconnu : vous pouvez le rechercher.
+
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, numérisez pour toujours. Merci d'utiliser Pocket Scanner.

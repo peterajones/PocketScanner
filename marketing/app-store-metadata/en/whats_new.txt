@@ -8,4 +8,8 @@ Ways to use it:
 
 With App Lock on, the camera opens first and Face ID comes before anything in your library is shown.
 
+Also new:
+- Card scans: with Page Size on Auto, scan a wallet-sized card with Scan Document and Pocket Scanner offers to scan the back too, then puts both sides on one page.
+- Simplified Chinese text in your scans is now recognized, so you can search for it.
+
 As always: no subscriptions, no ads, no tracking, nothing stored on our servers. Pay once, scan forever. Thanks for scanning with Pocket Scanner.
