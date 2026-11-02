@@ -21,7 +21,7 @@ both targets (app and Controls). Once 4.0 is released, further changes need 4.0.
 ## App Store What's New (for build 40)
 
 Source of truth: `marketing/app-store-metadata/en/whats_new.txt`, translated in the other 7
-locales next to it. The "Also new" section was added 2026-11-02 and still has to be entered in ASC.
+locales next to it. The "Also new" section was added 2026-11-02 and entered in ASC that day.
 English:
 
 > Instant Scan: one press opens the camera, from anywhere on your iPhone. The scan is saved, made
