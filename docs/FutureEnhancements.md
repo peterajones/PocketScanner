@@ -151,7 +151,8 @@ The core signing project is complete — sign a document, multiple signatures, s
 
 ### Release tooling
 
-- **Push App Store metadata via the App Store Connect API instead of by hand.** Every release,
+- ~~**Push App Store metadata via the App Store Connect API instead of by hand.**~~ — **Dropped 2026-11-05:**
+  Peter is keeping manual entry in ASC. The original reasoning follows. Every release,
   every localization's subtitle, keywords, description, promotional text and What's New has to be
   retyped into ASC. At seven locales that's ~35 fields per submission, across a UI whose language
   selector silently resets on every page navigation — which has already caused one shipped mistake
