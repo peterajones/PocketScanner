@@ -24,6 +24,13 @@ struct PageEditorView: View {
     @State private var showingApplyAllConfirm = false
     @State private var showingDiscardMarksConfirm = false
     @State private var bulkProgress: BulkProgress?
+    @State private var mode: EditMode = .crop
+    @State private var selection = EraseSelection()
+    /// The straightened, filtered page shown in Erase mode. Rebuilt on entering Erase
+    /// mode and when the filter changes there, never per frame.
+    @State private var erasePreview: UIImage?
+
+    private enum EditMode: Hashable { case crop, erase }
 
     private struct BulkProgress: Equatable {
         let current: Int
@@ -36,9 +43,29 @@ struct PageEditorView: View {
                 Group {
                     if let pageImage, let quadBinding {
                         VStack(spacing: 8) {
-                            QuadOverlay(image: displayedImage(pageImage), quad: quadBinding)
-                                .padding()
-                            rotationControls
+                            modePicker
+                            switch mode {
+                            case .crop:
+                                QuadOverlay(image: displayedImage(pageImage), quad: quadBinding)
+                                    .padding()
+                                if !selection.isEmpty {
+                                    Text("Changing the crop clears the erased areas.")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                                rotationControls
+                            case .erase:
+                                if let erasePreview {
+                                    EraseOverlay(image: erasePreview, rects: selection.rects) { rect in
+                                        selection.add(rect)
+                                        announceCount()
+                                    }
+                                    .padding()
+                                } else {
+                                    ProgressView()
+                                }
+                                eraseControls
+                            }
                             filterControls
                             if let errorMessage {
                                 Text(errorMessage).foregroundStyle(.red).font(.footnote)
@@ -75,6 +102,16 @@ struct PageEditorView: View {
                 }
             }
             .task { await prepare() }
+            .onChange(of: mode) { _, newMode in
+                if newMode == .erase { rebuildErasePreview() }
+            }
+            .onChange(of: filter) { _, _ in
+                if mode == .erase { rebuildErasePreview() }
+            }
+            // Boxes live in the straightened page's space: a new crop or rotation
+            // would move what they cover, so they go.
+            .onChange(of: quad) { _, _ in selection.clear() }
+            .onChange(of: rotationQuarterTurns) { _, _ in selection.clear() }
             .interactiveDismissDisabled(isWorking)
             .alert("Apply \(filter.displayName) to all pages?",
                    isPresented: $showingApplyAllConfirm) {
@@ -103,6 +140,45 @@ struct PageEditorView: View {
             get: { quad ?? Quad.fullRect(in: pageImage?.size ?? .zero) },
             set: { quad = $0 }
         )
+    }
+
+    private var modePicker: some View {
+        Picker("Edit mode", selection: $mode) {
+            Text("Crop").tag(EditMode.crop)
+            Text("Erase").tag(EditMode.erase)
+        }
+        .pickerStyle(.segmented)
+        .padding(.horizontal)
+        .disabled(isWorking)
+    }
+
+    private var eraseControls: some View {
+        HStack(spacing: 24) {
+            Button {
+                selection.undo()
+                announceCount()
+            } label: {
+                Label("Undo", systemImage: "arrow.uturn.backward")
+            }
+            .disabled(selection.isEmpty || isWorking)
+            Text(areaCountText).font(.footnote).foregroundStyle(.secondary)
+        }
+        .padding(.bottom, 16)
+    }
+
+    private var areaCountText: String {
+        String(localized: "\(selection.count) areas",
+               comment: "Page editor, Erase mode: how many areas are marked to be erased")
+    }
+
+    private func announceCount() {
+        AccessibilityNotification.Announcement(areaCountText).post()
+    }
+
+    private func rebuildErasePreview() {
+        guard let pageImage, let quad else { return }
+        erasePreview = pipeline.render(pageImage, quad: quad, quarterTurns: rotationQuarterTurns,
+                                       eraseRects: [], filter: filter)
     }
 
     private var rotationControls: some View {
@@ -252,7 +328,7 @@ struct PageEditorView: View {
     private func processAndReplaceCurrentPage(pageImage: UIImage, quad: Quad) async throws {
         guard let finalImage = pipeline.render(pageImage, quad: quad,
                                                quarterTurns: rotationQuarterTurns,
-                                               eraseRects: [], filter: filter) else {
+                                               eraseRects: selection.rects, filter: filter) else {
             throw PageEditError.cropFailed
         }
         let observations = (try? await ocr.recognizeText(in: finalImage)) ?? []
