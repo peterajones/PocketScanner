@@ -1,15 +1,5 @@
-Escaneo instantáneo: una pulsación abre la cámara desde cualquier lugar de tu iPhone. El escaneo se guarda, se vuelve buscable y se abre solo. Si quieres, cámbiale el nombre después.
+Novedad: un borrador para las páginas escaneadas. Elimina agujeros de grapas, manchas en los bordes y notas a mano que ya no necesitas.
 
-Cómo usarlo:
-- Botón de acción: Ajustes > Botón de acción > Controles > Escanear documento
-- Centro de control: toca + y añade Escanear documento
-- Pantalla de bloqueo: quita uno de los dos botones de abajo y añade Escanear documento
-- Siri o Spotlight: "Escanear con Pocket Scanner" (la primera vez, Siri te pide activar los atajos de la app)
-
-Con el Bloqueo de la app activado, primero se abre la cámara, y Face ID llega antes de que se muestre nada de tu biblioteca.
-
-Otras novedades:
-- Escaneo de tarjetas: con Tamaño de página en Automático, escanea una tarjeta de tamaño cartera con Escanear documento y Pocket Scanner te ofrece escanear también el reverso y luego pone ambas caras en una sola página.
-- Ahora se reconoce el texto en chino simplificado de tus escaneos, así que puedes buscarlo.
+Abre un documento, toca Editar páginas, toca una página y cambia a Borrar. Arrastra un recuadro sobre lo que quieras quitar; Deshacer elimina el último recuadro. Toca Aplicar y desaparece, y las palabras borradas ya no aparecen en las búsquedas.
 
 Como siempre: sin suscripciones, sin anuncios, sin rastreo y sin nada guardado en nuestros servidores. Paga una vez, escanea para siempre. Gracias por escanear con Pocket Scanner.

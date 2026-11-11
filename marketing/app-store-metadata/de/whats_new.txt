@@ -1,15 +1,5 @@
-Sofort-Scan: Ein Druck öffnet die Kamera, egal wo du gerade auf deinem iPhone bist. Der Scan wird gespeichert, durchsuchbar gemacht und für dich geöffnet. Umbenennen kannst du ihn später.
+Neu: ein Radierer für gescannte Seiten. Entferne Heftklammerlöcher, Flecken an den Rändern und handschriftliche Notizen, die du nicht mehr brauchst.
 
-So nutzt du ihn:
-- Aktionstaste: Einstellungen > Aktionstaste > Steuerelemente > Dokument scannen
-- Kontrollzentrum: Tippe auf + und füge „Dokument scannen“ hinzu
-- Sperrbildschirm: Entferne eine der beiden Tasten unten und füge dann „Dokument scannen“ hinzu
-- Siri oder Spotlight: „Mit Pocket Scanner scannen“ (beim ersten Mal fragt Siri, ob die Kurzbefehle der App aktiviert werden sollen)
-
-Ist die App-Sperre aktiv, öffnet sich zuerst die Kamera, und Face ID kommt, bevor irgendetwas aus deiner Bibliothek angezeigt wird.
-
-Außerdem neu:
-- Kartenscans: Ist die Seitengröße auf „Automatisch“ gestellt und du scannst mit „Dokument scannen“ eine Karte im Scheckkartenformat, bietet Pocket Scanner an, auch die Rückseite zu scannen, und bringt dann Vorder- und Rückseite auf eine einzige Seite.
-- Text in vereinfachtem Chinesisch wird in deinen Scans jetzt erkannt, sodass du danach suchen kannst.
+Öffne ein Dokument, tippe auf „Seiten bearbeiten“, tippe auf eine Seite und wechsle zu „Radieren“. Zieh einen Rahmen über alles, was verschwinden soll; „Widerrufen“ entfernt den letzten Rahmen. Tippe auf „Anwenden“, und es ist entfernt. Radierte Wörter erscheinen auch nicht mehr in der Suche.
 
 Wie immer: keine Abos, keine Werbung, kein Tracking und nichts auf unseren Servern. Einmal zahlen, für immer scannen. Danke, dass du mit Pocket Scanner scannst.

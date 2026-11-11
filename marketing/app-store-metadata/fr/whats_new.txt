@@ -1,15 +1,5 @@
-Scan instantané : une seule pression ouvre l'appareil photo, où que vous soyez sur votre iPhone. Le scan est enregistré, rendu interrogeable et ouvert pour vous. Vous pourrez le renommer ensuite.
+Nouveau : une gomme pour les pages scannées. Faites disparaître les trous d'agrafes, les taches sur les bords et les notes manuscrites dont vous n'avez plus besoin.
 
-Pour l'utiliser :
-- Bouton Action : Réglages > Bouton Action > Commandes > Scanner un document
-- Centre de contrôle : touchez + et ajoutez Scanner un document
-- Écran de verrouillage : retirez l'un des deux boutons du bas, puis ajoutez Scanner un document
-- Siri ou Spotlight : « Scanner avec Pocket Scanner » (la première fois, Siri vous demande d'activer les raccourcis de l'app)
-
-Avec le Verrouillage de l'app activé, l'appareil photo s'ouvre d'abord, et Face ID passe avant tout affichage de votre bibliothèque.
-
-Autres nouveautés :
-- Scan de cartes : avec Format de page sur Automatique, scannez une carte au format carte bancaire avec Scanner un document et Pocket Scanner vous propose de scanner aussi le verso, puis réunit les deux faces sur une seule page.
-- Le texte en chinois simplifié de vos scans est désormais reconnu : vous pouvez le rechercher.
+Ouvrez un document, touchez Modifier les pages, touchez une page, puis passez à Effacer. Tracez un cadre sur ce que vous voulez faire disparaître ; Défaire retire le dernier cadre. Touchez Appliquer et c'est supprimé, et les mots effacés n'apparaissent plus dans les recherches.
 
 Comme toujours : sans abonnement, sans publicité, sans suivi, et rien de stocké sur nos serveurs. Payez une fois, scannez pour toujours. Merci d'utiliser Pocket Scanner.
