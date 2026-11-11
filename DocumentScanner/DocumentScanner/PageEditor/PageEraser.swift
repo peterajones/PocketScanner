@@ -27,11 +27,22 @@ enum PageEraser {
         let clipped = rects.map { $0.standardized.intersection(bounds) }.filter { !$0.isEmpty }
         guard !clipped.isEmpty, let pixels = Pixels(image) else { return image }
 
-        // Sample with the caller's rects (not the clipped ones) so a box over the
-        // page corner still reads the band on its in-image sides.
-        let fills = rects.map { $0.standardized }
-            .filter { !$0.intersection(bounds).isEmpty }
-            .map { (rect: $0.intersection(bounds), colour: pixels.median(around: $0)) }
+        // Fill whole pixels: a box edge on a fractional pixel would blend, leaving a
+        // faint line of whatever it cut through.
+        let all = rects.map { $0.standardized.integral }.filter { !$0.intersection(bounds).isEmpty }
+        // A box wholly inside another adds nothing and has no band of its own to sample.
+        let boxes = all.enumerated().filter { i, box in
+            !all.enumerated().contains { j, other in
+                j != i && other.contains(box) && (other != box || j < i)
+            }
+        }.map(\.element)
+        // Sample each box's band, skipping pixels under the OTHER boxes: that ink is
+        // being erased too, so it must not colour this fill.
+        let fills = boxes.indices.map { i in
+            (rect: boxes[i].intersection(bounds),
+             colour: pixels.median(around: boxes[i],
+                                   excluding: boxes.indices.filter { $0 != i }.map { boxes[$0] }))
+        }
 
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
@@ -78,7 +89,7 @@ private struct Pixels {
         data = buffer
     }
 
-    func median(around rect: CGRect) -> UIColor {
+    func median(around rect: CGRect, excluding others: [CGRect] = []) -> UIColor {
         let r = rect.standardized
         let outer = r.insetBy(dx: -PageEraser.bandWidth, dy: -PageEraser.bandWidth)
         let x0 = max(0, Int(outer.minX.rounded(.down))), x1 = min(width, Int(outer.maxX.rounded(.up)))
@@ -91,6 +102,8 @@ private struct Pixels {
                 // Skip pixels inside the rect: only the band around it counts.
                 if CGFloat(x) + 0.5 > r.minX, CGFloat(x) + 0.5 < r.maxX,
                    CGFloat(y) + 0.5 > r.minY, CGFloat(y) + 0.5 < r.maxY { continue }
+                let centre = CGPoint(x: CGFloat(x) + 0.5, y: CGFloat(y) + 0.5)
+                if others.contains(where: { $0.contains(centre) }) { continue }
                 let i = (y * width + x) * 4
                 reds.append(data[i]); greens.append(data[i + 1]); blues.append(data[i + 2])
             }

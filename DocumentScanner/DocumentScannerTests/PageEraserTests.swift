@@ -89,6 +89,35 @@ final class PageEraserTests: XCTestCase {
         assertRGB(out.rgb(atX: 100, y: 100), (255, 255, 255))
     }
 
+    // Box edges fall on fractional pixels (view points ÷ screen scale). A blended edge
+    // pixel left a grey hairline of whatever the box cut through.
+    func test_erase_fractionalEdge_leavesNoHairline() {
+        let image = page(CGSize(width: 200, height: 200), cream,
+                         [(CGRect(x: 100, y: 100, width: 20, height: 20), .black)])
+        let out = PageEraser.erase([CGRect(x: 95, y: 95, width: 15.5, height: 30)], in: image)
+        assertRGB(out.rgb(atX: 110, y: 105), (245, 240, 224))
+    }
+
+    // A box at the page edge beside a note erased with another box: its band is mostly
+    // that note's ink. Ink under another box is being erased, so it must not colour the fill.
+    func test_erase_bandInsideAnotherBox_isNotSampled() {
+        let image = page(CGSize(width: 200, height: 200), cream,
+                         [(CGRect(x: 0, y: 0, width: 190, height: 200), .black)])
+        let out = PageEraser.erase([CGRect(x: 0, y: 0, width: 190, height: 200),
+                                    CGRect(x: 190, y: 50, width: 10, height: 20)], in: image)
+        assertRGB(out.rgb(atX: 195, y: 60), (245, 240, 224))
+    }
+
+    // A small box drawn inside a bigger one has no band of its own left to sample;
+    // it must not paint a white patch over the bigger box's cream fill.
+    func test_erase_boxInsideAnotherBox_keepsPaperColour() {
+        let image = page(CGSize(width: 200, height: 200), cream,
+                         [(CGRect(x: 80, y: 80, width: 20, height: 20), .black)])
+        let out = PageEraser.erase([CGRect(x: 50, y: 50, width: 100, height: 100),
+                                    CGRect(x: 70, y: 70, width: 40, height: 40)], in: image)
+        assertRGB(out.rgb(atX: 90, y: 90), (245, 240, 224))
+    }
+
     func test_erase_noRects_returnsSameImage() {
         let image = page(CGSize(width: 20, height: 20), cream)
         XCTAssertTrue(PageEraser.erase([], in: image) === image)

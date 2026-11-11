@@ -60,7 +60,6 @@ struct PageEditorView: View {
                                         selection.add(rect)
                                         announceCount()
                                     }
-                                    .padding()
                                 } else {
                                     ProgressView()
                                 }
