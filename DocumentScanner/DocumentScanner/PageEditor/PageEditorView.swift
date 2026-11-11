@@ -11,7 +11,7 @@ struct PageEditorView: View {
 
     private let renderer = PageImageRenderer()
     private let segmenter = DocumentSegmenter()
-    private let corrector = PerspectiveCorrector()
+    private let pipeline = PageEditPipeline()
     private let ocr = OCREngine()
     private let filterEngine = ImageFilterEngine()
 
@@ -250,11 +250,11 @@ struct PageEditorView: View {
     }
 
     private func processAndReplaceCurrentPage(pageImage: UIImage, quad: Quad) async throws {
-        guard let corrected = corrector.correct(pageImage, quad: quad) else {
+        guard let finalImage = pipeline.render(pageImage, quad: quad,
+                                               quarterTurns: rotationQuarterTurns,
+                                               eraseRects: [], filter: filter) else {
             throw PageEditError.cropFailed
         }
-        let rotated = rotatedImage(corrected)
-        let finalImage = filterEngine.apply(filter, to: rotated) ?? rotated
         let observations = (try? await ocr.recognizeText(in: finalImage)) ?? []
         // Inherit the size of the page being replaced. Reading the scan-time paper-size
         // setting here would give this one page a different size from its siblings.
