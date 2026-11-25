@@ -4,7 +4,6 @@ _Single source of truth for unfinished work in this project. Tick an item when i
 
 ## Next
 
-- [x] App Store Connect: rename the draft version 4.1.1 to 4.2 before submitting (it was created on 2026-11-25 only to unlock the new age rating questions; the 4.2 build's marketing version must match)
 
 ## Later
 
